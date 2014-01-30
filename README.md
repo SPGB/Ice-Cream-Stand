@@ -12,3 +12,9 @@ Ice Cream Stand is a free browser game where you sell delicious delicious ice cr
 * Combo flavors that unlock when you use certain flavor combinations. These give bonuses when sold
 * Achievements
 * Real-time chat
+* Close to 100 flavors, and 100 addons - each with individual high res art
+* mobile, tablet, and desktop resolutions
+* Friends system
+* Trending flavors
+* Addon events
+* Highscore boards for daily, weekly, and all-time
