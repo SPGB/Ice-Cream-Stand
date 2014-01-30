@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta property="fb:app_id" content="1421033384776672" />
+		<meta property="og:url" content="http://icecreamstand.ca" />
+		<meta property="og:image" content="http://icecreamstand.ca/img/thumb.png" />
+		<meta property="og:title" content="Ice Cream Stand">
+		<meta property="og:description" content="Free Browser game where you sell delicious delicious ice cream. Open up a stand, buy workers, unlock flavors.">
+		<meta property="og:type" content="website" />
+		<meta name="description" content="Ice Cream Stand, an incremental browser game in a global economy. Open up an ice cream stand and sell ice cream. Unlock flavors, upgrades, workers and more!" />
+		<title>ICE CREAM STAND</title> 
+		<style>
+			.new_user { position: relative; }
+			.back_button {
+				bottom: 10px;
+				cursor: pointer;
+				position: absolute;
+				right: 10px;
+				width: 50px;  
+			}
+		</style>
+	</head>
+	<body>
+		<link rel="stylesheet" href="css/style_12_21.css" />
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script>
+			var word_pool = ['vanilla.svg', 'chocolate.svg', 'strawberry.svg', 'mint.png', 'zombie.png', 'ghost.png', 'squidink.png', 'mocha.png', 'glass.png', 'uranium.png', 'bacon.png', 'mint.png'];
+			var word_pointer = 0;
+			var sign_up = <%= ( typeof sign_up == 'undefined')? false : true %>;
+			var trends = [];
+			var refer = atob(getURLParameter('refer'));
+			$(document).ready(function () {
+				$('body').append('<img src="img/' + word_pool[word_pointer + 1] + '" style="display:none;" />');
+				$('.icecream').click(function () {
+					word_pointer++;
+					if (word_pointer > word_pool.length - 1) word_pointer = 0;
+					$(this).attr('style', 'display: block; background-image: url("img/' + word_pool[word_pointer] + '"), url("img/cone.svg");');
+					$('body').append('<img src="img/' + word_pool[word_pointer + 1] + '" style="display:none;" />');
+				});
+				$('#new_game_button').click(function () {	
+					$('.screen_1').slideUp(100);
+					$('.new_game').slideDown(100);
+				});
+				$('#continue_button').click(function () {	
+					$('.screen_1').slideUp(100);
+					$('.continue').slideDown(100);
+				});
+				$('.back_button').click(function () {
+					$('.screen_1').slideDown(100);
+					$('.new_game, .continue').slideUp(100);  
+				});
+				if (window.location.search.substring(1) == 'signed_succes=0') {
+					$('h2').text('Can\'t start a new game :( That name might be taken');
+				}
+				if (sign_up) {
+					$('#new_game_button').click();
+					if (getURLParameter('refer') != 'null') {
+						$('.new_game form').prepend('<p>You are being refered by <span class="user_name">' + refer + '</span>. Sign up and beat the first quest to help him or her out!</p>' +
+						'<input type="hidden" name="refer" value="' + refer + '">');
+					}
+				}
+			});
+			function icecream_fx(cash) {
+				$('.icecream').after('<div class="icecream_float" style="color: #' + color_pool[Math.floor(Math.random()*10)] + '">' + cash + '</div>');
+				$('.icecream_float:first').animate({ 'margin-top': '0', 'margin-left' : (Math.floor(Math.random()*200)-100) + 'px'}, 1000, function () { $(this).remove() });
+				$('.icecream').after('<div class="icecream_particle" style=\'' + $('.icecream').attr('style') + '\'></div>');
+				$('.icecream_particle:first').css('left', Math.floor(Math.random()*400) + 'px').css('top', '-' + (Math.floor(Math.random()*200)+100) + 'px').animate({top:($(document).height() - 100 - Math.floor(Math.random()*100)) + 'px', opacity:'0'}, 4000, function () { $(this).remove() });
+			}
+			function getURLParameter(name) {
+				return decodeURI(
+					(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+				);
+			}
+		</script>
+		<div class="section-side">
+			<div id="ice_cream_holder">
+				<div style="height: 350px;">
+					<div class="icecream active" style='display: block; background-image: url("img/vanilla.svg"), url("img/cone.svg");'><div id="glow"></div></div>
+				</div>
+			</div>
+		</div><div class="section-main">
+			<div class="shop_leftend"></div>
+			<div class="shop_rightend"></div>
+			<div class="section-main-inner">
+				<h1><img src="img/vanilla.svg" />ICE CREAM STAND</h1>
+				<h2>Click the ice cream to sell it! Get cash and buy upgrades and employees.</h2>
+				<div class="new_user main_container">
+					<div class="screen_1" style="margin: 50px auto;">
+						<div class="button signup_input" id="new_game_button" style="text-align: center;">NEW GAME</div>
+						<div class="button signup_input" id="continue_button" style="text-align: center;">CONTINUE</div>
+					</div>
+					<div class="new_game" style="display: none;">
+						<h3>Create an account in two seconds</h3>
+						<img src="img/back-icon.png" class="back_button" />
+						<form action="signup" method="POST">
+							<input class="signup_input" type="text" name="name" placeholder="DESIRED USERNAME" autocomplete="off">
+							<input class="signup_input" type="password" name="password" placeholder="OPTIONAL PASSWORD" autocomplete="off">
+							<input class="signup_input button" type="submit" value="START!" class="button">
+						</form>
+					</div>
+					<div class="continue" style="display: none;">
+						<h3>Log in</h3>
+						<img src="img/back-icon.png" class="back_button" />
+						<form action="login" method="POST">
+							<input class="signup_input" type="text" name="user" placeholder="USERNAME">
+							<input class="signup_input"type="password" name="password" placeholder="PASSWORD">
+							<input class="signup_input button" type="submit" value="LOG IN!">
+						</form>
+					</div>
+				</div>
+		</div></div><div class="section-side" id="upgrades">
+		</div>
+	</body>
+</html>
