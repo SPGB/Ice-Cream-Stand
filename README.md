@@ -18,3 +18,7 @@ Ice Cream Stand is a free browser game where you sell delicious delicious ice cr
 * Trending flavors
 * Addon events
 * Highscore boards for daily, weekly, and all-time
+
+###Outstanding Issues
+
+Friend 2% bonus is still being implemented and should be in version 1.13D - internally testing it to ensure it isn't abused.
