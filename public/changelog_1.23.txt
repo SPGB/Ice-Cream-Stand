@@ -1,0 +1,27 @@
+#PATCH 1.23 - April 3rd 2014
+
+Flavours
+* Mashed potatoes value changed from 2.55 to 1.55
+
+Core
+* Changed starting add-on from Sprinkles to Cherries
+* Added an upgrade tier for Ice Cubes called Cold Hands, each level increased a click by +0.25, it scales on par with Autopilots
+* Workers now always cap at 1,000 (Versus 200 + 100/prestige) - this is part of an effort to simplify Prestige
+
+Titles
+* Added Titles ('Ice Creamizen' 'Artisan', 'Stand Mogul','King Sherbet'), based on Prestige bonus (0, 25, 75, 398)
+* 1,000 of any worker gives Cart Lord, Employee Lord, robot Over-lord, or Rocketman
+* >90 combos gives Combo Chief
+* 15 Expertise gives a Stone Cold title
+* Added a 'Designer' title to user cards (Babyboo, Kitty)
+
+Bugs
+* Removed "Jesus with a Bomb"
+* Fixed the "M&M" add-on
+* Fixed scaling on the badge container
+
+Misc
+* Added Reddit and Wiki links to the footer
+* Badge toggle is now saved server side
+* User cards now show all of a player's badges
+* Added an up arrow to the bottom left name

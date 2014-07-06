@@ -1,0 +1,1421 @@
+Express server listening on port 15888
+[90mGET /trending [32m200 [90m74ms - 488b[0m
+[90mPOST /me [32m200 [90m32ms - 54b[0m
+[90mGET /flavors [32m200 [90m33ms[0m
+[90mPOST /me [32m200 [90m12ms - 47b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 50b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [32m200 [90m30ms[0m
+[90mPOST /me [32m200 [90m43ms - 46b[0m
+[90mPOST /me [32m200 [90m32ms - 48b[0m
+[90mGET /flavors [32m200 [90m51ms[0m
+[90mGET /flavors [32m200 [90m21ms[0m
+[90mPOST /me [32m200 [90m9ms - 54b[0m
+[90mPOST /me [32m200 [90m23ms - 53b[0m
+[90mPOST /me [32m200 [90m26ms - 51b[0m
+[90mGET /flavors [32m200 [90m28ms[0m
+[90mGET /new_quest [32m200 [90m9ms - 0b[0m
+[90mGET /new_quest [32m200 [90m8ms - 0b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 47b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [32m200 [90m22ms[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m95ms[0m
+[90mPOST /me [32m200 [90m43ms - 53b[0m
+[90mPOST /me [32m200 [90m43ms - 51b[0m
+[90mGET / [36m304 [90m15ms[0m
+[90mPOST /me [32m200 [90m13ms - 50b[0m
+[90mGET /flavors [32m200 [90m13ms[0m
+[90mPOST /me [32m200 [90m13ms - 48b[0m
+[90mPOST /me [32m200 [90m14ms - 54b[0m
+[90mGET /me [32m200 [90m10ms[0m
+[90mGET /flavors [32m200 [90m39ms[0m
+[90mPOST /me [32m200 [90m20ms - 53b[0m
+[90mGET /toppings [36m304 [90m34ms[0m
+[90mPOST /last_flavor [32m200 [90m12ms - 17b[0m
+[90mGET /trending [32m200 [90m23ms - 496b[0m
+[90mGET /event [32m200 [90m8ms - 25b[0m
+[90mGET /flavors [32m200 [90m48ms[0m
+[90mPOST /me [32m200 [90m31ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 47b[0m
+[90mGET /new_quest [32m200 [90m10ms - 0b[0m
+[90mGET /quests [32m200 [90m7ms - 660b[0m
+[90mPOST /me [32m200 [90m12ms - 46b[0m
+[90mPOST /me [32m200 [90m30ms - 53b[0m
+[90mPOST /me [32m200 [90m32ms - 51b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mGET /flavors [32m200 [90m51ms[0m
+[90mPOST /me [32m200 [90m16ms - 54b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m111ms - 50b[0m
+[90mPOST /me [32m200 [90m51ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mGET /flavors [32m200 [90m43ms[0m
+[90mPOST /me [32m200 [90m11ms - 47b[0m
+[90mPOST /me [32m200 [90m25ms - 51b[0m
+[90mPOST /me [32m200 [90m22ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mGET /flavors [36m304 [90m16ms[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mPOST /me [32m200 [90m13ms - 54b[0m
+[90mGET /flavors [32m200 [90m19ms[0m
+[90mPOST /me [32m200 [90m17ms - 53b[0m
+[90mPOST /me [32m200 [90m27ms - 51b[0m
+[90mPOST /me [32m200 [90m24ms - 53b[0m
+[90mGET /flavors [32m200 [90m29ms[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 47b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 46b[0m
+[90mPOST /me [32m200 [90m15ms - 48b[0m
+Express server listening on port 15888
+[90mPOST /me [31m500 [90m19ms[0m
+[90mGET /flavors [32m200 [90m94ms[0m
+[90mPOST /me [32m200 [90m35ms - 51b[0m
+[90mPOST /me [32m200 [90m24ms - 53b[0m
+[90mGET /flavors [36m304 [90m13ms[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /flavors [32m200 [90m36ms[0m
+[90mPOST /me [32m200 [90m10ms - 47b[0m
+[90mGET /flavors [32m200 [90m25ms[0m
+Express server listening on port 15888
+[90mPOST /me [31m500 [90m1019ms[0m
+[90mPOST /me [31m500 [90m135ms[0m
+[90mPOST /me [31m500 [90m997ms[0m
+[90mPOST /me [31m500 [90m116ms[0m
+[90mPOST /me [31m500 [90m1095ms[0m
+[90mPOST /me [31m500 [90m417ms[0m
+[90mGET /flavors [32m200 [90m653ms[0m
+[90mPOST /me [32m200 [90m1128ms - 46b[0m
+[90mPOST /me [32m200 [90m1233ms - 48b[0m
+[90mPOST /me [32m200 [90m29ms - 54b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mGET /flavors [36m304 [90m17ms[0m
+[90mPOST /me [32m200 [90m13ms - 8b[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mGET /flavors [32m200 [90m26ms[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mGET /flavors [32m200 [90m21ms[0m
+[90mPOST /me [32m200 [90m18ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 52b[0m
+[90mPOST /me [32m200 [90m23ms - 50b[0m
+[90mPOST /me [32m200 [90m11ms - 54b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m110ms - 53b[0m
+[90mGET /flavors [32m200 [90m42ms[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+[90mPOST /me [32m200 [90m17ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mGET /flavors [36m304 [90m10ms[0m
+[90mPOST /me [32m200 [90m15ms - 45b[0m
+[90mGET /new_quest [32m200 [90m13ms - 0b[0m
+[90mGET /flavors [32m200 [90m21ms[0m
+[90mPOST /me [32m200 [90m12ms - 48b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 51b[0m
+[90mGET /flavors [32m200 [90m30ms[0m
+[90mPOST /me [32m200 [90m12ms - 54b[0m
+[90mGET /flavors [32m200 [90m25ms[0m
+[90mPOST /me [32m200 [90m10ms - 47b[0m
+[90mPOST /me [32m200 [90m25ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 51b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 50b[0m
+[90mGET /flavors [32m200 [90m30ms[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m85ms - 48b[0m
+[90mPOST /me [32m200 [90m24ms - 54b[0m
+[90mGET /new_quest [32m200 [90m16ms - 0b[0m
+[90mGET /flavors [32m200 [90m39ms[0m
+[90mPOST /me [32m200 [90m13ms - 51b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m17ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 47b[0m
+[90mPOST /me [32m200 [90m7ms - 52b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 46b[0m
+[90mGET /trending [32m200 [90m32ms - 496b[0m
+[90mGET /flavors [32m200 [90m45ms[0m
+[90mGET /flavors [32m200 [90m27ms[0m
+[90mGET /flavors [36m304 [90m10ms[0m
+[90mPOST /me [32m200 [90m25ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 50b[0m
+[90mPOST /me [32m200 [90m15ms - 51b[0m
+[90mGET /flavors [32m200 [90m37ms[0m
+[90mPOST /me [32m200 [90m39ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 48b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m95ms - 47b[0m
+[90mGET /flavors [32m200 [90m41ms[0m
+[90mPOST /me [32m200 [90m14ms - 51b[0m
+[90mPOST /me [32m200 [90m17ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 54b[0m
+[90mPOST /me [32m200 [90m20ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 52b[0m
+[90mGET /flavors [32m200 [90m37ms[0m
+[90mGET /flavors [36m304 [90m9ms[0m
+[90mGET /flavors [32m200 [90m21ms[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 46b[0m
+[90mPOST /me [32m200 [90m12ms - 50b[0m
+[90mPOST /me [32m200 [90m12ms - 48b[0m
+[90mPOST /me [32m200 [90m8ms - 47b[0m
+[90mGET /flavors [32m200 [90m40ms[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+[90mGET /flavors [32m200 [90m29ms[0m
+[90mPOST /me [32m200 [90m17ms - 54b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m102ms - 53b[0m
+[90mGET /flavors [32m200 [90m51ms[0m
+[90mPOST /me [32m200 [90m58ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 51b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mGET /new_quest [32m200 [90m11ms - 0b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mGET /new_quest [32m200 [90m8ms - 0b[0m
+[90mPOST /me [32m200 [90m10ms - 52b[0m
+[90mPOST /me [32m200 [90m8ms - 47b[0m
+[90mGET /new_quest [32m200 [90m11ms - 0b[0m
+[90mPOST /me [32m200 [90m12ms - 48b[0m
+[90mGET /flavors [32m200 [90m42ms[0m
+[90mPOST /me [32m200 [90m16ms - 50b[0m
+[90mPOST /me [32m200 [90m20ms - 54b[0m
+[90mGET /flavors [32m200 [90m24ms[0m
+[90mGET /flavors [36m304 [90m10ms[0m
+[90mPOST /me [32m200 [90m8ms - 46b[0m
+[90mGET /new_quest [32m200 [90m9ms - 0b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 51b[0m
+[90mGET /flavors [32m200 [90m30ms[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 52b[0m
+Express server listening on port 15888
+[90mGET / [32m200 [90m24ms[0m
+[90mGET /flavors [32m200 [90m71ms[0m
+[90mGET / [36m304 [90m10ms[0m
+[90mGET / [36m304 [90m10ms[0m
+[90mGET /me [32m200 [90m12ms[0m
+[90mPOST /me [32m200 [90m35ms - 51b[0m
+[90mGET /flavors [32m200 [90m35ms[0m
+[90mPOST /me [32m200 [90m21ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 47b[0m
+[90mGET /toppings [36m304 [90m29ms[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /last_flavor [32m200 [90m19ms - 17b[0m
+[90mGET /event [32m200 [90m27ms - 25b[0m
+[90mGET /trending [32m200 [90m28ms - 496b[0m
+[90mPOST /me [32m200 [90m24ms - 50b[0m
+[90mGET /flavors [32m200 [90m24ms[0m
+[90mGET /new_quest [32m200 [90m10ms - 0b[0m
+[90mGET /quests [32m200 [90m6ms - 660b[0m
+[90mGET / [36m304 [90m11ms[0m
+[90mGET /me [32m200 [90m9ms[0m
+[90mGET /flavors [36m304 [90m14ms[0m
+[90mGET /flavors [32m200 [90m50ms[0m
+[90mPOST /me [32m200 [90m14ms - 54b[0m
+[90mPOST /me [32m200 [90m9ms - 47b[0m
+[90mGET /toppings [36m304 [90m30ms[0m
+[90mGET /flavors [32m200 [90m30ms[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /last_flavor [32m200 [90m10ms - 17b[0m
+[90mPOST /me [32m200 [90m7ms - 53b[0m
+[90mGET /trending [32m200 [90m16ms - 496b[0m
+[90mGET /event [32m200 [90m5ms - 25b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 46b[0m
+[90mGET /flavors [32m200 [90m23ms[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m88ms - 47b[0m
+[90mPOST /me [32m200 [90m20ms - 52b[0m
+[90mGET /flavors [32m200 [90m40ms[0m
+[90mPOST /me [32m200 [90m13ms - 51b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m22ms - 54b[0m
+[90mPOST /me [32m200 [90m15ms - 50b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /flavors [32m200 [90m35ms[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 47b[0m
+[90mGET /flavors [32m200 [90m24ms[0m
+[90mPOST /me [32m200 [90m8ms - 51b[0m
+[90mGET /flavors [36m304 [90m15ms[0m
+[90mGET /flavors [32m200 [90m27ms[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 48b[0m
+[90mPOST /me [32m200 [90m12ms - 54b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m90ms - 45b[0m
+[90mPOST /me [32m200 [90m26ms - 53b[0m
+[90mGET /flavors [32m200 [90m38ms[0m
+[90mPOST /me [32m200 [90m18ms - 52b[0m
+[90mPOST /me [32m200 [90m23ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 50b[0m
+[90mPOST /me [32m200 [90m19ms - 51b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 47b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 54b[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+[90mGET /flavors [36m304 [90m14ms[0m
+[90mGET /flavors [32m200 [90m26ms[0m
+[90mPOST /me [32m200 [90m17ms - 48b[0m
+[90mGET /flavors [32m200 [90m24ms[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mGET /flavors [32m200 [90m26ms[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mGET /flavors [32m200 [90m29ms[0m
+Express server listening on port 15888
+[90mGET /trending [32m200 [90m53ms - 489b[0m
+[90mPOST /me [32m200 [90m38ms - 54b[0m
+[90mPOST /me [32m200 [90m10ms - 50b[0m
+[90mGET /flavors [32m200 [90m34ms[0m
+[90mPOST /me [32m200 [90m23ms - 51b[0m
+[90mGET /trending [32m200 [90m23ms - 496b[0m
+[90mPOST /me [32m200 [90m25ms - 46b[0m
+[90mPOST /me [32m200 [90m25ms - 51b[0m
+[90mGET /trending [32m200 [90m18ms - 491b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mGET /trending [32m200 [90m9ms - 498b[0m
+[90mPOST /me [32m200 [90m29ms - 48b[0m
+[90mGET /flavors [32m200 [90m26ms[0m
+[90mGET /trending [32m200 [90m19ms - 496b[0m
+[90mGET /flavors [36m304 [90m19ms[0m
+[90mPOST /me [32m200 [90m21ms - 51b[0m
+[90mPOST /me [32m200 [90m10ms - 54b[0m
+[90mGET /new_quest [32m200 [90m12ms - 0b[0m
+[90mGET /flavors [32m200 [90m32ms[0m
+[90mPOST /me [32m200 [90m15ms - 51b[0m
+[90mGET /new_quest [32m200 [90m8ms - 0b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m98ms - 50b[0m
+[90mGET /flavors [32m200 [90m44ms[0m
+[90mPOST /me [32m200 [90m18ms - 52b[0m
+[90mPOST /me [32m200 [90m16ms - 51b[0m
+[90mPOST /me [32m200 [90m12ms - 48b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 54b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /trending [32m200 [90m19ms - 496b[0m
+[90mPOST /me [32m200 [90m7ms - 46b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mGET /trending [32m200 [90m14ms - 496b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mGET /flavors [32m200 [90m17ms[0m
+[90mGET /flavors [32m200 [90m22ms[0m
+[90mPOST /me [32m200 [90m8ms - 51b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mGET /flavors [36m304 [90m7ms[0m
+[90mGET /flavors [32m200 [90m25ms[0m
+[90mPOST /me [32m200 [90m20ms - 50b[0m
+[90mPOST /me [32m200 [90m18ms - 54b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m67ms - 48b[0m
+[90mPOST /me [32m200 [90m23ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mGET /flavors [32m200 [90m27ms[0m
+[90mPOST /me [32m200 [90m15ms - 52b[0m
+[90mPOST /me [32m200 [90m12ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 54b[0m
+[90mGET /flavors [32m200 [90m35ms[0m
+[90mPOST /me [32m200 [90m10ms - 46b[0m
+[90mGET /flavors [36m304 [90m13ms[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mGET /trending [32m200 [90m14ms - 496b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mGET /flavors [32m200 [90m36ms[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 50b[0m
+[90mPOST /me [32m200 [90m13ms - 48b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m80ms[0m
+[90mPOST /me [32m200 [90m27ms - 52b[0m
+[90mPOST /me [32m200 [90m27ms - 51b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 46b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mPOST /me [32m200 [90m17ms - 47b[0m
+[90mPOST /me [32m200 [90m15ms - 50b[0m
+[90mPOST /me [32m200 [90m13ms - 54b[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mPOST /me [32m200 [90m11ms - 51b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m6ms - 53b[0m
+[90mGET /flavors [32m200 [90m16ms[0m
+[90mGET /flavors [32m200 [90m36ms[0m
+Express server listening on port 15888
+[90mGET /flavors [36m304 [90m42ms[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mPOST /me [32m200 [90m21ms - 49b[0m
+[90mPOST /me [32m200 [90m14ms - 51b[0m
+[90mPOST /me [32m200 [90m13ms - 54b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 48b[0m
+[90mGET /flavors [32m200 [90m35ms[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 50b[0m
+[90mPOST /me [32m200 [90m13ms - 52b[0m
+[90mGET /flavors [32m200 [90m25ms[0m
+[90mPOST /me [32m200 [90m12ms - 51b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mGET /flavors [36m304 [90m16ms[0m
+[90mPOST /me [32m200 [90m8ms - 45b[0m
+[90mPOST /me [32m200 [90m12ms - 54b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m89ms - 53b[0m
+[90mGET /flavors [32m200 [90m50ms[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mGET /new_quest [32m200 [90m8ms - 0b[0m
+[90mGET / [36m304 [90m15ms[0m
+[90mPOST /me [32m200 [90m14ms - 48b[0m
+[90mPOST /me [32m200 [90m18ms - 51b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mGET /me [32m200 [90m13ms[0m
+[90mPOST /me [32m200 [90m21ms - 53b[0m
+[90mGET /flavors [36m304 [90m41ms[0m
+[90mGET /toppings [36m304 [90m25ms[0m
+[90mPOST /last_flavor [32m200 [90m10ms - 17b[0m
+[90mGET /trending [32m200 [90m22ms - 496b[0m
+[90mGET /event [32m200 [90m7ms - 25b[0m
+[90mPOST /me [32m200 [90m24ms - 54b[0m
+[90mPOST /me [32m200 [90m19ms - 50b[0m
+[90mGET / [36m304 [90m14ms[0m
+[90mGET /quests [32m200 [90m11ms - 660b[0m
+[90mGET /new_quest [32m200 [90m13ms - 0b[0m
+[90mGET /me [32m200 [90m10ms[0m
+[90mGET /flavors [32m200 [90m33ms[0m
+[90mGET /toppings [36m304 [90m27ms[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /last_flavor [32m200 [90m8ms - 17b[0m
+[90mGET /trending [32m200 [90m14ms - 496b[0m
+[90mGET /event [32m200 [90m4ms - 25b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m7ms - 53b[0m
+[90mGET /flavors [32m200 [90m20ms[0m
+[90mGET /flavors [32m200 [90m27ms[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m77ms - 46b[0m
+[90mPOST /me [32m200 [90m16ms - 48b[0m
+[90mPOST /me [32m200 [90m20ms - 53b[0m
+[90mGET /new_quest [32m200 [90m9ms - 0b[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+[90mGET /flavors [32m200 [90m32ms[0m
+[90mGET /flavors [36m304 [90m9ms[0m
+[90mPOST /me [32m200 [90m14ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m7ms - 50b[0m
+[90mGET /trending [32m200 [90m14ms - 496b[0m
+[90mGET /flavors [32m200 [90m25ms[0m
+[90mPOST /me [32m200 [90m8ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [32m200 [90m24ms[0m
+[90mPOST /me [32m200 [90m8ms - 51b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mGET /flavors [36m304 [90m11ms[0m
+[90mPOST /me [32m200 [90m10ms - 48b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m76ms[0m
+[90mPOST /me [32m200 [90m32ms - 51b[0m
+[90mPOST /me [32m200 [90m10ms - 46b[0m
+[90mPOST /me [32m200 [90m16ms - 54b[0m
+[90mPOST /me [32m200 [90m8ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 50b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m25ms - 52b[0m
+[90mPOST /me [32m200 [90m8ms - 47b[0m
+[90mGET /flavors [32m200 [90m35ms[0m
+[90mPOST /me [32m200 [90m12ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mGET /flavors [32m200 [90m18ms[0m
+[90mPOST /me [32m200 [90m9ms - 54b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m106ms[0m
+[90mPOST /me [32m200 [90m47ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mGET /flavors [32m200 [90m35ms[0m
+[90mPOST /me [32m200 [90m13ms - 52b[0m
+[90mGET /new_quest [32m200 [90m7ms - 0b[0m
+[90mPOST /me [32m200 [90m9ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /new_quest [32m200 [90m6ms - 0b[0m
+[90mPOST /me [32m200 [90m9ms - 50b[0m
+[90mGET /new_quest [32m200 [90m9ms - 0b[0m
+[90mGET /flavors [36m304 [90m12ms[0m
+[90mPOST /me [32m200 [90m18ms - 46b[0m
+[90mPOST /me [32m200 [90m17ms - 48b[0m
+[90mPOST /me [32m200 [90m15ms - 54b[0m
+[90mGET /flavors [32m200 [90m25ms[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mGET /new_quest [32m200 [90m13ms - 0b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mGET /flavors [32m200 [90m28ms[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [36m304 [90m11ms[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m75ms - 54b[0m
+[90mGET /flavors [32m200 [90m44ms[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 48b[0m
+[90mPOST /me [32m200 [90m9ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 50b[0m
+[90mPOST /me [32m200 [90m11ms - 46b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m8ms - 54b[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mPOST /me [32m200 [90m8ms - 51b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /flavors [32m200 [90m23ms[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m97ms - 48b[0m
+[90mGET /flavors [32m200 [90m60ms[0m
+[90mGET /flavors [32m200 [90m32ms[0m
+[90mPOST /me [32m200 [90m18ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 50b[0m
+[90mPOST /me [32m200 [90m14ms - 54b[0m
+[90mPOST /me [32m200 [90m18ms - 53b[0m
+[90mPOST /me [32m200 [90m18ms - 51b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [32m200 [90m26ms[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mGET /flavors [36m304 [90m8ms[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mGET /flavors [32m200 [90m42ms[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /flavors [36m304 [90m16ms[0m
+[90mPOST /me [32m200 [90m14ms - 45b[0m
+[90mPOST /me [32m200 [90m13ms - 48b[0m
+[90mPOST /me [32m200 [90m11ms - 54b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m97ms - 50b[0m
+[90mPOST /me [32m200 [90m37ms - 53b[0m
+[90mGET /flavors [32m200 [90m38ms[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 54b[0m
+[90mPOST /me [32m200 [90m9ms - 48b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mGET /flavors [32m200 [90m30ms[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 51b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mGET /flavors [32m200 [90m29ms[0m
+[90mGET /flavors [32m200 [90m27ms[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m76ms[0m
+[90mPOST /me [32m200 [90m32ms - 52b[0m
+[90mGET / [32m200 [90m20ms - 7.36kb[0m
+[90mPOST /me [32m200 [90m17ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 48b[0m
+[90mGET /flavors [32m200 [90m39ms[0m
+[90mGET /flavors [36m304 [90m12ms[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 54b[0m
+[90mGET /new_quest [32m200 [90m7ms - 0b[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mGET /new_quest [32m200 [90m7ms - 0b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 51b[0m
+[90mPOST /me [32m200 [90m20ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m102ms[0m
+[90mPOST /me [32m200 [90m34ms - 52b[0m
+[90mPOST /me [32m200 [90m15ms - 46b[0m
+[90mPOST /me [32m200 [90m17ms - 48b[0m
+[90mPOST /me [32m200 [90m11ms - 54b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 51b[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /flavors [32m200 [90m16ms[0m
+[90mPOST /me [32m200 [90m15ms - 54b[0m
+[90mGET /flavors [32m200 [90m33ms[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m88ms - 48b[0m
+[90mGET /flavors [32m200 [90m50ms[0m
+[90mPOST /me [32m200 [90m23ms - 53b[0m
+[90mGET /flavors [32m200 [90m25ms[0m
+[90mPOST /me [32m200 [90m12ms - 51b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 46b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 54b[0m
+[90mGET /flavors [32m200 [90m22ms[0m
+[90mGET /flavors [36m304 [90m8ms[0m
+[90mPOST /me [32m200 [90m9ms - 50b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mGET /flavors [32m200 [90m35ms[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 47b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m66ms - 54b[0m
+[90mGET /flavors [32m200 [90m42ms[0m
+[90mPOST /me [32m200 [90m15ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 46b[0m
+[90mPOST /me [32m200 [90m11ms - 48b[0m
+[90mPOST /me [32m200 [90m14ms - 54b[0m
+[90mPOST /me [32m200 [90m10ms - 52b[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 51b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mGET / [36m304 [90m26ms[0m
+[90mGET /flavors [32m200 [90m43ms[0m
+[90mPOST /me [32m200 [90m61ms - 53b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m98ms[0m
+[90mGET /flavors [32m200 [90m25ms[0m
+[90mPOST /me [32m200 [90m39ms - 54b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET / [36m304 [90m14ms[0m
+[90mGET /me [32m200 [90m9ms[0m
+[90mGET /flavors [36m304 [90m30ms[0m
+[90mPOST /me [32m200 [90m17ms - 47b[0m
+[90mGET /toppings [36m304 [90m31ms[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mGET /flavors [32m200 [90m37ms[0m
+[90mPOST /last_flavor [32m200 [90m18ms - 17b[0m
+[90mGET /trending [32m200 [90m23ms - 496b[0m
+[90mGET /event [32m200 [90m19ms - 25b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 46b[0m
+[90mGET /new_quest [32m200 [90m8ms - 0b[0m
+[90mGET /quests [32m200 [90m7ms - 660b[0m
+[90mGET /flavors [32m200 [90m42ms[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /flavors [36m304 [90m12ms[0m
+[90mPOST /me [32m200 [90m14ms - 54b[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m103ms - 53b[0m
+[90mGET /flavors [32m200 [90m46ms[0m
+[90mPOST /me [32m200 [90m21ms - 53b[0m
+[90mGET /flavors [32m200 [90m16ms[0m
+[90mGET /new_quest [32m200 [90m8ms - 0b[0m
+[90mPOST /me [32m200 [90m13ms - 47b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 51b[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mPOST /me [32m200 [90m8ms - 54b[0m
+[90mPOST /me [32m200 [90m14ms - 45b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 50b[0m
+[90mGET /flavors [32m200 [90m56ms[0m
+[90mPOST /me [32m200 [90m15ms - 52b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m91ms - 47b[0m
+[90mGET /flavors [32m200 [90m53ms[0m
+[90mPOST /me [32m200 [90m52ms - 54b[0m
+[90mGET /new_quest [32m200 [90m13ms - 0b[0m
+[90mGET /flavors [32m200 [90m22ms[0m
+[90mGET /flavors [32m200 [90m21ms[0m
+[90mPOST /me [32m200 [90m28ms - 53b[0m
+[90mPOST /me [32m200 [90m33ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 51b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m17ms - 52b[0m
+[90mGET /flavors [32m200 [90m24ms[0m
+[90mGET /trending [32m200 [90m47ms - 496b[0m
+[90mGET /flavors [32m200 [90m51ms[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mGET /flavors [32m200 [90m28ms[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m14ms - 46b[0m
+[90mPOST /me [32m200 [90m13ms - 50b[0m
+[90mPOST /me [32m200 [90m9ms - 47b[0m
+[90mPOST /me [32m200 [90m21ms - 52b[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m75ms[0m
+[90mGET /flavors [36m304 [90m18ms[0m
+[90mPOST /me [32m200 [90m30ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m13ms - 52b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 47b[0m
+[90mPOST /me [32m200 [90m7ms - 50b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m15ms - 54b[0m
+[90mGET /flavors [32m200 [90m34ms[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m104ms - 53b[0m
+[90mGET /flavors [32m200 [90m52ms[0m
+[90mPOST /me [32m200 [90m58ms - 53b[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mGET /new_quest [32m200 [90m13ms - 0b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 51b[0m
+[90mGET /new_quest [32m200 [90m5ms - 0b[0m
+[90mPOST /me [32m200 [90m15ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 48b[0m
+[90mPOST /me [32m200 [90m16ms - 54b[0m
+[90mGET /flavors [32m200 [90m22ms[0m
+[90mGET /flavors [32m200 [90m22ms[0m
+[90mGET /new_quest [32m200 [90m8ms - 0b[0m
+[90mPOST /me [32m200 [90m10ms - 50b[0m
+[90mGET /new_quest [32m200 [90m6ms - 0b[0m
+[90mPOST /me [32m200 [90m20ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mGET /flavors [32m200 [90m30ms[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 51b[0m
+[90mPOST /me [32m200 [90m18ms - 51b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m78ms - 54b[0m
+[90mPOST /switch [32m200 [90m32ms - 2b[0m
+[90mGET /flavors [32m200 [90m37ms[0m
+[90mGET /flavors [36m304 [90m15ms[0m
+[90mGET /flavors [32m200 [90m17ms[0m
+[90mPOST /me [32m200 [90m23ms - 46b[0m
+[90mPOST /me [32m200 [90m15ms - 48b[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 51b[0m
+[90mPOST /me [32m200 [90m17ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 50b[0m
+[90mPOST /me [32m200 [90m11ms - 54b[0m
+[90mPOST /switch [32m200 [90m22ms - 2b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m66ms[0m
+[90mGET /flavors [32m200 [90m26ms[0m
+[90mGET /flavors [32m200 [90m21ms[0m
+[90mPOST /me [32m200 [90m32ms - 54b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 51b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mPOST /me [32m200 [90m9ms - 46b[0m
+[90mPOST /me [32m200 [90m8ms - 50b[0m
+[90mGET /flavors [32m200 [90m34ms[0m
+[90mPOST /me [32m200 [90m41ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /flavors [32m200 [90m22ms[0m
+[90mGET /flavors [32m200 [90m39ms[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 51b[0m
+[90mPOST /me [32m200 [90m12ms - 48b[0m
+[90mPOST /me [32m200 [90m15ms - 54b[0m
+[90mPOST /me [32m200 [90m15ms - 51b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m166ms - 162b[0m
+[90mGET /flavors [32m200 [90m75ms[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /switch [32m200 [90m32ms - 2b[0m
+[90mGET /flavors [32m200 [90m16ms[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m20ms - 52b[0m
+[90mPOST /switch [32m200 [90m26ms - 2b[0m
+[90mGET /flavors [32m200 [90m21ms[0m
+[90mPOST /me [32m200 [90m24ms - 50b[0m
+[90mPOST /me [32m200 [90m7ms - 46b[0m
+[90mPOST /me [32m200 [90m8ms - 54b[0m
+[90mPOST /me [32m200 [90m10ms - 48b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+Express server listening on port 15888
+[90mGET /flavors [31m500 [90m14ms[0m
+[90mPOST /me [32m200 [90m81ms - 54b[0m
+[90mGET /flavors [32m200 [90m30ms[0m
+[90mPOST /last_flavor [32m200 [90m13ms - 17b[0m
+[90mGET /trending [32m200 [90m20ms - 489b[0m
+[90mGET /flavors [32m200 [90m26ms[0m
+[90mPOST /me [32m200 [90m10ms - 50b[0m
+[90mGET /flavors [32m200 [90m39ms[0m
+[90mPOST /me [32m200 [90m46ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m18ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 47b[0m
+[90mGET /flavors [32m200 [90m22ms[0m
+[90mGET /flavors [32m200 [90m22ms[0m
+[90mPOST /me [32m200 [90m21ms - 78b[0m
+[90mPOST /me [32m200 [90m12ms - 78b[0m
+[90mPOST /me [32m200 [90m12ms - 45b[0m
+[90mPOST /me [32m200 [90m15ms - 54b[0m
+[90mPOST /me [32m200 [90m13ms - 78b[0m
+[90mGET /flavors [32m200 [90m32ms[0m
+[90mGET /new_quest [32m200 [90m9ms - 0b[0m
+[90mPOST /me [32m200 [90m17ms - 78b[0m
+[90mPOST /me [32m200 [90m11ms - 78b[0m
+[90mPOST /me [32m200 [90m12ms - 78b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 78b[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+[90mPOST /me [32m200 [90m17ms - 52b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m29ms - 78b[0m
+[90mPOST /me [32m200 [90m11ms - 78b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m77ms - 52b[0m
+[90mPOST /me [32m200 [90m13ms - 51b[0m
+[90mPOST /me [32m200 [90m15ms - 49b[0m
+[90mPOST /me [32m200 [90m10ms - 78b[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mPOST /me [32m200 [90m7ms - 52b[0m
+[90mPOST /me [32m200 [90m8ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 78b[0m
+[90mPOST /me [32m200 [90m14ms - 48b[0m
+[90mPOST /me [32m200 [90m20ms - 54b[0m
+[90mPOST /me [32m200 [90m20ms - 78b[0m
+[90mPOST /me [32m200 [90m10ms - 78b[0m
+[90mPOST /me [32m200 [90m12ms - 51b[0m
+[90mPOST /me [32m200 [90m22ms - 78b[0m
+[90mPOST /me [32m200 [90m27ms - 53b[0m
+[90mGET /new_quest [32m200 [90m17ms - 0b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 78b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mGET /flavors [32m200 [90m30ms[0m
+[90mPOST /me [32m200 [90m23ms - 52b[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+[90mPOST /me [32m200 [90m13ms - 52b[0m
+[90mPOST /me [32m200 [90m9ms - 78b[0m
+[90mPOST /me [32m200 [90m12ms - 51b[0m
+[90mPOST /me [32m200 [90m12ms - 78b[0m
+[90mPOST /me [32m200 [90m10ms - 78b[0m
+[90mPOST /me [32m200 [90m16ms - 48b[0m
+[90mGET /flavors [36m304 [90m19ms[0m
+[90mPOST /me [32m200 [90m9ms - 50b[0m
+[90mPOST /me [32m200 [90m11ms - 78b[0m
+[90mPOST /me [32m200 [90m9ms - 78b[0m
+[90mPOST /me [32m200 [90m18ms - 78b[0m
+[90mPOST /me [32m200 [90m50ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 78b[0m
+[90mPOST /me [32m200 [90m12ms - 78b[0m
+[90mPOST /me [32m200 [90m11ms - 78b[0m
+[90mPOST /me [32m200 [90m9ms - 78b[0m
+[90mGET /flavors [36m304 [90m13ms[0m
+[90mGET / [36m304 [90m16ms[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 46b[0m
+[90mGET /me [32m200 [90m10ms[0m
+[90mPOST /me [32m200 [90m19ms - 54b[0m
+[90mGET /flavors [32m200 [90m39ms[0m
+[90mGET /toppings [36m304 [90m27ms[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m121ms - 53b[0m
+[90mGET /flavors [32m200 [90m40ms[0m
+[90mGET /quests [32m200 [90m12ms - 660b[0m
+[90mGET /new_quest [32m200 [90m14ms - 0b[0m
+[90mPOST /me [32m200 [90m17ms - 51b[0m
+[90mPOST /me [32m200 [90m14ms - 78b[0m
+[90mPOST /me [32m200 [90m21ms - 78b[0m
+[90mPOST /me [32m200 [90m13ms - 78b[0m
+[90mPOST /me [32m200 [90m10ms - 50b[0m
+[90mGET /flavors [32m200 [90m24ms[0m
+[90mPOST /me [32m200 [90m12ms - 78b[0m
+[90mPOST /me [32m200 [90m9ms - 78b[0m
+[90mGET /favicon.ico [32m200 [90m2ms[0m
+[90mPOST /me [32m200 [90m11ms - 78b[0m
+[90mPOST /me [32m200 [90m8ms - 78b[0m
+[90mGET /flavors [32m200 [90m34ms[0m
+[90mPOST /me [32m200 [90m9ms - 78b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m19ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 51b[0m
+[90mPOST /me [32m200 [90m10ms - 54b[0m
+[90mGET /flavors [32m200 [90m26ms[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [32m200 [90m29ms[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 46b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 48b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m109ms - 54b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m24ms - 50b[0m
+[90mGET /flavors [36m304 [90m32ms[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 49b[0m
+[90mPOST /unlock [32m200 [90m9ms - 46b[0m
+[90mPOST /me [32m200 [90m15ms - 52b[0m
+[90mGET /flavors [32m200 [90m35ms[0m
+[90mGET /flavors [36m304 [90m11ms[0m
+[90mPOST /me [32m200 [90m14ms - 48b[0m
+[90mPOST /me [32m200 [90m9ms - 54b[0m
+[90mPOST /unlock [32m200 [90m9ms - 46b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 49b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m75ms[0m
+[90mPOST /unlock [32m200 [90m14ms - 48b[0m
+[90mPOST /me [32m200 [90m27ms - 50b[0m
+[90mGET /flavors [32m200 [90m27ms[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m9ms - 48b[0m
+[90mGET /flavors [32m200 [90m36ms[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mGET /flavors [32m200 [90m24ms[0m
+[90mGET /flavors [32m200 [90m23ms[0m
+[90mGET /event [32m200 [90m5ms - 25b[0m
+[90mPOST /unlock [32m200 [90m6ms - 48b[0m
+[90mGET /new_quest [32m200 [90m7ms - 0b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m78ms - 53b[0m
+[90mGET /flavors [36m304 [90m32ms[0m
+[90mPOST /me [32m200 [90m33ms - 50b[0m
+[90mPOST /me [32m200 [90m12ms - 46b[0m
+[90mPOST /me [32m200 [90m12ms - 47b[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 52b[0m
+[90mPOST /unlock [32m200 [90m5ms - 48b[0m
+[90mPOST /me [32m200 [90m16ms - 53b[0m
+[90mGET /flavors [32m200 [90m38ms[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m18ms - 53b[0m
+[90mPOST /me [32m200 [90m17ms - 53b[0m
+[90mGET /flavors [36m304 [90m10ms[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+Express server listening on port 15888
+[90mPOST /me [31m500 [90m15ms[0m
+[90mGET /new_quest [32m200 [90m70ms - 0b[0m
+[90mPOST /me [32m200 [90m23ms - 53b[0m
+[90mGET /flavors [32m200 [90m41ms[0m
+[90mPOST /me [32m200 [90m22ms - 50b[0m
+[90mGET /flavors [32m200 [90m29ms[0m
+[90mGET / [32m200 [90m15ms[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mGET /trending [32m200 [90m24ms - 496b[0m
+[90mPOST /me [32m200 [90m11ms - 46b[0m
+[90mPOST /me [32m200 [90m17ms - 52b[0m
+[90mGET /flavors [32m200 [90m21ms[0m
+[90mGET /me [32m200 [90m12ms[0m
+[90mGET /flavors [32m200 [90m34ms[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mGET /flavors [32m200 [90m34ms[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mGET /toppings [32m200 [90m48ms[0m
+[90mPOST /me [32m200 [90m21ms - 53b[0m
+[90mPOST /me [32m200 [90m17ms - 53b[0m
+[90mPOST /me [32m200 [90m22ms - 52b[0m
+[90mPOST /me [32m200 [90m23ms - 48b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+Express server listening on port 15888
+[90mGET /new_quest [32m200 [90m59ms - 0b[0m
+[90mGET /quests [32m200 [90m16ms - 660b[0m
+[90mGET /flavors [36m304 [90m53ms[0m
+[90mPOST /me [32m200 [90m56ms - 50b[0m
+[90mPOST /me [32m200 [90m16ms - 54b[0m
+[90mPOST /me [32m200 [90m19ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m27ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mGET /flavors [32m200 [90m33ms[0m
+[90mPOST /me [32m200 [90m10ms - 43b[0m
+[90mPOST /me [32m200 [90m9ms - 48b[0m
+[90mPOST /me [32m200 [90m20ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 52b[0m
+[90mPOST /me [32m200 [90m12ms - 54b[0m
+Express server listening on port 15888
+[90mPOST /me [31m500 [90m14ms[0m
+[90mPOST /me [32m200 [90m122ms - 53b[0m
+[90mGET /flavors [32m200 [90m50ms[0m
+[90mGET /flavors [32m200 [90m29ms[0m
+[90mGET /new_quest [32m200 [90m10ms - 0b[0m
+[90mPOST /me [32m200 [90m17ms - 53b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mGET /new_quest [32m200 [90m7ms - 0b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m13ms - 48b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m16ms - 54b[0m
+[90mGET /flavors [32m200 [90m28ms[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mGET /flavors [32m200 [90m23ms[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 46b[0m
+[90mGET /new_quest [32m200 [90m8ms - 0b[0m
+[90mGET /flavors [32m200 [90m32ms[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /new_quest [32m200 [90m11ms - 0b[0m
+[90mPOST /me [32m200 [90m15ms - 52b[0m
+Express server listening on port 15888
+[90mPOST /me [31m500 [90m17ms[0m
+[90mPOST /me [32m200 [90m59ms - 53b[0m
+[90mPOST /me [32m200 [90m18ms - 53b[0m
+[90mGET /flavors [32m200 [90m37ms[0m
+[90mGET /flavors [36m304 [90m15ms[0m
+[90mPOST /me [32m200 [90m11ms - 48b[0m
+[90mPOST /me [32m200 [90m15ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mGET /flavors [32m200 [90m34ms[0m
+[90mPOST /me [32m200 [90m9ms - 54b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 46b[0m
+[90mPOST /me [32m200 [90m24ms - 52b[0m
+[90mPOST /me [32m200 [90m15ms - 50b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+Express server listening on port 15888
+[90mPOST /me [31m500 [90m22ms[0m
+[90mGET /flavors [31m500 [90m4ms[0m
+[90mGET /flavors [32m200 [90m83ms[0m
+[90mGET /flavors [32m200 [90m15ms[0m
+[90mPOST /me [32m200 [90m30ms - 54b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m19ms - 52b[0m
+[90mGET / [32m200 [90m32ms[0m
+[90mGET /flavors [32m200 [90m32ms[0m
+[90mPOST /me [32m200 [90m19ms - 51b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [32m200 [90m27ms[0m
+[90mGET /me [32m200 [90m3ms - 13b[0m
+[90mGET /flavors [32m200 [90m26ms[0m
+[90mGET /favicon.ico [32m200 [90m2ms[0m
+[90mGET / [36m304 [90m13ms[0m
+[90mGET /me [32m200 [90m11ms[0m
+[90mGET /flavors [36m304 [90m30ms[0m
+[90mGET /toppings [36m304 [90m35ms[0m
+[90mPOST /last_flavor [32m200 [90m16ms - 17b[0m
+[90mGET /trending [32m200 [90m44ms - 496b[0m
+[90mGET /event [32m200 [90m40ms - 25b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 50b[0m
+[90mPOST /me [32m200 [90m11ms - 48b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m8ms - 54b[0m
+[90mGET /flavors [32m200 [90m23ms[0m
+[90mPOST /me [32m200 [90m27ms - 53b[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m122ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 49b[0m
+[90mGET /me [32m200 [90m18ms[0m
+[90mGET /combos [32m200 [90m20ms[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+[90mGET /flavors [36m304 [90m15ms[0m
+[90mPOST /me [32m200 [90m12ms - 54b[0m
+[90mGET /flavors [32m200 [90m42ms[0m
+[90mPOST /me [32m200 [90m18ms - 53b[0m
+[90mGET /me [32m200 [90m7ms[0m
+[90mGET /combos [36m304 [90m15ms[0m
+[90mPOST /me [32m200 [90m10ms - 48b[0m
+[90mPOST /me [32m200 [90m13ms - 52b[0m
+[90mPOST /me [32m200 [90m8ms - 50b[0m
+[90mPOST /me [32m200 [90m20ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m20ms - 52b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m88ms[0m
+[90mPOST /me [32m200 [90m44ms - 54b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [32m200 [90m29ms[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+[90mPOST /me [32m200 [90m7ms - 46b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m18ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mGET /flavors [36m304 [90m9ms[0m
+[90mPOST /me [32m200 [90m10ms - 48b[0m
+[90mGET /flavors [32m200 [90m29ms[0m
+[90mGET /me [32m200 [90m6ms - 13b[0m
+[90mPOST /me [32m200 [90m9ms - 50b[0m
+[90mGET /flavors [32m200 [90m16ms[0m
+[90mPOST /me [32m200 [90m14ms - 54b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /new_quest [32m200 [90m8ms - 0b[0m
+[90mGET /flavors [32m200 [90m28ms[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [32m200 [90m28ms[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m103ms[0m
+[90mPOST /me [32m200 [90m31ms - 52b[0m
+[90mPOST /me [32m200 [90m14ms - 48b[0m
+[90mPOST /me [32m200 [90m16ms - 54b[0m
+[90mGET /new_quest [32m200 [90m11ms - 0b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m7ms - 52b[0m
+[90mGET /flavors [36m304 [90m16ms[0m
+[90mPOST /me [32m200 [90m15ms - 46b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mGET /flavors [32m200 [90m39ms[0m
+[90mPOST /me [32m200 [90m12ms - 50b[0m
+[90mPOST /me [32m200 [90m7ms - 52b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 54b[0m
+[90mPOST /me [32m200 [90m22ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mGET /flavors [32m200 [90m32ms[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m81ms - 53b[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mGET /new_quest [32m200 [90m8ms - 0b[0m
+[90mPOST /me [32m200 [90m16ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 50b[0m
+[90mPOST /me [32m200 [90m8ms - 54b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mGET /flavors [36m304 [90m11ms[0m
+[90mPOST /me [32m200 [90m10ms - 45b[0m
+[90mGET /flavors [32m200 [90m24ms[0m
+[90mPOST /me [32m200 [90m11ms - 51b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET /flavors [32m200 [90m35ms[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m14ms - 48b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m100ms[0m
+[90mGET /flavors [32m200 [90m42ms[0m
+[90mPOST /me [32m200 [90m27ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 52b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 50b[0m
+[90mGET /flavors [36m304 [90m11ms[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mPOST /last_flavor [32m200 [90m16ms - 17b[0m
+[90mPOST /me [32m200 [90m11ms - 48b[0m
+[90mPOST /me [32m200 [90m11ms - 54b[0m
+[90mPOST /me [32m200 [90m8ms - 52b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m18ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 46b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 52b[0m
+[90mPOST /me [32m200 [90m9ms - 54b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [32m200 [90m36ms[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m95ms[0m
+[90mPOST /me [32m200 [90m34ms - 52b[0m
+[90mPOST /me [32m200 [90m14ms - 54b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m8ms - 54b[0m
+[90mPOST /me [32m200 [90m8ms - 50b[0m
+[90mPOST /me [32m200 [90m14ms - 48b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /last_flavor [32m200 [90m9ms - 17b[0m
+[90mGET /flavors [32m200 [90m35ms[0m
+[90mGET /flavors [32m200 [90m21ms[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mGET /flavors [32m200 [90m27ms[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mGET /flavors [36m304 [90m11ms[0m
+[90mPOST /me [32m200 [90m9ms - 46b[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 54b[0m
+[90mPOST /me [32m200 [90m12ms - 52b[0m
+[90mGET / [36m304 [90m42ms[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mGET /me [32m200 [90m11ms - 746b[0m
+Express server listening on port 15888
+[90mGET /flavors [32m200 [90m155ms[0m
+[90mPOST /me [32m200 [90m53ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 48b[0m
+[90mPOST /me [32m200 [90m8ms - 50b[0m
+[90mGET /flavors [32m200 [90m33ms[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 52b[0m
+[90mPOST /me [32m200 [90m12ms - 54b[0m
+[90mPOST /me [32m200 [90m14ms - 53b[0m
+[90mGET /flavors [32m200 [90m34ms[0m
+[90mPOST /me [32m200 [90m19ms - 53b[0m
+[90mGET /flavors [36m304 [90m11ms[0m
+[90mPOST /me [32m200 [90m13ms - 51b[0m
+[90mPOST /me [32m200 [90m7ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 52b[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mPOST /me [32m200 [90m13ms - 54b[0m
+Express server listening on port 15888
+[90mGET /new_quest [32m200 [90m40ms - 0b[0m
+[90mPOST /me [32m200 [90m101ms - 53b[0m
+[90mGET /flavors [32m200 [90m65ms[0m
+[90mGET / [32m200 [90m15ms[0m
+[90mGET /me [32m200 [90m16ms[0m
+[90mPOST /me [32m200 [90m34ms - 50b[0m
+[90mGET /flavors [32m200 [90m34ms[0m
+[90mGET /toppings [36m304 [90m34ms[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mPOST /last_flavor [32m200 [90m10ms - 17b[0m
+[90mGET /trending [32m200 [90m22ms - 496b[0m
+[90mGET /event [32m200 [90m9ms - 25b[0m
+[90mGET /trending [32m200 [90m20ms - 496b[0m
+[90mPOST /me [32m200 [90m15ms - 51b[0m
+[90mGET / [36m304 [90m13ms[0m
+[90mPOST /me [32m200 [90m13ms - 54b[0m
+[90mGET /me [32m200 [90m9ms[0m
+[90mGET /flavors [32m200 [90m31ms[0m
+[90mGET /flavors [32m200 [90m33ms[0m
+[90mGET /toppings [36m304 [90m26ms[0m
+[90mGET /flavors [32m200 [90m19ms[0m
+[90mPOST /me [32m200 [90m13ms - 54b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET / [36m304 [90m7ms[0m
+[90mGET /me [36m304 [90m6ms[0m
+[90mGET /flavors [32m200 [90m23ms[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m20ms - 48b[0m
+[90mGET /toppings [36m304 [90m22ms[0m
+[90mPOST /me [32m200 [90m8ms - 53b[0m
+[90mPOST /last_flavor [32m200 [90m8ms - 17b[0m
+[90mGET /trending [32m200 [90m14ms - 496b[0m
+[90mGET /event [32m200 [90m7ms - 25b[0m
+Express server listening on port 15888
+[90mGET /new_quest [32m200 [90m72ms - 0b[0m
+[90mGET /quests [32m200 [90m58ms - 660b[0m
+[90mGET /trending [32m200 [90m83ms - 496b[0m
+[90mGET /flavors [32m200 [90m44ms[0m
+[90mGET /new_quest [32m200 [90m14ms - 0b[0m
+[90mPOST /me [32m200 [90m29ms - 50b[0m
+[90mGET /trending [32m200 [90m24ms - 496b[0m
+[90mPOST /me [32m200 [90m15ms - 54b[0m
+[90mPOST /me [32m200 [90m13ms - 52b[0m
+[90mPOST /me [32m200 [90m10ms - 53b[0m
+[90mPOST /me [32m200 [90m13ms - 53b[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mGET / [36m304 [90m13ms[0m
+[90mGET /me [32m200 [90m12ms[0m
+[90mGET /flavors [36m304 [90m29ms[0m
+[90mGET /toppings [36m304 [90m38ms[0m
+[90mPOST /me [32m200 [90m23ms - 52b[0m
+[90mGET /flavors [32m200 [90m41ms[0m
+[90mPOST /me [32m200 [90m31ms - 53b[0m
+[90mPOST /me [32m200 [90m25ms - 54b[0m
+[90mPOST /last_flavor [32m200 [90m12ms - 17b[0m
+[90mGET /trending [32m200 [90m23ms - 496b[0m
+[90mGET /event [32m200 [90m17ms - 25b[0m
+[90mGET /flavors [32m200 [90m57ms[0m
+[90mPOST /me [32m200 [90m22ms - 48b[0m
+[90mGET /new_quest [32m200 [90m10ms - 0b[0m
+[90mGET /quests [32m200 [90m10ms - 660b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [36m304 [90m14ms[0m
+[90mPOST /me [32m200 [90m9ms - 53b[0m
+[90mPOST /me [32m200 [90m16ms - 54b[0m
+[90mPOST /me [32m200 [90m11ms - 52b[0m
+[90mPOST /me [32m200 [90m11ms - 53b[0m
+[90mGET /flavors [32m200 [90m24ms[0m
+Express server listening on port 15888
+[90mGET /logout [36m302 [90m48ms - 68b[0m
+[90mGET /login [32m200 [90m39ms[0m
+[90mPOST /me [32m200 [90m99ms - 53b[0m
+[90mGET /flavors [32m200 [90m40ms[0m
+Express server listening on port 15888
+[90mPOST /me [32m200 [90m84ms - 53b[0m
+[90mGET /new_quest [32m200 [90m14ms - 0b[0m
+[90mPOST /me [32m200 [90m12ms - 53b[0m
+[90mGET /login [36m304 [90m18ms[0m
+Express server listening on port 15888
+[90mGET /login [36m304 [90m32ms[0m

@@ -1,0 +1,17 @@
+#PATCH 1.22 - March 28th 2014
+
+Added "Jesus with a Bomb"
+
+CORE
+Sped up flavour purchases and add-on purchases
+Changelog is now versioned, you can go backwards to previous versions
+Expertise is now on the right hand side in a thermometer
+Ice Cream is now sold by mousing over an ice themed icon
+
+BUG
+Fixed text overlap with chat disclaimer
+
+MISC
+You must now have started your second quest before you can chat (this is to stop the spam and make life easier for everyone)
+Changed "Version 1.22" text to "view Changelog for"
+Added prestige levels to stats

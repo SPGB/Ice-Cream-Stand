@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="<%= (locals.lang)? lang : 'en' %>">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+		<meta property="fb:app_id" content="1421033384776672" />
+		<meta property="og:url" content="http://icecreamstand.ca" />
+		<meta property="og:image" content="http://icecreamstand.ca/img/thumb.png" />
+		<meta property="og:title" content="Ice Cream Stand">
+		<meta property="og:description" content="Free Browser game where you sell delicious delicious ice cream. Open up a stand, buy workers, unlock flavors.">
+		<meta property="og:type" content="website" />
+		<meta name="description" content="Ice Cream Stand, an incremental browser game in a global economy. Open up an ice cream stand and sell ice cream. Unlock flavors, upgrades, workers and more!" />
+		<link rel="icon" type="image/png" href="http://icecreamstand.ca/img/favicon.png" />
+		<title>Ice Cream Stand</title>
+	</head>
+	<body>
+		<link rel="stylesheet" href="css/style_2_2.css" />
+		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<style>
+			thead td {
+				font-weight: bold;
+			}
+			tbody tr:nth-child(2n+1) td {
+			    background-color: #F1F1F1;
+			}
+			td {
+			    padding: 5px;
+			    width: 220px;
+			}
+		</style>
+		<div style="margin: 20px auto; display: block; width: 680px; background-color: #fff; padding-top: 20px;">
+			<%= (locals.alert)? alert : '' %>
+			<h2>ICS Chat Moderation</h2>
+			<ol>
+				<li>No personal Information</li>
+				<li>Be safe, Appropriate and respectful to others</li>
+			</ol>
+		<form action="mod" method="post" style="padding: 20px;">
+			<input placeholder="user name" name="username">
+			<input placeholder="reason" name="reason">
+			<input type="submit" value="Mute">
+		</form>
+		<div>
+
+		<% if (locals.banned) { %>
+			<table style="margin: 10px auto; display: inline-block;">
+				<thead>
+					<tr><td>Muted user</td><td>Reason</td><td>Timestamp</td></tr>
+				</thead>
+			<% for (i in banned) { %>
+				<tr><td><%= banned[i].name %> <small>(<%= banned[i].ip%>)</small></td>
+				<td><%= (banned[i].mute_reason)? banned[i].mute_reason : '-' %></td>
+				<td><small><%= (banned[i].mute_at)? banned[i].mute_at : '-' %></small></td></tr>
+			<% } %>
+		<% } %>
+		</div>
+	</body>
+</html>

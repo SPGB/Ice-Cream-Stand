@@ -1,0 +1,21 @@
+#PATCH 1.21 - March 20th 2014
+
+EVENT
+Sun's event title "By the power of Ra!" (credit: anon9mous)
+
+GAMEPLAY
+Each tier of workers unlocks with 25 of the previous workers
+Added mods, please welcome Xenko and Icemonger as ICS's first set of moderators
+
+DESIGN
+Added a picture for quests
+Added a picture for chat disclaimer
+Darkened the purple in some areas to make text more legible
+Slimmed the current flavour bar
+Tweaks to user card
+Updated log out message
+
+BUG FIXES
+renamed sort base flavour to sort max flavour
+Fixed a bug with sorting glitching sold amounts
+mystery flavour will reveal itself if you unlock that flavour

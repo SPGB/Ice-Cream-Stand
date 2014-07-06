@@ -9,7 +9,7 @@
 		<meta property="og:description" content="Free Browser game where you sell delicious delicious ice cream. Open up a stand, buy workers, unlock flavors.">
 		<meta property="og:type" content="website" />
 		<meta name="description" content="Ice Cream Stand, an incremental browser game in a global economy. Open up an ice cream stand and sell ice cream. Unlock flavors, upgrades, workers and more!" />
-		<title>ICE CREAM STAND</title> 
+		<title>Ice Cream Stand</title> 
 		<style>
 			.new_user { position: relative; }
 			.back_button {
@@ -22,7 +22,7 @@
 		</style>
 	</head>
 	<body>
-		<link rel="stylesheet" href="css/style_12_21.css" />
+		<link rel="stylesheet" href="css/style_2_2.css" />
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script>
 			var word_pool = ['vanilla.svg', 'chocolate.svg', 'strawberry.svg', 'mint.png', 'zombie.png', 'ghost.png', 'squidink.png', 'mocha.png', 'glass.png', 'uranium.png', 'bacon.png', 'mint.png'];
@@ -32,12 +32,13 @@
 			var refer = atob(getURLParameter('refer'));
 			$(document).ready(function () {
 				$('body').append('<img src="img/' + word_pool[word_pointer + 1] + '" style="display:none;" />');
-				$('.icecream').click(function () {
+				setInterval(function () {
 					word_pointer++;
 					if (word_pointer > word_pool.length - 1) word_pointer = 0;
 					$(this).attr('style', 'display: block; background-image: url("img/' + word_pool[word_pointer] + '"), url("img/cone.svg");');
 					$('body').append('<img src="img/' + word_pool[word_pointer + 1] + '" style="display:none;" />');
-				});
+				}, 5000);
+
 				$('#new_game_button').click(function () {	
 					$('.screen_1').slideUp(100);
 					$('.new_game').slideDown(100);
@@ -46,9 +47,13 @@
 					$('.screen_1').slideUp(100);
 					$('.continue').slideDown(100);
 				});
+				$('#forgot').click(function () {	
+					$('.screen_1, .new_game, .continue').slideUp(100);
+					$('.forgot_container').slideDown(100);
+				});
 				$('.back_button').click(function () {
 					$('.screen_1').slideDown(100);
-					$('.new_game, .continue').slideUp(100);  
+					$('.new_game, .continue, .forgot_container').slideUp(100);  
 				});
 				if (window.location.search.substring(1) == 'signed_succes=0') {
 					$('h2').text('Can\'t start a new game :( That name might be taken');
@@ -83,29 +88,40 @@
 			<div class="shop_leftend"></div>
 			<div class="shop_rightend"></div>
 			<div class="section-main-inner">
-				<h1><img src="img/vanilla.svg" />ICE CREAM STAND</h1>
-				<h2>Click the ice cream to sell it! Get cash and buy upgrades and employees.</h2>
+				<h1><img src="/img/icslogo.png" alt="logo"></h1>
+				<h2>Click the ice cream to sell it! Get cash and buy upgrades and employees</h2>
+				<%- (locals.alert)? '<div class="alert">' + alert + '</div>': '' %>
 				<div class="new_user main_container">
 					<div class="screen_1" style="margin: 50px auto;">
-						<div class="button signup_input" id="new_game_button" style="text-align: center;">NEW GAME</div>
-						<div class="button signup_input" id="continue_button" style="text-align: center;">CONTINUE</div>
+						<div class="button signup_input" id="new_game_button" style="text-align: center;">New Game</div>
+						<div class="button signup_input" id="continue_button" style="text-align: center;">Continue</div>
 					</div>
 					<div class="new_game" style="display: none;">
-						<h3>Create an account in two seconds</h3>
+						<h4>Create an account in two seconds</h3>
 						<img src="img/back-icon.png" class="back_button" />
 						<form action="signup" method="POST">
-							<input class="signup_input" type="text" name="name" placeholder="DESIRED USERNAME" autocomplete="off">
-							<input class="signup_input" type="password" name="password" placeholder="OPTIONAL PASSWORD" autocomplete="off">
-							<input class="signup_input button" type="submit" value="START!" class="button">
+							<input class="signup_input" type="text" name="name" placeholder="Username" autocomplete="off">
+							<input class="signup_input" type="password" name="password" placeholder="Password (optional)" autocomplete="off">
+							<input class="signup_input" type="text" name="email" placeholder="Email (optional)" autocomplete="off">
+							<input class="signup_input button" type="submit" value="Start" class="button">
 						</form>
 					</div>
 					<div class="continue" style="display: none;">
-						<h3>Log in</h3>
+						<h4>Log in</h3>
 						<img src="img/back-icon.png" class="back_button" />
 						<form action="login" method="POST">
-							<input class="signup_input" type="text" name="user" placeholder="USERNAME">
-							<input class="signup_input"type="password" name="password" placeholder="PASSWORD">
-							<input class="signup_input button" type="submit" value="LOG IN!">
+							<input class="signup_input" type="text" name="user" placeholder="Username">
+							<input class="signup_input"type="password" name="password" placeholder="Password">
+							<input class="signup_input button" type="submit" value="Log In">
+						</form>
+						<a href="#" id="forgot">Forgot your password?</a>
+					</div>
+					<div class="forgot_container" style="display: none;">
+						<h4>Don't sweat - it happens! What was your email address?</h3>
+						<img src="img/back-icon.png" class="back_button" />
+						<form action="forgot" method="POST">
+							<input class="signup_input" type="text" name="email" placeholder="Email">
+							<input class="signup_input button" type="submit" value="Reset My Password">
 						</form>
 					</div>
 				</div>

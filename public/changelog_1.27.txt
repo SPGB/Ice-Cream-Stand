@@ -1,0 +1,19 @@
+#PATCH 1.27
+
+Core
+Added an alien worker tier (15 per)
+Friend gold is now claimable
+
+General
+-Cones and Combos are now rearrangeable (should be tomorrow)
+Message number is now saved to lighten the server load
+Hiding the quests box will now split events and trends
+Added a timestamp of when the player last prestiged to the prestige tooltip
+You can now toggle the display of Trends/Events
+Added chat rules to the chat disclaimer (viewable by toggling do no disturb mode)
+Trends now start at 75k (from 50k) - added a progress bar
+
+Bugs
+Fixed a bug where a player could turn in the same dynamic quest multiple times
+Fixed the completion message on quest 5
+Fixed quests not triggering until you reload

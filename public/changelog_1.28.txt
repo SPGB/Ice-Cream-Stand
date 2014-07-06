@@ -1,0 +1,40 @@
+#PATCH 1.28
+ 
+COMBOS
++Thorium + Oil is now "Infinite Energy" (+.90)
++Antimatter + Cherries is now "Alpha and Omega" (+1.74) (credit: Lady Hatty)
+
+Core
++Trends are now randomly selected from the flavours with the current price less than 80% of their base price
++Click to redeem money now updates instantly, added a money bag icon
++Achievements added to the main menu
++Accumulation milestones now give +2, +5, +10 bonus clicks when reached
+
+TECHNICAL
++If you've recently sent a message in chat the sync rate for chat messages will speed up by 300% (to every 5s from 15s)
+
+AESTHETIC
+Updated the combo/trend/event banner icons
+
+MISC
+Money from friends total is now capped at 10 mill
+
++Moved the bubble animation from expertise to trending
+
+BUGS
++Dynamic quests now read "Event" not "Trend"
++Reconnecting should now be a bit smarter
+
+PRIVATE MESSAGING
++It's own dedicated section that's toggle-able
++You can write a message to anyone, not just friends
++adding time stamps to messages
++view sent messages and deleted messages
+
+MODS
+I'm saddened to see 2 mods stepping down, they did great work and kept the chat clean and appropriate. Please be extra-respectful to our two remaining mods, Xenko and Sunbucks
++Icemonger is stepping down from being a mod
++Lady Hatty is stepping down from being a mod
+
+MOST ASKED FOR FEATURE
+select-able titles - I'm looking into this. I'd like to add more titles to the game before I worry about customization
