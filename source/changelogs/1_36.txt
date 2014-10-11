@@ -1,0 +1,5 @@
+#PATCH 1.36 - July 29th 2014
+
+This patch is mainly a quiality of life patch aimed at some various bug fixes and some aesthetic tweaks.
+
+full patch notes here: http://blog.samgb.com/ice-cream-stand-patch-1-36/

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="<%= (locals.lang)? lang : 'en' %>">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
@@ -12,21 +12,24 @@
 		<meta name="description" content="Incremental browser game where you open an ice cream stand and sell ice cream. Unlock flavors, add-ons, workers, and raise a cow!" />
 		<link rel="icon" type="image/png" href="http://static.icecreamstand.ca/favicon.png" />
 		<title>Ice Cream Stand</title>
+		<script type="text/javascript">
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-44957881-1']);
+		  _gaq.push(['_trackPageview']);
+
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		</script>
 	</head>
 	<body>
-	<link rel="stylesheet" href="<%= (!locals.release_channel || release_channel == 2)? 'https://s3.amazonaws.com/icecreamstand.com/common.css.gz' : 'http://static.icecreamstand.ca/common.css.gz' %>" />
-	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<link rel="stylesheet" href="<%= (!locals.release_channel || release_channel > 0)? 'https://s3.amazonaws.com/icecreamstand.com/common.css.gz?patch=136' : 'http://static.icecreamstand.ca/common.css.gz' %>" />
+	<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script type="text/javascript" src="http://static.icecreamstand.ca/jquery.easing.1.3.js"></script>
-	<script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main<%= (locals.release_channel)? release_channel : 0 %>.js.gz"></script>
-	<script>
-	  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-	  ga('create', 'UA-44957881-1', 'icecreamstand.ca');
-	  ga('send', 'pageview');
-	</script>
+	<script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main<%= (locals.release_channel)? release_channel : 0 %>.js.gz?patch=136"></script>
+	<script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
 	<canvas id="canvas_main" style="width: 100%; position: fixed; height: 100%;"></canvas>
 	<div class="section-side">
 				<div class="icecream">
@@ -61,7 +64,7 @@
 							<div class="flavor_tab tooltip" id="accumulation" x-type="highscore">Accumulation</div>
 							<div class="flavor_tab tab_round_right tooltip" id="cowlv" x-type="cow">Cow Lv</div>
 						</div>
-						<div>
+						<div id="button_right">
 							<div class="flavor_tab active tab_round_left" id="top_10">10</div>
 							<div class="flavor_tab tab_round_right" id="top_100">100</div>
 						</div>
@@ -71,11 +74,12 @@
 			<div class="flavor main_container">  
 				<h4>Ice Cream
 						<span class="container_controls">
+							<div class="flavor_tab" x-id="main_franken" id="frankenflavour_tab" style="display:none;">Frankenflavour</div>
 							<div class="flavor_tab active" x-id="main_base">Flavour</div>
 							<div class="flavor_tab" x-id="main_addon">Add-on</div>
 							<div class="flavor_tab" x-id="main_cone">Cone</div>
 							<div class="flavor_tab" x-id="main_combo">Combo</div>
-							<a class="expand">+</a>
+							<a class="expand">Expand</a>
 						</span>
 				</h4>
 					<div id="main_base" class="inner_flavor_container"></div>
@@ -85,15 +89,17 @@
 			</div><div class="quests main_container half_size">
 					<h4>Quests
 					<span class="container_controls">
-						<a class="expand">+</a>
+						<a class="expand">Expand</a>
 					</span></h4>
 					<div class="quest_list"></div>
 				</div><div class="trending_and_events main_container half_size hidden">
 					<h4>Events and Trends</h4>
 
 					<div class="event">
-						<span id="event_name"></span>
-						<span id="trend_time"></span>
+						<div class="event_container">
+							<span id="event_name"></span>
+							<span id="trend_time"></span>
+						</div>
 					</div>
 
 					<div class="trending">
@@ -105,7 +111,7 @@
 							</div>
 							<div class="trend_title tooltip" x-type="trending"></div>
 							<span id="trend_time">
-								<span id="trend_bonus"></span>
+								<span id="trend_bonus" class="money_icon"></span>
 							</span>
 						</div>
 					</div>
@@ -113,7 +119,7 @@
 			</div><div class="achievements main_container half_size" style="display: none;">
 					<h4>Achievements
 					<span class="container_controls">
-						<a class="expand">+</a>
+						<a class="expand">Expand</a>
 					</span></h4>
 					<div>
 						<div class="achievement_list">
@@ -125,25 +131,23 @@
 				<div class="chat main_container">
 					<h4>Chat
 					<span class="container_controls">
-						<a class="expand">+</a>
+						<a class="expand">Expand</a>
 					</span></h4>
 					<div class="chat_container_main">
 						<div id="chat_window">
 						</div>
 						<form id="new_message" method="POST" action="chat">
+							<div id="typing"></div>
 							<div class="badge_selector"><div class="badge_inner"><b>Badges</b> <span class="triangle-down"></span></div></div><input type="text" name="text" maxlength="240" placeholder="What would you like to say" autocomplete="off">
 							<input type="submit" class="button" value="Send">
 						</form>
 					</div>
 				</div>
 				<span class="footer">
-					<a href='#' id="invite" class="button">Invite A Friend</a>
-					<a href='mailto:avonwodahs+icecream@gmail.com' class='send_feedback button' target="_blank">Feedback</a>
 					<p>
-						<a href="http://www.reddit.com/r/icecreamstand/" target="_blank">Sub-reddit</a>
 						<a href="http://icecreamstand.wikia.com" target="_blank">Wiki</a>
-						<a href="http://streethobbit.com" target="_blank">Designer's Blog</a>
-						<a href="https://twitter.com/SamGB" target="_blank">Developer's Twitter</a>
+						<a href="http://blog.samgb.com" target="_blank">Blog</a>
+						<a href="http://www.reddit.com/r/icecreamstand/" target="_blank">Reddit</a>
 					</p>
 					<span id="version_info"></span>
 				</span>
@@ -186,6 +190,12 @@
 						<img x-src="http://static.icecreamstand.ca/coldhands.png" class="tooltip"  />
 						<div class="unlock_text">Cold Hands<span class="cost">250</span></div>
 						<div class="sale_level"></div><button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button>
+					</div>
+					<div x-type="frankenflavour" id="unlock_frankenflavour" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/frankenflavour.png" class="tooltip" /><div class="unlock_text">Frankenflavour<span class="cost" id="frankenflavour_amount">1x Lab Parts</span></div><div class="sale_level">0</div><button>Unlock</button>
+					</div>
+					<div x-type="adopt_cow" id="unlock_cow" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/icon_breed.png" class="tooltip" /><div class="unlock_text">Adopt a Cow<span class="cost">1,000</span></div><div class="sale_level"></div><button>Unlock</button>
 					</div>
 					<div x-type="prestige" id="unlock_prestige" class="unlockable">
 						<img x-src="http://static.icecreamstand.ca/prestige_thumb.png" class="tooltip" /><div class="unlock_text">Prestige<span class="cost" id="prestige_amount">*</span></div><div class="sale_level">0</div><div class="button prestige_button">Confirm</div>
@@ -256,21 +266,31 @@
 			</div>
 		</div>
 		<div class="gold">0</div>
-		<div class="gold_sales">Income per Minute: $<span></span></div>
+		<div class="gold_sales tooltip" x-type="ipm">Income per Minute <span class="money_icon"></span></div>
 		<div class="floating_footer">
 		<div class="login">
-			<span id="name"></span>
+			<span id="name" class="user_card"></span>
 			<div>
 				<a href='' class='view_settings'>Settings</a>
 				<a href='stats' class='view_stats'>Stats</a>
 				<a href='highscores' class='view_highscores'>Highscores</a>
 				<a href='#!achievements' class='view_achievements'>Achievements</a>
+				<a href='#' id="invite">Invite</a>
+				<a href='#' id="feedback">Feedback</a>
 				<a href='#' id="donate">Donate</a>
 				<a href='logout'>Logout</a>
 				<span class="triangle-down"></span>
 			</div>
 		</div>
-		<div class="friends_counter"><span id="count">0</span><div><span class="triangle-down"></span></div></div><div class="friends_button_container"><div class="friend_message friends_button"></div></div><input class="friends_add_text" autocomplete="off" placeholder="Friend's name" style="display:none;"><div class="friends_add tooltip" x-type="friend"><img src="http://static.icecreamstand.ca/addfriend.svg" height=24 width=24 alt="Add Friend" /></div>
+		<div class="friends_counter">
+			<span id="count">0</span>
+			<div class="friends_list_holder">
+				<h4>Friends</h4>
+				<div class="friends_list_online"></div>
+				<div class="friends_list_offline"></div>
+				<span class="triangle-down"></span>
+			</div>
+		</div><div class="friends_button_container"><div class="friend_message friends_button"></div></div><input class="friends_add_text" autocomplete="off" placeholder="Friend's name" style="display:none;"><div class="friends_add tooltip" x-type="friend"><img src="http://static.icecreamstand.ca/addfriend.svg" height=24 width=24 alt="Add Friend" /></div>
 		</div>
 		<div class="cow tooltip" x-type="cow"></div>
 		<div class="cow_alt"></div>

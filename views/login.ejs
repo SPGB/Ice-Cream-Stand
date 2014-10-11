@@ -2,14 +2,16 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
 		<meta property="fb:app_id" content="1421033384776672" />
 		<meta property="og:url" content="http://icecreamstand.ca" />
 		<meta property="og:image" content="http://icecreamstand.ca/img/thumb.png" />
 		<meta property="og:title" content="Ice Cream Stand">
 		<meta property="og:description" content="Free Browser game where you sell delicious delicious ice cream. Open up a stand, buy workers, unlock flavors.">
 		<meta property="og:type" content="website" />
-		<meta name="description" content="Ice Cream Stand, an incremental browser game in a global economy. Open up an ice cream stand and sell ice cream. Unlock flavors, upgrades, workers and more!" />
-		<title>Ice Cream Stand</title> 
+		<meta name="description" content="Incremental browser game where you open an ice cream stand and sell ice cream. Unlock flavors, add-ons, workers, and raise a cow!" />
+		<link rel="icon" type="image/png" href="http://static.icecreamstand.ca/favicon.png" />
+		<title>Sign Up - Ice Cream Stand</title> 
 		<style>
 			.new_user { position: relative; }
 			.back_button {
@@ -22,7 +24,7 @@
 		</style>
 	</head>
 	<body>
-		<link rel="stylesheet" href="css/style_2_2.css" />
+		<link rel="stylesheet" href="https://s3.amazonaws.com/icecreamstand.com/common.css.gz" />
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script>
 			var word_pool = ['vanilla.svg', 'chocolate.svg', 'strawberry.svg', 'mint.png', 'zombie.png', 'ghost.png', 'squidink.png', 'mocha.png', 'glass.png', 'uranium.png', 'bacon.png', 'mint.png'];
@@ -89,41 +91,58 @@
 			<div class="shop_rightend"></div>
 			<div class="section-main-inner">
 				<h1><img src="/img/icslogo.png" alt="logo"></h1>
-				<h2>Click the ice cream to sell it! Get cash and buy upgrades and employees</h2>
+				
 				<%- (locals.alert)? '<div class="alert">' + alert + '</div>': '' %>
 				<div class="new_user main_container">
+					<h2>Sign Up!</h2>		
 					<div class="screen_1" style="margin: 50px auto;">
 						<div class="button signup_input" id="new_game_button" style="text-align: center;">New Game</div>
 						<div class="button signup_input" id="continue_button" style="text-align: center;">Continue</div>
 					</div>
 					<div class="new_game" style="display: none;">
-						<h4>Create an account in two seconds</h3>
 						<img src="img/back-icon.png" class="back_button" />
 						<form action="signup" method="POST">
 							<input class="signup_input" type="text" name="name" placeholder="Username" autocomplete="off">
-							<input class="signup_input" type="password" name="password" placeholder="Password (optional)" autocomplete="off">
-							<input class="signup_input" type="text" name="email" placeholder="Email (optional)" autocomplete="off">
-							<input class="signup_input button" type="submit" value="Start" class="button">
+							<input class="signup_input" type="password" name="password" placeholder="Password (OPTIONAL)" autocomplete="off">
+							<input class="signup_input" type="text" name="email" placeholder="Email (OPTIONAL)" autocomplete="off">
+							<input class="signup_input button" type="submit" value="START" class="button">
 						</form>
 					</div>
 					<div class="continue" style="display: none;">
-						<h4>Log in</h3>
 						<img src="img/back-icon.png" class="back_button" />
 						<form action="login" method="POST">
 							<input class="signup_input" type="text" name="user" placeholder="Username">
-							<input class="signup_input"type="password" name="password" placeholder="Password">
+							<input class="signup_input" type="password" name="password" placeholder="Password">
 							<input class="signup_input button" type="submit" value="Log In">
 						</form>
 						<a href="#" id="forgot">Forgot your password?</a>
 					</div>
 					<div class="forgot_container" style="display: none;">
-						<h4>Don't sweat - it happens! What was your email address?</h3>
+						<h4>Don't sweat - it happens! What was your email address?</h4>
 						<img src="img/back-icon.png" class="back_button" />
 						<form action="forgot" method="POST">
 							<input class="signup_input" type="text" name="email" placeholder="Email">
 							<input class="signup_input button" type="submit" value="Reset My Password">
 						</form>
 					</div>
+				</div>
+				<div class="login_pitch">
+					<p>
+						Open an Ice Cream Stand and <b>sell exciting and weird flavours</b>. Hire workers, research flavours and add-ons.
+					</p>
+					<img src="http://static.icecreamstand.ca/employee_thumb.png" />
+				</div>
+				<div class="login_pitch">
+					<img src="http://static.icecreamstand.ca/questicon.png" />
+					<p>
+						Complete Quests and <b>rescue the Ice Cream Princess.</b> No two dynamic quests are the same!
+					</p>
+				</div>
+				<div class="login_pitch">
+					<p>
+						Raise a cow.
+					</p>
+					<img src="http://static.icecreamstand.ca/cow.svg" class="no_background" />
 				</div>
 		</div></div><div class="section-side" id="upgrades">
 		</div>

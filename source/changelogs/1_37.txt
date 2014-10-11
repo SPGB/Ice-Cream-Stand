@@ -1,0 +1,22 @@
+#PATCH 1.37 - August 9th
+
+BUGS
+Fixed a memory leak
+
+CORE
+Updated Friend cards to be their own window + tabbed
+Added a circular avatar for Gravatar user images (more instructions to follow)
+Added an inventory screen for cows, more on this to come
+
+AESTHETIC
+Visually improved the achievement section, each achievement now gives 10 achievement points
+
+MISC
+Hovering over Income per minute now shows a price breakdown
+You can now click your name in the bottom right to see your user card
+
+ACHIEVEMENTS
+Added the Grandmaster (lvl 15 expertise)
+
+BUGS
+Fixed a bug with quests not updating

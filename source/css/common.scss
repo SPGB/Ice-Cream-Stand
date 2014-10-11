@@ -3,10 +3,15 @@ $purple: #7F7DC7;
 $purple-light: #9F9DE7;
 $pink: #F9C9D3;
 $grey: #404040;
-$green: #009955;
+$green: #0da673;
 $red: #BC0000;
+$grey: #999;
+
 @mixin drop-shadow() {
-    box-shadow: 0px 1px 4px -1px $grey;
+    box-shadow: 0px 1px 4px -1px #444;
+}
+@mixin drop-shadow-more() {
+    box-shadow: 0px 2px 6px 0 #444;
 }
 
 html {
@@ -18,7 +23,7 @@ body {
     background-image: url("http://static.icecreamstand.ca/background_kenny6.png");
     background-position: left bottom;
     background-repeat: repeat-x;
-    color: $grey;
+    color: #222;
     font: 14px "Lucida Grande",Helvetica,Arial,sans-serif;
     height: 100%;
     margin: 0;
@@ -28,6 +33,7 @@ body {
 textarea {
     font-family: "Lucida Grande",Helvetica,Arial,sans-serif;
     margin-bottom: 10px;
+    background-color: #f1f1f1;
 }
 a {
     color: $purple;
@@ -67,11 +73,13 @@ input:focus, textarea:focus, keygen:focus, select:focus {
     outline: none;
 }
 .section-main h2 {
+    background-color: $purple;
+    color: #fff;
     font-size: 14px;
-    padding: 40px 0;
-    text-align: center;
-    letter-spacing: 2px;
     line-height: 21px;
+    margin: -10px -10px 20px;
+    padding: 10px;
+    text-align: left;
 }
 .section-side {
     display: inline-block;
@@ -84,7 +92,7 @@ input:focus, textarea:focus, keygen:focus, select:focus {
 }
 .shop_leftend {
     position: absolute;
-    background-image: url(http://d3dd170h1cxsan.cloudfront.net/shop_leftend.png);
+    background-image: url(http://static.icecreamstand.ca/shop_leftend.png);
     width: 33px;
     height: 100px;
     top: 2px;
@@ -93,7 +101,7 @@ input:focus, textarea:focus, keygen:focus, select:focus {
 }
 .shop_rightend {
     position: absolute;
-    background-image: url(http://d3dd170h1cxsan.cloudfront.net/shop_rightend.png);
+    background-image: url(http://static.icecreamstand.ca/shop_rightend.png);
     width: 33px;
     height: 100px;
     top: 2px;
@@ -101,8 +109,8 @@ input:focus, textarea:focus, keygen:focus, select:focus {
     background-size: contain;
 }
 .section-main {
-    background-color: #DFC89D;
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/shop_background.svg");
+    background-color: #cdbc9a;
+    background-image: url("http://static.icecreamstand.ca/shop_background.svg");
     background-repeat: repeat-x;
     background-size: auto 100px;
     background-position: 0 -1px;
@@ -123,15 +131,17 @@ input:focus, textarea:focus, keygen:focus, select:focus {
 }
 h4 {
     background-color: $purple;
-    border-radius: 2px 2px 0 0;
     color: #fff;
     margin: -10px -10px 10px;
     padding: 5px 10px;
     position: relative;
 }
-.message > h4 {
+.message > h4, .alert_shadow > h4 {
     font-size: 16px;
     padding: 10px;
+}
+.alert_shadow > h4 { 
+    background-color: darken($purple, 5%);
 }
 .current_value {
     border-radius: 5px;
@@ -139,12 +149,8 @@ h4 {
     right: 30px;
     text-align: right;
     top: 25px;
-    width: 14.5%;
     z-index: 2;
     font-size: 18px;
-}
-.current_value:before {
-    content: '$';
 }
 #ice_cream_holder {
     position: absolute;
@@ -152,7 +158,7 @@ h4 {
 }
 .icecream {
     display: none;
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/vanilla.png"), url("http://d3dd170h1cxsan.cloudfront.net/cone.png");
+    background-image: url("http://static.icecreamstand.ca/vanilla.png"), url("http://static.icecreamstand.ca/cone.png");
     background-position: left 100px, center bottom;
     background-repeat: no-repeat;
     background-size: contain, 175px auto;
@@ -203,11 +209,31 @@ h4 {
     font-size: 24px;
 }
 .cow_float {
-    transform: rotate(90deg);
-    color: $grey;
-    right: auto;
+    background-color: #fff;
+    border-radius: 25px;
+    color: $purple;
+    display: inline-block;
+    font-size: 24px;
+    font-weight: bold;
+    height: 16px;
+    line-height: 12px;
     margin-left: 75px;
-    line-height: 0;
+    padding: 10px;
+    right: auto;
+    text-align: center;
+    -ms-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+    width: 16px;
+}
+.cow_float.float_success {
+    background-color: $green;
+    color: #fff;
+}
+.cow_float.float_failure {
+    background-color: $red;
+    color: #fff;
 }
 .gold_sales {
     font-size: 14px;
@@ -241,15 +267,39 @@ h4 {
 }
 .gold {
     font-size: 32px;
-    min-width: 260px;
     position: fixed;
     right: 20px;
     top: 5px;
     z-index: 2; 
     text-align: right;
 }
+.money_icon {
+    position: relative;
+    margin-left: 15px;
+    font-weight: bold;
+}
+.gold:before, .current_value:before, .unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before, .money_icon:before {
+    background-image: url("http://static.icecreamstand.ca/coins2.svg");
+    background-size: 100% 100%;
+    content: " ";
+    display: block;
+    height: 20px;
+    left: -18px;
+    position: absolute;
+    top: -2px;
+    width: 20px;
+}
 .gold:before {
-    content: '$';
+    width: 30px;
+    height: 30px;
+    left: -25px;
+    top: 5px;
+}
+.current_value:before, .flavor_current:before {
+    top: 2px;
+}
+.unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before {
+    top: -1px;
 }
 .money_text {
     color: #a1a1a1;
@@ -278,7 +328,6 @@ h4 {
     background-color: $purple-light;
     border-radius: 2px 0 0 2px;
     color: #FEFFED;
-    cursor: pointer;
     display: inline-block;
     padding: 5px 10px;
     transition: background 0.5s;
@@ -292,12 +341,14 @@ h4 {
     display: inline-block;
     padding: 5px;
 }
+.friends_counter > span {
+    cursor: default;
+}
 .friends_add.tooltip > img {
     margin: -5px 0 -7px;
 }
 .friends_add:hover, .friends_counter:hover {
     background-color: $purple;
-    cursor: pointer;
 }
 .friends_add_text {
     display: inline-block;
@@ -307,9 +358,9 @@ h4 {
     display: block;
 }
 .friends_counter > div {
-    background-color: $purple-light;
+    background-color: $purple;
     border-radius: 2px;
-    @include drop_shadow();
+    @include drop-shadow();
     bottom: 13px;
     display: none;
     margin-bottom: 20px;
@@ -321,26 +372,35 @@ h4 {
     z-index: 2;
 }
 .friends_counter .triangle-down {
+    border-top: 15px solid #7f7dc7;
     bottom: -15px;
-    left: 54px;
+    left: 46px;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 .friends_counter user {
     color: #fff;
     display: block;
     position: relative;
+    text-transform: capitalize;
+    padding: 2px;
 }
-user {
+user, .user_card {
     cursor: pointer;
+    transition: color 0.25s ease 0s;
+}
+user:hover, .user_card:hover {
+    color: $purple;
 }
 .friends_counter user:hover {
-    background-color: $purple-light;
+    background-color: #404040;
 }
 .friend_options {
     position: absolute;
     right: 0;
     top: 0;
 }
-.friend_message, .friend_poke, .friend_delete {
+.friend_message, .friend_poke, .friend_delete, .friend_reply {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -351,14 +411,21 @@ user {
     padding: 6px 0;
     width: 20px;
 }
-.friend_message {
-    background-image: url(http://d3dd170h1cxsan.cloudfront.net/email.svg);
+.friend_message, .friend_reply {
+    background-image: url(http://static.icecreamstand.ca/email.svg);
 }
 .friend_poke {
-    background-image: url(http://d3dd170h1cxsan.cloudfront.net/poke.svg);
+    background-image: url(http://static.icecreamstand.ca/poke.svg);
 }
-.friend_delete {
-    background-image: url(http://d3dd170h1cxsan.cloudfront.net/delete.svg);
+.friend_delete:before {
+    content: "+";
+    display: block;
+    font-size: 16px;
+    font-weight: bold;
+    margin-left: 5px;
+    margin-top: -7px;
+    position: absolute;
+    transform: rotate(45deg);
 }
 .friend_message:hover, .friend_poke:hover, .friend_delete:hover {
     background-color: #6462AC;
@@ -382,18 +449,18 @@ user {
     padding-right: 10px;
 }
 .login div {
-    bottom: 0px;
-    padding-bottom: 35px;
+    bottom: 20px;
     display: none;
-    position: absolute;
     left: 10px;
+    padding-bottom: 20px;
+    position: absolute;
     text-align: left;
     z-index: 2;
 }
 .login div .triangle-down {
     left: 5px;
-    border-width: 10px;
-    bottom: 25px;
+    border-width: 20px;
+    bottom: 0;
 }
 .login div a {
     color: #fff;
@@ -408,7 +475,7 @@ user {
     border-radius: 0 0 2px 2px;
 }
 .login div a:hover {
-    @include drop_shadow();
+    @include drop-shadow();
     color: #fff;
 }
 .login a {
@@ -426,22 +493,24 @@ user {
     font-size: 12px;
 }
 .sell_value {
-    background: rgba(255,255,255,0.3);
+    background-color: rgba(255, 255, 255, 0.1);
     display: none;
-    font-size: 12px;
     font-weight: bold;
     height: 70px;
     line-height: 25px;
     margin-top: 20px;
     position: absolute;
-    right: 0;
+    right: 20px;
     text-align: center;
     top: 295px;
     z-index: 0;
     transition: left 0.5s;
     left: 0;
-    width: 100%;
-    border-right: 2px solid #fff;
+}
+#new_message {
+    background-color: #f1f1f1;
+    margin: 10px -10px -10px;
+    padding: 10px;
 }
 .current_flavor {
     margin-bottom: 10px;
@@ -450,25 +519,22 @@ user {
     text-transform: uppercase;
 }
 .footer {
+    background-color: #f1f1f1;
     display: block;
+    font-size: 12px;
+    margin-top: -12px;
+    padding: 0 10px;
     position: relative;
 }
 .footer a {
     display: inline-block;
-    font-size: 12px;
     padding: 10px;
-}
-.footer p {
-    margin: 0;
-}
-.footer > p a {
-    padding: 10px 3px;
 }
 .send_feedback {
     float: right;
 }
 .darkness {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.4);
     bottom: 0;
     left: 0;
     position: fixed;
@@ -501,7 +567,7 @@ user {
     right: 0;
 }
 .banner.small {
-    padding: 6px;
+    padding: 0px;
     z-index: 3;
     left: 0;
 }
@@ -512,6 +578,10 @@ user {
     margin-top: 0;
     top: 0;
 }
+.tab.locked {
+    background-color: $grey;
+}
+
 .locked tr, .unlocked tr {
     background-color: #fff;
 }
@@ -524,8 +594,15 @@ user {
 .locked, .unlocked {
     border-collapse: collapse;
 }
-.unlockable.locked:before {
-    content: "Locked";
+.locked:before {
+    background-color: #404040;
+    color: #f1f1f1;
+    content: "LOCKED";
+    font-size: 8px;
+    left: 0;
+    position: absolute;
+    top: 0;
+    z-index: 2;
 }
 .locked.tab {
     background-color: #404040;
@@ -541,12 +618,21 @@ user {
     font-weight: bold;
 }
 .achievement_list .locked tr td {
-    color: #999;
+    color: $grey;
 }
 .option_wrapper {
-    display: inline-block;
     position: relative;
     z-index: 2;
+    height: 100px;
+    width: 100px;
+    display: inline-block;
+    margin: 6px;
+    background-color: rgba(255,255,255,0.3);
+    background-image: url(http://static.icecreamstand.ca/background_icons.png);
+    cursor: pointer;
+    transition: background 0.5s;
+    border-radius: 2px;
+    overflow: hidden;
 }
 .option_wrapper .icecream_float {
     font-size: 26px;
@@ -592,7 +678,7 @@ user {
 }
 .outofstock:before {
     background-color: rgba(0, 0, 0, 0.2);
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/outofstock.png");
+    background-image: url("http://static.icecreamstand.ca/outofstock.png");
     background-size: 100% auto;
     content: "";
     height: 100px;
@@ -604,7 +690,7 @@ user {
 }
 .inline-message {
     background-color: #FFFFFF;
-    color: $grey;
+    color: #222;
     letter-spacing: 0;
     border-radius: 10px 10px 10px 10px;
     bottom: 20px;
@@ -657,12 +743,13 @@ iframe.facebook {
     top: 5px;
     width: 10px;
     z-index: 2;
-}
-.message_close:hover {
     @include drop-shadow();
 }
-.message {
-    background-color: #FFF1C6;
+.message_close:hover, .over {
+    @include drop-shadow-more();
+}
+.message, .alert_shadow {
+    background-color: #fff;
     border-radius: 2px;
     left: 50%;
     margin-left: -310px;
@@ -672,58 +759,54 @@ iframe.facebook {
     max-width: 100%;
     padding: 10px;
     z-index: 11;
+    span#title {
+        color: #DFAF7E;
+        content: "Message";
+        font-size: 20px;
+        left: 20px;
+        letter-spacing: 2px;
+        position: absolute;
+        top: 20px;
+        font-weight: bold;
+    }
+    span#description {
+        display: block;
+        font-size: 16px;
+        text-align: left;
+    }
+    span#description form {
+        font-size: 14px;
+        margin: 10px auto 0;
+    }
+    span#description form.alert-form input {
+        display: inline-block;
+        width: 200px;
+        margin-bottom: 10px;
+        float: right;
+    }
+    span#description form.alert-form input[type="radio"] {
+        width: auto;
+        float: none;
+        background: #fff;
+        margin-left: 15px;
+    }
+    span#description form.alert-form input#settings_update {
+        float: none;
+        margin-bottom: 0;
+        width: 100%;
+    }
+    span#description form.paypal {
+        width: 200px;
+    }
+    span#description form.paypal input {
+        border: 1px solid transparent;
+    }
 }
-.message > span#title {
-    color: #DFAF7E;
-    content: "Message";
-    font-size: 20px;
-    left: 20px;
-    letter-spacing: 2px;
-    position: absolute;
-    top: 20px;
-    font-weight: bold;
-}
-.message > span#description {
-    display: block;
-    font-size: 16px;
-    text-align: left;
-}
-.message > .button {
-    border-radius: 4px 4px 4px 4px;
-    float: left;
-    margin: 10px 0;
-    padding: 10px;
-    width: 100px;
-    font-size: 14px;
-    clear: both;
-}
-.message > span#description form {
-    font-size: 14px;
-    margin: 10px auto 0;
-    min-height: 250px;
-}
-.message > span#description form.alert-form input {
-    display: inline-block;
-    width: 200px;
-    margin-bottom: 10px;
-    float: right;
-}
-.message > span#description form.alert-form input[type="radio"] {
-    width: auto;
-    float: none;
-    background: #fff;
-    margin-left: 15px;
-}
-.message > span#description form.alert-form input#settings_update {
-    float: none;
-    margin-bottom: 0;
-    width: 100%;
-}
-.message > span#description form.paypal {
-    width: 200px;
-}
-.message > span#description form.paypal input {
-    border: 1px solid transparent;
+.alert_shadow {
+    min-height: 40px;
+    transition: margin 0.25s ease 0s;
+    opacity: 1;
+    z-index: 9;
 }
 .quest_princess {
     float: left;
@@ -775,10 +858,7 @@ iframe.facebook {
     font-weight: normal;
     position: absolute;
     top: 22px;
-    left: 0;
-}
-.unlockable .cost:before {
-    content: '$';
+    left: 12px;
 }
 .unlockable img:nth-child(1) {
     background-color: rgba(255,255,255,0.5);
@@ -789,7 +869,7 @@ iframe.facebook {
     margin-right: 3px;
     width: 75px;
 }
-.button_container.highscore_button_container {
+.button_container {
     background-color: #ddd;
     font-size: 0;
     line-height: 20px;
@@ -798,10 +878,10 @@ iframe.facebook {
     margin-top: -10px;
     padding: 10px;
 }
-.button_container.highscore_button_container > div:nth-child(2) {
+.button_container > #button_right {
     float: right;
 }
-.button_container.highscore_button_container > div {
+.button_container > div {
     display: inline-block;
 }
 .highscores {
@@ -824,7 +904,6 @@ iframe.facebook {
     cursor: pointer;
     font-weight: bold;
     padding: 3px;
-    border-radius: 2px;
 }
 .button:hover, button:hover {
     @include drop-shadow();
@@ -840,7 +919,7 @@ iframe.facebook {
     height: 100px;
     margin: 10px auto;
     width: 100px;
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/background_icons.png");
+    background-image: url("http://static.icecreamstand.ca/background_icons.png");
 }
 .button.prestige_cancel {
     background-color: #C33232;
@@ -857,13 +936,14 @@ iframe.facebook {
     margin-left: 0;
 }
 .upgrade_success {
-    background-color: $green !important;
+    color: $green !important;
 }
 .upgrade_error { 
-    background-color: $red !important;
+    color: $red !important;
 }
 input {
-    border: 1px solid #FADBFC;
+    border: none;
+    background-color: #f1f1f1;
     display: block;
     margin-bottom: 10px;
     padding: 5px;
@@ -910,7 +990,7 @@ input {
     min-height: 100px;
     margin-top: 17px;
 }
-.option:not([x-type="addon"]):not(.combo_option):hover , .unlockable:not([x-type="addon"]):hover img{
+.option_wrapper:hover , .unlockable:not([x-type="addon"]):hover img{
     background-color: rgba(255, 255, 255, 0.9);
     -webkit-animation-name: background-move; 
     -webkit-animation-duration: 4s; 
@@ -925,7 +1005,7 @@ input {
     animation-iteration-count: infinite;
     animation-timing-function: linear;
 }
-.option[x-type="addon"]:hover , .unlockable[x-type="addon"]:hover img{
+.unlockable[x-type="addon"]:hover img{
     background-color: rgba(255, 255, 255, 0.9);
     -webkit-animation-name: background-move-addon; 
     -webkit-animation-duration: 4s; 
@@ -942,39 +1022,30 @@ input {
 }
 .option {
     width: 100px;
-    height: 100px;
-    display: inline-block;
-    margin: 6px;
-    background-color: rgba(255,255,255,0.3);
-    background-image: url(http://d3dd170h1cxsan.cloudfront.net/background_icons.png);
-    cursor: pointer;
-    transition: background 0.5s;
-    border-radius: 2px;
 }
 .option[x-type="addon"], .unlockable[x-type="addon"] img  {
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/toppings/jar.png"), url("http://d3dd170h1cxsan.cloudfront.net/background_icons.png");
+    background-image: url("http://static.icecreamstand.ca/toppings/jar.png");
     background-size: 100% auto, auto auto;
 }
-.option.drag {
-    @include drop_shadow();
+.option.drag, .option:hover {
+    @include drop-shadow();
 }
 .option.over {
-    @include drop_shadow();
+    @include drop-shadow();
     opacity: 0.5;
 }
 .option.selected {
-    @include drop_shadow();
+    @include drop-shadow-more();
 }
 .upgrades_inner, .flavors_inner, .employees_inner, .toppings_inner, .cones_inner {
     max-height: 630px;
     padding-bottom: 5px;
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.75);
 }
 .controls_back:hover, .controls_forward:hover, .controls_show:hover , .button:hover, button:hover {
     background-color: $purple;
 }
 .flavor_tab {
-    background-color: $purple-light;
     color: #fff;
     cursor: pointer;
     display: inline-block;
@@ -990,7 +1061,8 @@ input {
     border-radius: 0 2px 0 0;
 }
 .flavor_tab.active {
-    background-color: $purple;
+    background-color: $purple-light !important;
+    text-decoration: underline;
 }
 .tab_round_left {
     border-radius: 2px 0 0 2px;
@@ -1013,65 +1085,163 @@ input {
 .flavor div#main_base {
     display: block;
 }
+.achievements_locked {
+    background-color: #f1f1f1;
+    opacity: 0.8;
+}
 .user_info_card {
-    position: absolute;
-    z-index: 12;    
+    left: 50%;
+    margin-left: -300px;
     pointer-events: none;
+    position: absolute;
+    width: 600px;
+    z-index: 12;
+}
+.gravatar {
+    background-color: $grey;
+    border: 2px solid #fff;
+    border-radius: 50px;
+    margin-top: -100px;
+    position: absolute;
+    width: 100px;
 }
 .user_card_name {
     text-transform: capitalize;
 }
-.user_info_inner {
-    background-color: #fff;
-    padding: 10px;
-    @include drop_shadow();
-    border-radius: 2px;
-    text-align: left;
-}
-.user_info_inner tr:nth-child(2n) {
-    background-color: #f1f1f1;
-}
 .user_info_inner > table {
-    border: medium none;
-    margin-left: -10px;
-    margin-right: -10px;
+    width: calc(75% - 40px);
     border-collapse: collapse;
+    margin: 25px 0;
 }
-
 .user_info_inner .badges {
     position: absolute;
-    right: 5px;
-    bottom: 5px;
+    right: 200px;
+    bottom: 10px;
+}
+.user_addon {
+    display: block;
+    width: 100%;
 }
 .user_info_badge {
     height: 20px;
     margin-right: 5px;
     vertical-align: middle;
 }
+#description > .badges {
+    bottom: 10px;
+    position: absolute;
+    right: 200px;
+}
+.ipm_breakdown {
+    width: 100%;
+}
+.ipm_breakdown tr > td:nth-child(2) {
+    text-align: right;
+}
 .user_info_inner td {
     border: 0 none;
     margin: 0;
     padding: 2px 10px;
 }
-.user_info_prestige {
-    float: right;
-    font-size: 10px;
-    margin-top: 2px;
+.user_info_inner > time {
+    margin-left: 10px;
+}
+.user_info_inner > table b {
+    margin-right: 10px;
+}
+.user_bottom_panel > time {
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 10px;
+}
+.user_bottom_panel {
+    width: 65%;
+}
+.button.add_friend, .button.send_message {
+    margin-right: 10px;
+    display: inline-block;
+    font-size: 12px;
+    line-height: 10px;
+    left: 160px;
+    padding: 5px 10px;
+    width: auto;
+}
+.button.add_friend[x-enabled="false"] {
+    background-color: $green;
 }
 .user_info_type {
     font-weight: bold;
+}
+.user_cow {
+    background-image: url("http://static.icecreamstand.ca/background_kenny6.png");
+    background-position: right bottom;
+    bottom: 0;
+    padding: 20px 20px 0;
+    position: absolute;
+    right: 0;
+    top: 40px;
+    width: 25%;
+    cursor: pointer;
+}
+.user_cow[x-night="true"] {
+    background-image: url("http://static.icecreamstand.ca/background_night.png");
+}
+.user_cow > .user_cow_inner {
+    bottom: 0;
+    left: 20px;
+    position: absolute;
+}
+.user_cow_title {
+    bottom: 5px;
+    left: 5px;
+    position: absolute;
+    z-index: 2;
+}
+.user_cow_title[x-rainbow="true"] {
+    font-weight: bold;
+    animation: colorchange 2s; /* animation-name followed by duration in seconds*/
+    -webkit-animation: colorchange 2s; /* Chrome and Safari */
+    -webkit-animation-iteration-count: infinite; /*Safari and Chrome*/
+    -moz-animation-iteration-count: infinite; /*Safari and Chrome*/
+    animation-iteration-count: infinite;
+}
+ @keyframes colorchange {
+      0%   { COLOR: $red;}
+      25%  { COLOR: yellow;}
+      50%  { COLOR: $purple;}
+      75%  { COLOR: $green;}
+      100% { COLOR: $red;}
+}
+
+@-webkit-keyframes colorchange {
+      0%   { COLOR: $red;}
+      25%  { COLOR: yellow;}
+      50%  { COLOR: $purple;}
+      75%  { COLOR: $green;}
+      100% { COLOR: $red;}
+}
+.cow_buttons {
+    margin-top: 20px;
+}
+.button.button_cow {
+    display: inline-block;
+    font-size: 12px;
+    margin-right: 10px;
+    padding: 5px;
+}
+.button.button_cow[x-enabled="false"] {
+    background-color: $grey;
 }
 .user_icecream {
     background-position: left top, left 71px;
     background-repeat: no-repeat;
     background-size: 100px auto;
-    height: 100%;
-    position: absolute;
-    right: -54px;
-    top: 0;
-    width: 100px;
     height: 215px;
-    z-index: -1;
+    position: absolute;
+    right: -53px;
+    top: 55px;
+    width: 100px;
+    z-index: 1;
 }
 .user_card_name {
     font-weight: bold;
@@ -1083,17 +1253,19 @@ input {
     text-transform: capitalize;
 }
 .clock {
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/clock.svg");
+    background-image: url("http://static.icecreamstand.ca/clock.svg");
     background-repeat: no-repeat;
     margin-left: 20px;
     vertical-align: middle;
     margin-right: 5px;
     display: inline-block;
+    width: 20px;
+    height: 20px;
 }
 .clock_hand {
-    -webkit-animation: clock_move 30s linear;
-    -moz-animation: clock_move 30s linear;
-    animation: clock_move 30s linear;
+    -webkit-animation: clock_move 15s linear;
+    -moz-animation: clock_move 15s linear;
+    animation: clock_move 15s linear;
     -webkit-animation-iteration-count: infinite; /*Safari and Chrome*/
     -moz-animation-iteration-count: infinite; /*Safari and Chrome*/
     animation-iteration-count: infinite;
@@ -1155,9 +1327,13 @@ input {
     bottom: -15px;
 }
 .trend_title {
-    font-weight: bold;
+    font-size: 12px;
     text-align: center;
     text-transform: capitalize;
+}
+.trend_title:after {
+    content: ' is Trending!';
+
 }
 .upgrades div, .employees div {
     width: 576px;
@@ -1167,10 +1343,9 @@ input {
     display: none !important;
 }
 .main_container {
-    background-color: #fff;
+    background-color: rgba(255,255,255,0.85);
     padding: 10px;
     margin-bottom: 10px;
-    border-radius: 2px;
     min-height: 50px;
     position: relative;
 }
@@ -1198,7 +1373,7 @@ input {
     background-color: #AFE4FF;
     vertical-align: middle;
     padding: 0 1px;
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/background_icons.png");
+    background-image: url("http://static.icecreamstand.ca/background_icons.png");
     background-size: 100% 50%;
 }
 .trending_img.active {
@@ -1209,9 +1384,15 @@ input {
     width: 75px;
 }
 #trend_time > #trend_bonus {
-    display: block;
+    float: left;
     font-weight: bold;
     margin-bottom: 10px;
+}
+#event_name {
+    display: inline-block;
+    font-size: 12px;
+    min-width: 120px;
+    text-align: center;
 }
 .trend_title .trending_img {
     border-radius: 4px;
@@ -1227,8 +1408,8 @@ input {
     bottom: 20px;
 }
 .base_active {
-    background-color: $purple-light;
-    border-radius:  5px;
+    background-color: #f1f1f1;
+    border-radius:  2px;
     color: $grey;
     height: 46px;
     left: 0;
@@ -1242,14 +1423,11 @@ input {
     height: 35px;
 }
 .chat_disclaimer {
-    background-image: url("http://static.icecreamstand.ca/princess_chat.png");
-    background-repeat: no-repeat;
     text-align: center;
     width: 80%;
     padding: 30px;
     padding-left: 100px;
     margin: 0 auto;
-    background-position: left bottom;
     height: 140px;
 }
 .chat_disclaimer #invite {
@@ -1261,15 +1439,15 @@ input {
     padding: 10px 20px;
 }
 #trend_left {
-    display: none;
     font-size: 10px;
     left: 50px;
     position: absolute;
     right: 50px;
     text-align: center;
     text-transform: capitalize;
-    top: 1px;
+    top: 2px;
     z-index: 1;
+    display: none;
 }
 .trending:hover #trend_left {
     display: block;
@@ -1284,18 +1462,20 @@ input {
     -moz-animation-iteration-count: infinite;
     -moz-animation-timing-function: linear;
 }
-#trend_bonus:before {
-    content: '+$';
-}
-#trend_time {
+.trending #trend_time {
     font-size: 14px;
     position: absolute;
     right: 15px;
     text-align: right;
     top: 10px;
 }
-.new_user {
-    margin-bottom: 160px;
+.event #trend_time {
+    bottom: -30px;
+    font-size: 14px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    text-align: right;
 }
 h3#upgrades_text {
     font-size: 20px;
@@ -1335,7 +1515,7 @@ h3#upgrades_text {
     height: 130px;
     margin-top: -150px;
     margin-left: -50px;
-    @include drop_shadow();
+    @include drop-shadow-more();
     border-radius: 2px;
     text-align: left;
     z-index: 3;
@@ -1356,9 +1536,6 @@ h3#upgrades_text {
     width: 200px;
     display: inline-block;
 }
-.flavor_current:before {
-    content: '$';
-}
 .flavor_current {
     text-align: right;
 }
@@ -1373,18 +1550,18 @@ h3#upgrades_text {
 .triangle-left {
     border-top: 15px solid transparent;
     border-bottom: 15px solid transparent;
-    border-right: 15px solid $purple-light;
+    border-right: 15px solid $purple;
     position: absolute;
     left: -15px;
-    top: 40%;
+    top: 10%;
 }
 .triangle-right {
     border-top: 15px solid transparent;
     border-bottom: 15px solid transparent;
-    border-left: 15px solid $purple-light;
+    border-left: 15px solid $purple;
     position: absolute;
     right: -15px;
-    top: 40%;
+    top: 10%;
 }
 .triangle-up {
     border-left: 15px solid transparent;
@@ -1405,16 +1582,20 @@ h3#upgrades_text {
 .hovercard > .triangle-down {
    border-top: 15px solid #fff; 
 }
+.hovercard > .triangle-up {
+   border-bottom: 15px solid #fff; 
+}
 .expand {
-    background-color: #9F9DE7;
-    border-radius: 0 2px 0 0;
-    color: #FEFFED;
+    color: #fff;
     cursor: pointer;
     display: inline-block;
-    font-size: 14px;
-    padding: 5px;
-    text-align: center;
-    width: 12px;
+    font-size: 12px;
+    height: calc(100% - 16px);
+    line-height: 12px;
+    padding: 8px;
+}
+.expand.active {
+    background-color: $purple-light;
 }
 .icecream:hover #glow, .icecream.active #glow {
     display: block;
@@ -1428,7 +1609,7 @@ h3#upgrades_text {
     -moz-animation-timing-function: linear;
 }
 #glow {
-    background-image: url(http://d3dd170h1cxsan.cloudfront.net/glow.png);
+    background-image: url(http://static.icecreamstand.ca/glow.png);
     background-size: cover;
     display: none;
     margin-left: -37px;
@@ -1447,7 +1628,7 @@ h3#upgrades_text {
 }
 .tab {
     -moz-user-select: none;
-    background-color: $purple-light;
+    background-color: $purple;
     color: #FEFFED;
     cursor: pointer;
     display: inline-block;
@@ -1465,12 +1646,14 @@ h3#upgrades_text {
 }
 .tab.active:hover, .flavor_tab.active:hover {
     cursor: default;
+    box-shadow: none;
 }
 .main_nav .flavor_tab.active:hover {
     cursor: pointer;
 }
 .tab.active { 
-    background-color: $purple;
+    background-color: $purple-light;
+    text-decoration: underline;
 }
 .icecream_particle {
     background-position: center top, 5px 37px;
@@ -1580,6 +1763,50 @@ h3#upgrades_text {
     margin: 30px 0;
     text-align: center;
 }
+.new_user {
+    min-height: 250px;
+}
+.login_pitch {
+    background-color: #c7b085;
+    min-height: 100px;
+    padding: 10px;
+    position: relative;
+    margin-bottom: 20px;
+}
+.login_pitch > p {
+    background-color: #fff;
+    display: inline-block;
+    font-size: 16px;
+    padding: 20px;
+    position: relative;
+    vertical-align: top;
+    width: 50%;
+    text-align: left;
+}
+.login_pitch > img {
+    background-color: #fff;
+    display: inline-block;
+    float: right;
+    height: 100px;
+}
+.login_pitch:nth-child(2n) {
+    text-align: right;
+}
+.login_pitch:nth-child(2n) > img {
+    float: left;
+}
+.login_pitch > p:after {
+    border-color: transparent transparent transparent #fff;
+    border-right: 20px solid transparent;
+    border-style: solid;
+    border-width: 20px;
+    content: " ";
+    position: absolute;
+    right: -20px;
+}
+.no_background {
+    background: none repeat scroll 0 0 transparent !important;
+}
 .level {
     float: right;
     margin-left: 20px;
@@ -1593,7 +1820,7 @@ h3#upgrades_text {
     display: block;
 }
 .cloud {
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/cloud_1.png");
+    background-image: url("http://static.icecreamstand.ca/cloud_1.png");
     height: 309px;
     left: -600px;
     position: absolute;
@@ -1604,14 +1831,21 @@ h3#upgrades_text {
 .combo_option {
     background-position: center top, center center;
     background-repeat: no-repeat, no-repeat, repeat;
-    background-size: 100% 50%, contain, auto;
-    border-radius: 5px;
+    background-size: 100% 65%, contain;
     display: inline-block;
-    font-size: 0;
-    height: 100px;
-    margin: 10px 5px;
     width: 100px;
+    height: 100px;
+    font-size: 0;
     cursor: pointer;
+    vertical-align: top;
+}
+.combo_split {
+    background-position: right center;
+    background-size: 100px 100px;
+    height: 100px;
+    position: absolute;
+    right: 0;
+    width: 50px;
 }
 .user_name {
     text-transform: capitalize;
@@ -1626,9 +1860,31 @@ h3#upgrades_text {
     position: fixed;
 }
 .tutorial_0 {
-    top: 275px;
-    left: 22%;
+    background-image: url("http://static.icecreamstand.ca/sell_cold_sprite.png");
+    background-position: 0px 115px;
+    background-repeat: repeat-x;
+    background-size: auto auto;
+    left: 18%;
+    top: 316px;
+    transition: background 0.1s linear 0s;
+    animation: cube_move 15s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    -webkit-animation: cube_move 15s; /* Chrome, Safari, Opera */
+    -webkit-animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
 }
+/* Chrome, Safari, Opera */
+@-webkit-keyframes cube_move {
+    from { background-position: 0.0px 115px; }
+    to { background-position: 128.0px 115px; }
+}
+
+/* Standard syntax */
+@keyframes cube_move {
+    from { background-position: 0.0px 115px; }
+    to { background-position: 128.0px 115px; }
+} 
 .tutorial_1 {
     left: 40%;
     top: 360px;
@@ -1644,29 +1900,37 @@ h3#upgrades_text {
     margin-left: -187px;
 }
 .tutorial > h2 {
-    margin-top: 0;
+    background-color: $purple;
+    color: #fff;
+    margin: -15px -15px 20px;
+    padding: 15px;
 }
 .button.next_tutorial {
-    width: 150px;
+    background-color: $green;
     margin: 20px auto;
-    clear: both;
+    padding: 10px;
     text-align: center;
-    padding: 5px;
 }
 .tutorial_3 .button.next_tutorial{
     display: inline-block;
     margin: 10px;
     vertical-align: middle;
     width: 130px;
-    margin-top: 30px;
+    margin-top: 10px;
 }
 .quest_default {
-    background-color: #dfdfdf;
+    background-color: #f1f1f1;
+    background-image: url("http://static.icecreamstand.ca/princess_chat.png");
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-size: auto 100px;
     border-radius: 5px;
-    color: $grey;
-    height: 67px;
+    color: #404040;
+    font-weight: bold;
+    height: 110px;
     margin-top: 17px;
-    padding: 10px;
+    padding: 20px 10px;
+    text-align: center;
 }
 .quest_star {
     vertical-align: middle;
@@ -1697,12 +1961,30 @@ h3#upgrades_text {
     margin-top: 10px;
 }
 .button.complete_quest {
-    background-color: $green;
+    background-color: $grey;
     text-align: center;
     margin-bottom: 0px;
     margin-top: 10px;
     padding: 5px;
     height: 20px;
+    position: relative;
+}
+.complete_quest > b {
+    position: absolute;
+    display: block;
+    z-index: 2;
+    width: 100%;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+#complete_quest_progress {
+    position: absolute;
+    top: 0;
+    bottom: 0px;
+    left: 0;
+    width: 0%;
+    background-color: $green;
+    transition: width 0.25s ease 0s;
 }
 #filter_flavour {
     background-image: url("http://static.icecreamstand.ca/filter.svg");
@@ -1805,7 +2087,7 @@ h3#upgrades_text {
     color: #fff;
 }
 .toggle_container {
-    background-color: #fff;
+    background-color: #f1f1f1;
     color: #414141;
     font-size: 12px;
     text-transform: capitalize;
@@ -1826,9 +2108,10 @@ h3#upgrades_text {
     top: 5px;
     padding: 2px;
 }
-#event_name {
-    display: block;
-    padding: 0 55px 0 5px;
+.event_container {
+    display: table;
+    margin: 15px auto 10px;
+    position: relative;
 }
 .achievement_bubble {
     background-color: #FFFFFF;
@@ -1841,7 +2124,7 @@ h3#upgrades_text {
     z-index: 3;
 }
 .achievement_bubble > img {
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/background_icons.png");
+    background-image: url("http://static.icecreamstand.ca/background_icons.png");
     height: 100px;
     float: left;
     margin-right: 20px;
@@ -1858,8 +2141,8 @@ h3#upgrades_text {
     margin-top: 10px;
 }
 .expertise_bar_outer {
-    background-color: #fff;
-    border: 2px solid #fff;
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid #fff;
     border-bottom: none;
     border-radius: 10px 0 0 10px;
     height: 200px;
@@ -1870,33 +2153,24 @@ h3#upgrades_text {
     transition: left 0.5s, width 0.5s;
 }
 .expertise_bar_inner {
-    animation-duration: 5s;
-    animation-iteration-count: infinite;
-    animation-name: expertise-move;
-    animation-timing-function: linear;
-    -webkit-animation-duration: 5s;
-    -webkit-animation-iteration-count: infinite;
-    -webkit-animation-name: expertise-move;
-    -webkit-animation-timing-function: linear;
     background-color: $pink;
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/expertise_animation.png");
-    background-position: right top;
-    background-repeat: repeat-x;
-    background-size: 50px;
-    border-radius: 10px 0 0 0;
+    background-image: url("http://static.icecreamstand.ca/expertise_stripes.png");
+    background-position: left bottom;
+    background-repeat: repeat-y;
+    border-radius: 5px 0 0 0;
     transition: height 1s;
     position: absolute;
-    bottom: 0;
+    bottom: 5px;
     width: 100%;
     z-index: 2;
 }
 .expertise_number {
-     bottom: -27px;
-    font-size: 16px;
+    bottom: -31px;
+    right: 3px;
+    letter-spacing: -2px;
+    font-size: 18px;
     font-weight: bold;
-    left: -10px;
     position: absolute;
-    right: 0;
     text-align: center;
     white-space: pre;
     z-index: 3;
@@ -1916,18 +2190,21 @@ h3#upgrades_text {
     top: 160px;
     display: none;
     background-color: #fff;
-    @include drop_shadow();
+    @include drop-shadow();
     border-radius: 2px;
     padding: 5px;
     white-space: pre;
     z-index: 3;
+}
+#version_num {
+    cursor: pointer;
 }
 .expertise_bar_outer:hover .expertise_hover{
     display: block;
 }
 .expertise_ball {
     background-color: $pink;
-    border: 2px solid #ffffff;
+    border: 1px solid #ffffff;
     border-radius: 30px 0 0 30px;
     bottom: -51px;
     height: 60px;
@@ -1973,7 +2250,7 @@ h3#upgrades_text {
 }
 .expertise_level {
     position: absolute;
-    bottom: 13px;
+    bottom: 0px;
     left: 5px;
     padding: 2px 5px;
     font-weight: bold;
@@ -2003,29 +2280,30 @@ h3#upgrades_text {
     font-size: 10px;
 }
 .currently_online {
-    color: #666;
+    color: $grey;
     display: block;
     text-align: center;
 }
 #chat_window {
     margin-bottom: 10px;
     border-radius: 5px;
-    overflow: hidden;
+    margin: 0 -10px;
     max-height: 600px;
 }
 #chat_window .chat {
     font-size: 12px;
     position: relative;
-    padding: 5px 0;
-}
-#chat_window .chat:nth-child(odd) {
-    background-color: #f1f1f1;
+    padding: 5px 10px;
+    border-bottom: 1px solid #fff;
 }
 .chat_container_main input { 
     display: inline-block;
-    border-radius: 2px;
     margin-bottom: 0;
     width: 72px;
+    background-color: #fff;
+} 
+.chat_container_main input[type="submit"] {
+    background-color: $green;
 } 
 .chat_container_main { 
     width: 100%; 
@@ -2042,7 +2320,7 @@ h3#upgrades_text {
     display: inline-block;
 }
 .trending_and_events.main_container:not(.half_size) {
-    display: block !important;
+    display: block;
 }
 .trending_and_events.main_container:not(.half_size) .event, .trending_and_events.main_container:not(.half_size) .trending {
     display: inline-block;
@@ -2054,8 +2332,7 @@ h3#upgrades_text {
     margin-right: 15px;
 }
 .event, .trending {
-    background-color: #d5d3ff;
-    border-radius: 2px;
+    background-color: #ece2c4;
     height: 65px;
     margin-top: 15px;
     padding: 10px;
@@ -2075,6 +2352,7 @@ h3#upgrades_text {
     text-align: left;
     vertical-align: top;
     width: 82%;
+    word-wrap: break-word;
 }
 #chat_window  time {
     display: none;
@@ -2092,7 +2370,7 @@ h3#upgrades_text {
 }
 .main_container.half_size {
     display: inline-block;
-    min-height: 230px;
+    min-height: 220px;
     vertical-align: top;
     width: calc(50% - 25px);
 }
@@ -2110,7 +2388,6 @@ h3#upgrades_text {
     background-color: #FFFFFF;
     border-radius: 2px;
     bottom: 50px;
-    color: $grey;
     left: 10px;
     min-width: 100px;
     padding: 10px;
@@ -2140,7 +2417,7 @@ h3#upgrades_text {
     border-top: 15px solid #fff;
 }
 .unlockable button.tier {
-    background-color: #999999;
+    background-color: $grey;
     border-radius: 5px;
     cursor: pointer;
     margin-left: 2px;
@@ -2156,21 +2433,18 @@ h3#upgrades_text {
 .unlockable button.tier[x-amount="gold"] {
     background-color: #d3ca68;
 }
-.unlockable:nth-child(even) {
-    background-color: #f1f1f1;
-}
 #gamble_result {
     background-color: #F1F1F1;
     height: 100px;
     margin-right: 10px;
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/background_icons.png");
+    background-image: url("http://static.icecreamstand.ca/background_icons.png");
     vertical-align: middle;
     width: 100px;
     border-radius: 5px;
     float: left;
 }
 #gamble_icon {
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/background_icons.png");
+    background-image: url("http://static.icecreamstand.ca/background_icons.png");
     border-radius: 5px;
     height: 52px;
     margin: 5px 0;
@@ -2200,25 +2474,18 @@ h3#upgrades_text {
     display: none;
 }
 .wrapper_addon_thumb {
+    height: 70%;
+    left: 4px;
     pointer-events: none;
     position: absolute;
-    top: 9px;
-    left: 0;
+    top: -21px;
     width: 97%;
-    height: 55%;
     z-index: 2;
 }
 #version_info {
-    color: $grey;
-    font-size: 12px;
     position: absolute;
-    right: 0px;
-    text-align: right;
-    bottom: 0px;
-}
-#version_num {
-    cursor: pointer;
-    font-weight: bold;
+    bottom: 0;
+    right: 10px;
 }
 #canvas_sales {
     width: 100%;
@@ -2260,18 +2527,16 @@ h3#upgrades_text {
     opacity: 1 !important;
 }
 .friend_gold {
-    background-color: $purple;
-    border-radius: 2px;
-    color: #FFFFFF;
+    background-color: $green;
     cursor: pointer;
     display: inline-block;
     font-size: 14px;
     font-weight: bold;
     height: 17px;
-    padding: 5px 5px 5px 40px;
+    padding: 5px 20px 5px 40px;
     position: absolute;
-    right: 0;
-    top: 20px;
+    right: 15px;
+    top: 0px;
 }
 .last_prestige {
     font-size: 12px !important;
@@ -2296,7 +2561,7 @@ h3#upgrades_text {
     -webkit-animation-name: expertise-move;
     -webkit-animation-timing-function: linear;
     background-color: $pink;
-    background-image: url("http://d3dd170h1cxsan.cloudfront.net/expertise_animation.png");
+    background-image: url("http://static.icecreamstand.ca/expertise_animation.png");
     background-position: right top;
     background-repeat: repeat-y;
     background-size: 50px auto;
@@ -2330,8 +2595,17 @@ h3#upgrades_text {
     padding: 5px;
     cursor: pointer;
 }
-#message_list {
-    width: 100%;
+.friends_list_offline, .friends_list_online {
+    max-height: 250px;
+    overflow-y: scroll;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+.friends_list_holder > h4 {
+    margin: 0;
+}
+#description > table#message_list {
+    margin: 10px -10px;
     border-collapse: collapse;
 }
 #message_list td {
@@ -2389,7 +2663,7 @@ h3#upgrades_text {
     padding-left: 85px;
 }
 message-controls {
-    color: #666666;
+    color: $purple;
     display: block;
     text-align: center;
 }
@@ -2410,7 +2684,6 @@ message-next {
 }
 .vote_box > b {
     background-color: rgba(0, 0, 0, 0.3);
-    border-radius: 2px;
     color: #ffffff;
     display: block;
     font-weight: bold;
@@ -2453,51 +2726,68 @@ message-next {
     background-image: url("http://static.icecreamstand.ca/cow.svg");
     background-repeat: no-repeat;
     bottom: 20px;
-    cursor: pointer;
     height: 90px;
     position: fixed;
     right: 10%;
     width: 150px;
+    cursor: pointer;
+}
+.cow_inventory {
+    background-color: #f1f1f1;
+    float: right;
+}
+.inventory_slot {
+    border: 1px solid #fff;
+    height: 50px;
+    width: 50px;
+    position: relative;
+}
+.inventory_clear {
+    cursor: pointer;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+.cow_inventory:before {
+    content: "Inventory";
+    font-weight: bold;
+    margin-left: -75px;
+    position: absolute;
+    text-align: center;
 }
 body.night {
     background-image: url(http://static.icecreamstand.ca/background_night.png);
     background-color: #251d38;
     color: #ddd;
-    .current_flavor, .expertise_level {
-        color: $grey;
-    }
     .chat.admin {
         color: #aaa8f2;
+    }
+    .new_message {
+        background-color: #222;
     }
     .base_active, inner_flavor_container {
     background-color: $grey;
     }
     .section-main, .hovercard, .tutorial {
-        background-color: $grey;
+        background-color: #222;
     }
     .main_container {
-        background-color: darken($grey, 5%);
+        background-color: #444;
     }
     .event, .trending {
-        background-color: darken($grey, 10%);
+        background-color: #333;
     }
     #trend_sold_outer {
         background-color: darken($grey, 20%);
     }
-    .upgrades_inner, .flavors_inner, .employees_inner, .toppings_inner, .cones_inner {
-        background-color: $grey;
-    }
-    #chat_window .chat:nth-child(2n+1), .unlockable:nth-child(2n) {
-        background-color: $grey;
+    .sell_value, .upgrades_inner, .flavors_inner, .employees_inner, .toppings_inner, .cones_inner {
+        background-color: rgba(0,0,0,0.2);
     }
     .message {
-        background-color: #666;
+        background-color: #444;
     }
     #message_list tr {
-        background-color: $grey !important;
-    }
-    .user_info_inner {
-        background-color: $grey;
+        background-color: #444 !important;
     }
     .expertise_bar_outer {
         background-color: $grey;
@@ -2506,14 +2796,23 @@ body.night {
     .expertise_ball {
         border-color: $grey;
     }
-    .user_info_inner tr:nth-child(2n) {
-        background-color: $grey;
-    }
     .expertise_number {
-        color: $grey;
+        color: #404040;
     }
     .chat_disclaimer {
         background: none;
+    }
+    #version_info {
+        color: #fff;
+    }
+    .gold:before, .current_value:before, .unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before, .money_icon:before {
+        background-image: url(http://static.icecreamstand.ca/coins_night.svg);
+    }
+    .footer, #new_message {
+        background-color: #333;
+    }
+    #chat_window .chat {
+        border-color: #222;
     }
 }
 .cow_level_bar {
@@ -2530,6 +2829,223 @@ body.night {
     height: 10px;
     line-height: 10px;
 }
+.inventory_thumb {
+    height: 50px;
+    width: 50px;
+    backgorund-image: url("http://static.icecreamstand.ca/background_icons.png");
+}
+.cow_attachment {
+    height: 50px;
+    left: -3px;
+    position: absolute;
+    top: -29px;
+    width: 50px;
+    background-repeat: no-repeat;
+}
+.cow_attachment[x-type="hat_basic"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hat_basic.png");
+}
+.cow_attachment[x-type="amulet_basic"] {
+    left: 34px;
+    top: 16px;
+}
+.cow_attachment[x-type="wings_rainbow"] {
+    left: 42px;
+    top: -24px;
+    width: 59px;
+}
+.cow_attachment[x-type="coat_basic"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/coat_basic.png");
+    height: 71px;
+    width: 56px;
+    left: 37px;
+    top: 19px;
+}
+.item {
+    font-size: 0;
+    height: 50px;
+    width: 34px;
+    cursor: move;
+    position: fixed;
+    bottom: 20px;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: contain;
+}
+.item:after {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 100px;
+    bottom: -5px;
+    content: " ";
+    height: 25px;
+    left: 10px;
+    position: absolute;
+    right: 10px;
+    z-index: -1;
+}
+.item.hay {
+    background-image: url('https://s3.amazonaws.com/icecreamstand.com/hay.png');
+}
+.item.hat_basic {
+    background-image: url('https://s3.amazonaws.com/icecreamstand.com/items/hat_basic.png');
+    width: 50px;
+}
+.item[x-type="amulet_basic"], .cow_attachment[x-type="amulet_basic"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/amulet_basic.png");
+}
+.item[x-type="wings_rainbow"], .cow_attachment[x-type="wings_rainbow"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/wings_rainbow.png");
+}
+.item.coat_basic {
+    background-image: url('https://s3.amazonaws.com/icecreamstand.com/items/coat_basic.png');
+    width: 50px;
+}
+.item.rock {
+    background-image: url('https://s3.amazonaws.com/icecreamstand.com/rock.png');
+}
+.inventory_item img {
+    width: 100%;
+    height: 100%;
+}
+.inventory_item {
+    background-color: #afe4ff;
+    background-image: url("http://static.icecreamstand.ca/background_icons.png");
+    background-size: 100% 50%;
+    border: 2px solid $purple;
+    display: inline-block;
+    height: 25px;
+    vertical-align: middle;
+    width: 25px;
+}
+.inventory_hover_img {
+    height: 40px;
+    width: 40px;
+    vertical-align: middle;
+}
+.col_2 {
+    display: inline-block;
+    vertical-align: top;
+    width: 50%;
+}
+.col_3 {
+    display: inline-block;
+    width: 33%;
+    text-align: center;
+    vertical-align: middle;
+}
+.franken_selector {
+    background-color: $purple;
+    color: #fff;
+    margin-top: -120px;
+    padding: 10px;
+    position: absolute;
+    width: 300px;
+    z-index: 3;
+}
+.franken_close {
+    margin: 0 -10px -10px;
+    background-color: $purple-light;
+    cursor: pointer;
+    padding: 10px;
+}
+.col_3.franken_center > p {
+    text-transform: capitalize;
+}
+.franken_composite {
+    background-image: url("http://static.icecreamstand.ca/background_icons.png");
+    border-radius: 2px;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+    position: relative;
+}
+.franken_img {
+    background-size: 100px 100px;
+    height: 100px;
+    width: 50px;
+    position: absolute;
+}
+.franken_img.second {
+    background-position: right top;
+    right: 0px;
+}
+.franken_center > button {
+    padding: 10px;
+}
+#franken_name {
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 16px;
+}
+.icecream_franken {
+    background-position: right top;
+    background-repeat: no-repeat;
+    background-size: 226px auto;
+    height: 200px;
+    position: absolute;
+    right: 0;
+    top: 100px;
+    width: 50%;
+}
+.franken_option {
+    display: inline-block;
+    width: 33%;
+    cursor: pointer;
+    text-transform: capitalize;
+}
+.franken_option:hover {
+    @include drop-shadow();
+}
+.franken_selector .col_3 {
+    cursor: pointer;
+}
+.selector_nav {
+    background-color: $purple-light;
+    margin: -10px -10px 0;
+    padding: 10px;
+}
+.franken_selector .col_3.active {
+    border-bottom: 1px solid #f1f1f1;
+    font-weight: bold;
+}
+#refer_url {
+    width: 90%;
+}
+.settings_tab {
+    display: inline-block;
+    cursor: pointer;
+    background-color: $purple-light;
+    padding: 5px 10px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 10px;
+}
+.settings_tab[x-active="true"] {
+    background-color: $purple;
+    @include drop-shadow();
+}
+.settings_area {
+    display: none;
+}
+.settings_area[x-active="true"] {
+    display: block;
+}
+.button_container .flavor_tab {
+    background-color: $purple;
+}
+#typing {
+    color: #666;
+    font-size: 10px;
+    margin-top: -20px;
+    position: absolute;
+    
+}
+.is_typing {
+    display: inline-block;
+    margin-right: 10px;
+}
+
 /* RESPONSIVE */
 
 @media all and (max-width : 1240px) {

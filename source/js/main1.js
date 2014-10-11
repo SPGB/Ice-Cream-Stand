@@ -1,10 +1,12 @@
 Icecream = (function(){ //encapsulate that, homie!
-var version = '1.33';
+"use strict";
+var version = '1.39';
 var user_me = { name : 'newbie', gold : 0};
+var cow = { happiness: 75};
 var flavors = [];
 var toppings = [];
 var gold = null;
-var color_pool = ['a09de6', '8E8CD6', '8280c9', '7270ba', '615fac', '52509e', '454392', '4b4975', '444']; //for click fx
+var color_pool = ['9a2f2f', '5f2f9a', '2f8f9a', '2f9a39', '919a2f', '52509e', '454392', '4b4975', '9a2f8f']; //for click fx
 var trending_flavor; //id
 var trending_bonus = 0;
 var trending_addon; //id
@@ -23,6 +25,7 @@ var cached_cone_value = 0;
 var cached_cone = 'default';
 var cached_machinery;
 var cache_sell_num = 0
+var cache_sell_inactive = 0
 var sales_per = 0; //number of sales every 5 secs
 var dragSrcEl = null;
 var last_worker_fx = 0; //0 through 4
@@ -62,6 +65,7 @@ var interval_employees;
 var interval_gold;
 var interval_sell;
 var interval_chat;
+var interval_events;
 var cached_new_messages = 0;
 var process_clicks_iteration = 0;
 var game_working = true;
@@ -79,30 +83,37 @@ var cache_unread_message = false;
 var win_height = 0, doc_height = 0;
 var messages = [];
 var alert_queue = [];
+var alert_current;
 var alert_active = false;
-var cow_happiness = 1; //ranging from 0 to 1
 var canvas_width = 0;
 var speed = 15; 
-
+var is_deep_sleep = false;
+var is_chatting = false;
+var item_remove = true;
+var socket;
+var typing_cache = {};
 $(document).ready(function () {
     lang = $('html').attr('lang');
     canvas_cache_height = $(document).height();
     if (lang !== 'en') {
         $.ajax({
-            url: '/js/lang_' + $('html').attr('lang') + '.js',
+            url: image_prepend + '/' + $('html').attr('lang') + '.json.gz',
             type: 'GET',
             dataType: 'JSON',
             success: function (j) {
                 cached_language = j;
             }, error: function (j) {
-                console.log('error loading languages: ' + j)
+                console.log('error loading languages: ' + j);
             }
         });
     }
-    main('start');
+    main('start', function () {
+        cow_hay();
+    });
     $('body').on('click', '.flavor .flavor_tab', function () {
-        $('#main_base, #main_addon, #main_combo, #main_cone').hide();
-        $('#' + $(this).attr('x-id')).show().find('img').each(function () {
+        var xid = $(this).attr('x-id');
+        $('.flavor .inner_flavor_container').hide();
+        $('#' + xid).show().find('img[x-src]').each(function () {
             var xsrc = $(this).attr('x-src');
             if (typeof xsrc !== 'undefined') {
                 $(this).attr('src', xsrc).removeAttr('x-src');
@@ -112,7 +123,7 @@ $(document).ready(function () {
         $(this).addClass('active');
         $('.filter_box').remove();
         if ($(this).parent().find('.expand').hasClass('active')) Icecream.paginate(0);
-        if ($(this).attr('x-id') == 'main_combo') {
+        if (xid == 'main_combo') {
             var that = this;
             $.ajax({
                 url : '/me',
@@ -124,39 +135,32 @@ $(document).ready(function () {
                         url : '/combos',
                         type: 'GET',
                         dataType: 'JSON',
-                        success: function (combos) {
-                            var combo_len = combos.length;
-                            for (i in user_me.combos) {
-                                var combo, flavor, addon;
+                        success: function (j) {
+                            combos = j;
+                            var combo_len = user_me.combos.length;
+                            for (var i = 0; i < combo_len; i++) {
                                 var combo_id = user_me.combos[i];
-                                if ($('.combo_option[x-id="' + combo_id + '"]').length == 0) {
-                                for (var k = 0; k < combo_len; k++) {
-                                    if (combos[k]._id == combo_id) {
-                                        combo = combos[k];
-                                        break;
-                                    }
-                                }
-                                for (n in flavors) {
-                                    flavor = flavors[n];
-                                    if (flavor._id == combo.flavor_id) break;
-                                }
-                                for (n in toppings) {
-                                    addon = toppings[n];
-                                    if (addon._id == combo.topping_id) break;
-                                }
-                                var div = $('<div />', {
-                                        'class': 'combo_option tooltip option', 
-                                                'x-type': 'combo', 
-                                                'x-id': combo._id, 
-                                                'x-addon': addon._id, 
-                                                'x-flavor': flavor._id,
-                                                'x-value': combo.value,
-                                                'x-name': combo.name,
-                                        'draggable': true,
-                                        'style': 'background-image:url(' + image_prepend + '/toppings/' + addon.name.replace(/\W/g, '') + '.png), url('+image_prepend+'/' + flavor.name.replace(/\s+/g, '') + 
-                                        '_thumb.png), url('+image_prepend+'/background_icons.png)',
-                                        'text': combo.name
+                                if ($('.combo_option[x-id="' + combo_id + '"]').length === 0) {
+                                    var combo = Icecream.get_combo(combo_id);
+                                    var combo_franken = null;
+                                    var flavor = Icecream.get_flavor(combo.flavor_id);
+                                    var addon = Icecream.get_addon(combo.topping_id);
+                                    if (combo.franken_id) combo_franken = Icecream.get_flavor(combo.franken_id);
+
+                                    var div = $('<div />', {
+                                            'class': 'combo_option tooltip option', 
+                                                    'x-type': 'combo', 
+                                                    'x-id': combo_id, 
+                                                    'x-addon': addon._id, 
+                                                    'x-flavor': flavor._id,
+                                                    'x-franken': combo.franken_id,
+                                                    'x-value': combo.value,
+                                                    'x-name': combo.name,
+                                            'draggable': true,
+                                            'style': 'background-image:url(' + image_prepend + '/toppings/' + addon.name.replace(/\W/g, '') + '.png), url('+image_prepend+'/' + flavor.name.replace(/\s+/g, '') + '_thumb.png)',
+                                            'html': combo.name + ( (combo_franken)? '<div class="combo_split" style="background-image: url('+image_prepend+'/' + combo_franken.name.replace(/\s+/g, '') + '_thumb.png)"></div>' : '')
                                     });
+
                                     $('.flavor div#main_combo').prepend(div);
                                     $(div).wrap('<div class="option_wrapper"></div>');
                                 }
@@ -167,7 +171,79 @@ $(document).ready(function () {
                 }
             });
             
+        } else if (xid == 'main_franken') {
+            $('#main_franken').remove();
+            $('.flavor').append('<div class="inner_flavor_container" id="main_franken">' +
+                '<div class="col_3 franken_left"><div class="option_wrapper"></div></div>' +
+                '<div class="col_3 franken_center"><b>&lt; - - - - - &gt;</b><p>Select your flavours<br><br></p><button>Combine!</button></div><div class="col_3 franken_right"><div class="option_wrapper"></div></div></div>');
+            //$('.col_2.franken_left .option_wrapper').html( $('#main_base .option.selected')[0].outerHTML );
         }
+    });
+    $('body').on('click', '.franken_option', function () {
+        var f_text = $(this).text();
+        var f_len = flavors.length;
+        var f;
+        for (var i = 0; i < f_len; i++) {
+            f = flavors[i];
+            if (f.name == f_text) break;
+        }
+        var f_name = f.name.replace(/\s+/g, '');
+        
+        $(this).closest('.col_3').find('.option_wrapper').html('<img x-type="base" x-value="' + f.value + '" x-base-value="' + f.base_value + '" class="option tooltip" x-id="' + f._id + '" id="' + f_name + '" src="' + image_prepend + '/' + f_name + '_thumb.png">');
+        $('.franken_selector').remove();
+        $('.franken_center p').html( get_franken_info() );
+        $('.franken_center b').html( get_franken_image() );
+    });
+    $('body').on('click', '#main_franken button', function () {
+        var f_1 = $('.col_3.franken_left .option').attr('x-id');
+        var f_2 = $('.col_3.franken_right .option').attr('x-id');
+        if (!f_1 || !f_2 || f_1 == f_2) {
+            return alert('Please select two different flavours to combine.');
+        }
+        
+        $.ajax({
+            url: '/last/franken',
+            data: { one: f_1, two: f_2},
+            dataType: 'json',
+            type: 'POST',
+            success: function (j) {
+                if (j.message) {
+                    return alert(j.message);
+                }
+                user_me.last_flavor = f_1;
+                user_me.last_frankenflavour = f_2;
+                main('base');
+                _gaq.push(['_trackEvent', 'Flavour', 'Combined a frankenflavour', $('#franken_name').text()]);
+            }
+        });
+    });
+    $('body').on('click', '#main_franken .option_wrapper', function (e) {
+        $('.franken_selector').remove();
+        $(this).after('<div class="franken_selector"><div class="selector_nav"><div class="col_3 active" x-show="selector_normal">Normal</div><div class="col_3" x-show="selector_heroic">Heroic</div><div class="col_3" x-show="selector_legendary">Legendary</div></div>' +
+            '<p id="selector_normal"></p><p id="selector_heroic" style="display: none;"></p><p id="selector_legendary" style="display: none;"></p><div class="franken_close">Close</div></div>');
+        var f_len = flavors.length;
+        for (var i = 0; i < f_len; i++) {
+            if (i < (24 * 3) ) {
+                $('.franken_selector p#selector_normal').append('<div class="franken_option">' + flavors[i].name + '</div>');
+            } else if (i < (27 * 3) && user_me.upgrade_frankenflavour >= 2) {
+                $('.franken_selector p#selector_heroic').append('<div class="franken_option">' + flavors[i].name + '</div>');
+            } else if (user_me.upgrade_frankenflavour == 3) {
+                $('.franken_selector p#selector_legendary').append('<div class="franken_option">' + flavors[i].name + '</div>');
+            }
+        }
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+    });
+    $('body').on('click', '.franken_selector .col_3', function () {
+        $('.franken_selector .col_3').removeClass('active');
+        $(this).addClass('active');
+        var show = $(this).attr('x-show');
+        $('.franken_selector p').hide();
+        $('.franken_selector p#' + show).show();
+    });
+    $('body').on('click', '.franken_close', function () {
+        $('.franken_selector').remove();
     });
     $('body').on('click', '.highscores .button_container .flavor_tab, .highscores .flavor_tab#hide', function () {
         if ($(this).attr('id') == 'hide') {
@@ -179,13 +255,12 @@ $(document).ready(function () {
         $('.refresh_highscores').click();
     });
     $('body').on('click', '.tab', function () {
-        console.log('switching tabs to ' + $(this).attr('id'));
         if ($(this).hasClass('locked')) return false;
         $('.tab.active').removeClass('active');
         $(this).addClass('active');
         $('.flavors_inner, .employees_inner, .upgrades_inner, .toppings_inner, .cones_inner').hide();
         $('.' + $(this).attr('id') + '_inner').show();
-        $('.' + $(this).attr('id') + '_inner img').each(function () {
+        $('.' + $(this).attr('id') + '_inner img[x-src]').each(function () {
             var xsrc = $(this).attr('x-src');
             if (typeof xsrc !== 'undefined') {
                 $(this).attr('src', xsrc).removeAttr('x-src');
@@ -214,35 +289,35 @@ $(document).ready(function () {
         return false;
     });
     $('body').on('click', '.flavor .expand', function () {
-        if ($(this).text() == '+') {
+        if (!$(this).hasClass('active')) {
             $('#main_base, #main_addon, #main_combo, #main_cone').addClass('expanded').css('overflow', 'visible');
             Icecream.paginate(0);
-            $(this).text('-').addClass('active');
+            $(this).text('Minimize').addClass('active');
         } else {
             $('#main_base, #main_addon, #main_combo, #main_cone').removeClass('expanded').css('overflow', 'hidden');
-            $(this).text('+').removeClass('active');
+            $(this).text('Expand').removeClass('active');
             $('.filter_box').remove();
         }
     });
     $('body').on('click', '.quests .expand', function () {
-        if ($(this).text() == '+') {
+        if (!$(this).hasClass('active')) {
             $('.quest').show();
-            $(this).text('-').addClass('active');
+            $(this).text('Minimize').addClass('active');
         } else {
             $('.quest').hide();
             $('.quest:first').show();
-            $(this).text('+').removeClass('active');
+            $(this).text('Expand').removeClass('active');
         }
     });
     $('body').on('click', '.chat.main_container .expand', function () {
-        if ($(this).text() == '+') {
+        if (!$(this).hasClass('active')) {
             $('.chat.main_container').attr('x-expand', true);
             $('#chat_window').css('overflow-y', 'scroll');
-            $(this).text('-').addClass('active');
+            $(this).text('Minimize').addClass('active');
         } else {
             $('.chat.main_container').attr('x-expand', false);
             $('#chat_window').css('overflow-y', 'hidden');
-            $(this).text('+').removeClass('active');
+            $(this).text('Expand').removeClass('active');
         }
         cached_last_message = '';
         $('#chat_window').text('');
@@ -265,8 +340,8 @@ $(document).ready(function () {
         var scroll_top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
         var top = $(this).offset().top - 20;
         var reverse;
-        if (top < 200 + scroll_top) { 
-            top += 275;
+        if (top < 150 + scroll_top) { 
+            top += 225;
             reverse = true;
         }
         $('.hovercard').css('top', top - scroll_top);
@@ -298,8 +373,23 @@ $(document).ready(function () {
             $('.hovercard').html('<div>Add-on research<span class="level">' + user_me.upgrade_addon + '</span></div><p>Each level unlocks 3 new add-ons for your ice cream</p>');
         } else if (xtype == 'trending') {
             $('.hovercard').html('<div>Trending</div>This flavour is in demand! Sell it quickly while it\'s hot. As it gets sold more it becomes less popular.<p class="flavor_text">Every 1,000 sales reduces the bonus by $0.05. After 75,000 sales the trend cycles out.</p>'); 
+        } else if (xtype == 'adopt_cow') {
+            $('.hovercard').html('<div>Adopt a Cow</div>Adopt a helper to increase your Ice Cream sales. Cows can equip items, and have ability scores (Strength, Constitution, Intelligence).<p class="flavor_text">When a cow grows old it can be replaced with a new, younger and stronger cow. Cows persist through prestige.</p>'); 
         } else if (xtype == 'friend') {
             $('.hovercard').html('<div>Friend</div><p>Make the Ice Cream Stand more exciting and play with friends. Every day your friends get a bonus .01% of any money you earn. This doesn\'t take away from what you earn. It\'s a fascimile of social interaction that gives you some of the benefits.</p>');
+        } else if (xtype == 'item') {
+            var item = $(this).attr('x-name');
+            $('.hovercard').html('<div>' + item.replace(/_/g, ': ') + '</div><p>This is an item the cow has equipped</p>');
+            $('.hovercard').css('z-index',12);
+        } else if (xtype == 'strength') {
+            $('.hovercard').html('<div>Strength</div><p>Strength increases the % bonus increase of your cow. Every 1 point of strength gives an additional 1% bonus to income.</p>');
+            $('.hovercard').css('z-index',12);
+        } else if (xtype == 'constitution') {
+            $('.hovercard').html('<div>Constitution</div><p>Constitution decreases the rate at which your happiness declines. Each point in constitution decreases the decline rate by 5%.</p>');
+            $('.hovercard').css('z-index',12);
+        } else if (xtype == 'intelligence') {
+            $('.hovercard').html('<div>Intelligence</div><p>Intelligence increases the total amount of happiness your cow can have. Each points increase your total happiness by 2.</p>');
+            $('.hovercard').css('z-index',12);
         } else if (xtype == 'autopilot') {
             $('.hovercard').html('<div>Autopilot<span class="level">' + user_me.upgrade_autopilot + '</span></div><p>automatically sells your active flavor for you. Selling once every 10 seconds per level of autopilot.</p><p>It can be leveled up to 250.</p>');
         } else if (xtype === 'coldhands') {
@@ -336,51 +426,72 @@ $(document).ready(function () {
             } else {
                 $('.hovercard').html('<div>Accumulation Highscores</div><p>This is a leaderboard for the amount of money earned in one consecutive batch.</p>');
             }
-             $('.hovercard').css('height', 80).css('margin-top', '-205px');
+            $('.hovercard').css('height', 80);
+        } else if (xtype === 'inventory') {
+            var name = $(this).attr('x-name');
+            $('.hovercard').html('<div><img src="' + image_prepend + '/items/' + name.replace(/\s+/g, '') + '.png" class="inventory_hover_img" /> ' + name + '</div><p>This is an item in your inventory.</p>');
+        } else if (xtype === 'ipm') { 
+            var sales_time = (5 - (user_me.upgrade_machinery*0.25));
+            var income_per_minute_worker = (sales_per/sales_time)*cached_worker_value*60;
+            var income_per_minute_ap = user_me.upgrade_autopilot * 6 * cached_sell_value;
+            $('.hovercard').html('<div>Income Breakdown</div><table class="ipm_breakdown">' +
+                '<tr><td>Average worker value</td><td>$' + (cached_worker_value).toFixed(2) + '</td></tr>' +
+                '<tr><td>Number of Sales</td><td>$' + sales_per + '<br>' +
+                '<tr><td>Income from workers</td><td>$' + (income_per_minute_worker).toFixed(2) + '</td></tr>' +
+                '<tr><td>Income from autopilot</td><td>$' + (income_per_minute_ap).toFixed(2) + '</td></tr>' +
+                '<tr><td>Total</td><td>$' + (income_per_minute_ap + income_per_minute_worker).toFixed(2) + '</td></tr>' +
+                '</table>');
         } else if (xtype === 'vote') {
-            var xname = $(this).attr('x-name');
+            var xname =  $(this).attr('x-name');
             var title = (xname)? 'Vote for ' + xname : 'Voting';
             $('.hovercard').html('<div>' + title + '</div><p>Click on a flavour to vote for it. The ice cream conglomerates will influence public perception and make the public want a specific flavour of ice cream enough that they would be willing to pay a premium.' + 
             'The flavour with the most votes will be the next to trend. The trending bonus goes up by $.05 for each vote. You can vote once every 10 minutes.</p>');
         } else if (xtype === 'cow') {
+            if (!cow.name) {
+                $('.hovercard').html('<div>Adopt A Cow</div><p>Adopt a cow under the <b>Upgrade menu</b> first.</p>');
+                return false;
+            }
             var cow_status = 'is happy';
             var cow_emote = ':)';
-            if (cow_happiness < 0.1) {
+            if (cow.happiness < 10) {
                 cow_status = 'is unhappy';
                     cow_emote = ':(';
-            } else if (cow_happiness < 0.2) {
+            } else if (cow.happiness < 20) {
                 cow_status = 'demands sacrifices';
                 cow_emote = '>:(';
-            } else if (cow_happiness < 0.3) {
+            } else if (cow.happiness < 30) {
                 cow_status = 'is unhappy and full of ignorance';
                 cow_emote = ':<';
-            } else if (cow_happiness < 0.4) {
+            } else if (cow.happiness < 40) {
                 cow_status = 'is unhappy and full of attachment';
                 cow_emote = ':c';
-            }else if (cow_happiness < 0.5) {
+            }else if (cow.happiness < 50) {
                 cow_status = 'is unhappy and full of aversion';
                 cow_emote = ';|';
-            } else if (cow_happiness < 0.6) {
+            } else if (cow.happiness < 60) {
                 cow_status = 'is feeling existential';
                 cow_emote = ':o';
-            } else if (cow_happiness < 0.7) {
-                cow_status = 'contemplates his role in the grand scheme of things';
+            } else if (cow.happiness < 70) {
+                cow_status = 'contemplates his role';
                 cow_emote = ':|';
-            } else if (cow_happiness < 0.8) {
+            } else if (cow.happiness < 80) {
                 cow_status = 'is content';
                 cow_emote = ':)';
-            } else if (cow_happiness < 0.9) {
+            } else if (cow.happiness < 90) {
                 cow_status = 'is elated';
                 cow_emote = ':^)';
             }
             user_me.cow_level = 100 * ( user_me.cow_clicks / ( user_me.cow_clicks + 1000 ) );
             var next_level = Math.ceil( user_me.cow_level );
             var progress =  100 + ( (user_me.cow_level - next_level) / .01 );
-            $('.hovercard').html('<div>' + user_me.cow_name.replace(/(<|>)/gi, '') + '<span class="level">' + Math.floor(user_me.cow_level) + '</span></div><p><i class="emote">' + cow_emote + '</i>' +
-                ' The cow <b>' + cow_status + ' (' + Math.ceil(cow_happiness * 100).toFixed(0) + '%)</b><div class="cow_level_bar"><span style="width: ' + progress + '%;"></span></div> ' + user_me.cow_clicks + ' clicks</p><p class="flavor_text">Use the cow to make it happy. A happy cow produces more, and gives you +10% sales + .5% per level. This persists through prestige.</p>');
+            var cname = (cow)? cow.name : user_me.cow_name.replace(/(<|>)/gi, '');
+            $('.hovercard').html('<div>' + cname + '<span class="level">' + Math.floor(user_me.cow_level) + '</span></div><p><i class="emote">' + cow_emote + '</i> ' +
+                cname + ' <b>' + cow_status + ' (' + (cow.happiness).toFixed(0) + '%)</b><div class="cow_level_bar"><span style="width: ' + progress + '%;"></span></div> ' + user_me.cow_clicks + ' Hay</p><p class="flavor_text">Feed your cow hay to make it happy. A happy cow produces more, and gives you +10% sales + .5% per level.<br><b>Click to view more.</b></p>');
         } else if (xtype == 'expertise') {
             $('.hovercard').css('left', '23%'); 
             $('.hovercard').html('<div>Expertise level</div><p>Sell this flavor to raise your expertise level. Higher value flavors are more difficult to master. Each level gives a bonus +10% to the flavor\'s value for you and your workers. The maximum expertise level is 15.</p>');
+        }   else if (xtype == 'frankenflavour') {
+            $('.hovercard').html('<div>Frankenflavour</div><p>Combine two flavours into one stronger flavour. Frankenflavour transformations last 20 minutes and are free. There are three tiers, one for normal, heroic, and legendary.</p><p class="flavor_text">To unlock each of the three tiers requires the item "lab parts". The first drops from the combo It\'s Alive. Frankenflavours do not last through prestige. </p>');
         }  else if (xtype == 'prestige') {
             $('.hovercard').css('height', 180).css('font-size', '12px');
            var current_prestige = get_prestige_bonus(user_me);
@@ -401,18 +512,20 @@ $(document).ready(function () {
         } else if (xtype == 'heroic') {
             $('.hovercard').html('<div>Heroic Tier<span class="level">' + user_me.upgrade_heroic + '</span></div><p>Unlock 3 high level flavors and add-ons. This can be upgraded 3 times.</p>');
         } else if (xtype == 'legendary') {
-            $('.hovercard').html('<div>Legendary Tier<span class="level">' + user_me.upgrade_legendary + '</span></div><p>Unlock 3 high level flavors and add-ons. This can be upgraded 2 times.</p>');
+            $('.hovercard').html('<div>Legendary Tier<span class="level">' + user_me.upgrade_legendary + '</span></div><p>Unlock 3 high level flavors and add-ons. This can be upgraded 2 times. You must have 1 level of Prestige to unlock this.</p>');
         } else if (xtype == 'combo') {
             var combo_value = parseFloat($(elem).attr('x-value'));
             var flavor_value = 0;
             var addon_value = 0;
-            for (i in flavors) {
+            var f_len = flavors.length;
+            var t_len = toppings.length;
+            for (var i = 0; i < f_len; i++) {
                 if (flavors[i]._id == $(elem).attr('x-flavor')) {
                     flavor_value = flavors[i].value;
                     break;
                 }
             }
-            for (i in toppings) {
+            for (var i = 0; i < t_len; i++) {
                 if (toppings[i]._id == $(elem).attr('x-addon')) {
                     addon_value = toppings[i].value;
                     break;
@@ -420,15 +533,23 @@ $(document).ready(function () {
             }
             $('.hovercard').html('<div>' + $(elem).attr('x-name') + '<span class="level flavor_current">' + (combo_value + flavor_value + addon_value).toFixed(2) + '</span></div><p>Click this ice cream to switch to it for a bonus <b>$' + parseFloat($(this).attr('x-value')).toFixed(2) + '</b></p><p class="flavor_text">Combos are made by matching a certain base and addon into an even better flavor. Increases the value of the flavor.</p>');
         } else if (xtype == 'value') {  
-            $('.hovercard').css('top',(parseInt($(elem).css('top')) - 40) + 'px').css('margin-left', (((canvas_cache_width / 4) - 300) / 2) + 'px');
-            var flavor = flavors[i];
-            for (i in flavors) {
-                flavor = flavors[i];
-                if (flavor._id == $('#main_base .selected').attr('x-id')) break;
+            var top = parseInt( $(elem).offset().top ) - 40;
+            $('.hovercard').css('top', top).css('margin-left', (((canvas_cache_width / 4) - 300) / 2) + 'px');
+            var flavor = Icecream.get_flavor( user_me.last_flavor );
+            var base_type = 'Flavour';
+            var base;
+            var time_left = '';
+            if (user_me.last_frankenflavour) {
+                base_type = 'Frankenflavour';
+                var frankenflavour = Icecream.get_flavor( user_me.last_frankenflavour );
+                base = (flavor.value + frankenflavour.value) * 0.75; 
+                var time_delta = new Date() - new Date(user_me.last_frankenflavour_at);
+                time_left = 'Time left: ' + (20 - (time_delta / 1000 / 60)).toFixed(1) + ' Minutes';
+            } else {
+                base = flavor.value;
             }
-            var base = flavor.value;
             var base_mods = 0;
-            $('.hovercard').html('<div>' + $('.current_flavor').text() + '</div><p style="text-align: right;">Base value: $' + parseFloat(base).toFixed(2) + '<br />' +
+            $('.hovercard').html('<div>' + $('.current_flavor').text() + '</div>' + time_left + '<p style="text-align: right;">' + base_type +' value: $' + parseFloat(base).toFixed(2) + '<br />' +
             'Add-on value: $' + parseFloat($('#main_addon .selected').attr('x-value')).toFixed(2) + '<br /></p>');
             if (cached_cone_value > 0) {
                 $('.hovercard p').append('Cone bonus: $' + parseFloat(cached_cone_value).toFixed(2) + '<br />');
@@ -460,7 +581,8 @@ $(document).ready(function () {
             }
             $('.hovercard').css('left', ($(elem).offset().left - 25) + 'px');
         } else if (xtype == 'base') {
-            for (i in flavors) {
+            var f_len = flavors.length;
+            for (var i = 0; i < f_len; i++) {
                 var flavor = flavors[i];
                 if (flavor._id == $(elem).attr('x-id')) {
                     var expertise = parseInt($(elem).parent().find('.expertise_level').text());
@@ -470,18 +592,20 @@ $(document).ready(function () {
                     var value = flavor.value + expertise_bonus + prestige_bonus;
                     var flavors_sold_index = user_me.flavors.indexOf(flavor._id);
                     var num_sold = (parseInt(user_me.flavors_sold[flavors_sold_index]) > 0)? user_me.flavors_sold[flavors_sold_index] : '0';
-                    $('.hovercard').html('<div>' + flavor.name + '<span class="level flavor_current">' + parseFloat(value).toFixed(2) + '<small>Base: $' + (flavor.value).toFixed(2) + '</small></span></div><p>' + flavor.description + '</p>' + 
-                    '<p>Maximum base value $' + parseFloat(flavor.base_value).toFixed(2) + ' You\'ve sold: ' + num_sold + '</p><p class="flavor_text">Flavour value fluctuates over time based on supply.</p>');
+                    $('.hovercard').html('<div>' + flavor.name + '<span class="level flavor_current money_icon">' + parseFloat(value).toFixed(2) + '</span></div>' +
+                        '<p>' + flavor.description + '</p>' + 
+                    '<p>Value <span class="money_icon">' + parseFloat(flavor.value).toFixed(2) + '</span> (Max <span class="money_icon">' + parseFloat(flavor.base_value).toFixed(2) + '</span>). You\'ve sold: ' + num_sold + '</p><p class="flavor_text">Flavour value fluctuates over time based on supply.</p>');
                     break;
                 }
                 $('.hovercard').html('<div>' + $(elem).attr('id') + '<span class="level flavor_current">?<small>Base: ?</small></span></div><p>This flavour has not yet been unlocked</p>' + 
                 '<p>Maximum base value ? You\'ve sold: 0</p><p class="flavor_text">Flavour value fluctuates over time based on supply.</p>');
             }
         } else if (xtype == 'addon') {
-            for (i in toppings) {
+            var t_len = toppings.length;
+            for (var i = 0; i < t_len; i++) {
                 var t = toppings[i];
                 if (t.name == $(elem).attr('id')) {
-                    $('.hovercard').html('<div>' + t.name + '<span class="level flavor_current">' + t.value.toFixed(2) + '</span></div><p>Add-ons can be used with a base flavour to increase the value of ice cream.</p><p class="flavor_text">Addons increase the value of every ice cream you or your workers sell and do not decrease in value over time like flavours.</p>');
+                    $('.hovercard').html('<div>' + t.name + '<span class="level flavor_current money_icon">' + t.value.toFixed(2) + '</span></div><p>Add-ons can be used with a base flavour to increase the value of ice cream.</p><p class="flavor_text">Addons increase the value of every ice cream you or your workers sell and do not decrease in value over time like flavours.</p>');
                     break;
                 }
             }
@@ -508,6 +632,21 @@ $(document).ready(function () {
     $('body').on('click', '.flavor .combo_option', function () {
         $('#main_base .option[x-id="' + $(this).attr('x-flavor') + '"]').click();
         $('#main_addon .option[x-id="' + $(this).attr('x-addon') + '"]').click();
+        var franken = $(this).attr('x-franken');
+        if (franken) {
+            $.ajax({
+                url: '/last/franken',
+                data: { 
+                    one: $(this).attr('x-flavor'),
+                    two: franken
+                },
+                dataType: 'json',
+                type: 'POST',
+                success: function (j) {
+                    main('flavour');
+                }
+            });
+        }
     });
     $('body').on('click', '#main_cone .option', function () {
         cached_cone = $(this).attr('id');
@@ -521,7 +660,6 @@ $(document).ready(function () {
             'whitechocolate': 1.00,
         };
         cached_cone_value = cached_cone_value_options[cached_cone];
-        console.log('cone value: ' + cached_cone_value);
         $('.flavor #main_cone .option.selected').removeClass('selected');
         $(this).addClass('selected');
         var flavor = Icecream.get_flavor(user_me.last_flavor);
@@ -535,40 +673,45 @@ $(document).ready(function () {
         $('.flavor .option[x-type="addon"].selected').removeClass('selected');
         $(this).addClass('selected');
         var addon_name = image_prepend + '/toppings/' + $(this).attr('id').replace(/\W/g, '') + '.png';
-        console.log('Switching to ' + addon_name);
         $('.icecream #topping').attr('style', 'background-image: url(' +addon_name + ');');
         $('.icecream #topping').attr('x-addon', $(this).attr('id'));
 
-
-        user_me.last_addon = $(this).attr('x-id');
-        $.ajax({
-            url: 'last_flavor',
-            data: 'f=' + user_me.last_flavor + '&a=' + user_me.last_addon,
-            dataType: 'JSON',
-            type: 'POST',
-            success: function (j) {
-                combos = j;
-                update_sell_value();
-                Icecream.update_worker_fx();
-            }
-        });
+        if (combos.length === 0 || user_me.last_addon != $(this).attr('x-id') ) {
+            user_me.last_addon = $(this).attr('x-id');
+            $.ajax({
+                url: 'last_flavor',
+                data: 'f=' + user_me.last_flavor + '&a=' + user_me.last_addon,
+                dataType: 'JSON',
+                type: 'POST',
+                success: function (j) {
+                    combos = j;
+                    update_sell_value();
+                    Icecream.update_worker_fx();
+                }
+            });
+        }
         var total_value = parseFloat($('#main_base .option.selected').attr('x-value')) + parseFloat($('#main_addon .option.selected').attr('x-value'));
     });
-    $('body').on('click', '.flavor .option[x-type="base"]', function () {
+    $('body').on('click', '#main_base .option[x-type="base"]', function () {
         $('.flavor .option[x-type="base"].selected').removeClass('selected');
         $(this).addClass('selected');
         var id = $(this).attr('x-id');
         var flavor = Icecream.get_flavor(id);
+        $('.icecream_franken').remove();
         if (user_me.last_flavor === id) {
             $('.icecream, .sell_value').css('display','block');
             var f_name = flavor.name.replace(/\s+/g, '');
             $('.icecream').css('background-image', 'url("'+image_prepend+'/' + f_name + '.png"), url("'+image_prepend+'/cones/'+cached_cone+'.png")');
-            $('.current_flavor').text(__(flavor.name) );
-             if ($('#main_addon .selected').length > 0) $('.current_flavor').append('<br/>' + __('with') + ' ' + __($('#main_addon .selected').attr('id')) );
+            if (user_me.last_frankenflavour) {
+                var franken = Icecream.get_flavor(user_me.last_frankenflavour);
+                 var franken_name = franken.name.replace(/\s+/g, '');
+                $('.icecream').prepend('<div class="icecream_franken" style="background-image: url(' + image_prepend + '/' + franken_name + '.png);"></div>');
+            }
             update_sell_value();
             init_canvas();
         } else {
             user_me.last_flavor = id;
+            user_me.last_frankenflavour = null;
             $.ajax({
                 url: 'last_flavor',
                 data: 'f=' + user_me.last_flavor + '&a=' + user_me.last_addon,
@@ -600,6 +743,14 @@ $(document).ready(function () {
         if (t == 'prestige') {
             game_working = false;
         }
+        if (t == 'legendary' && user_me.prestige_level === 0) {
+            $(this).append('<div class="unlock_update">Requires 1 level of Prestige.</div>');
+            setTimeout(function () {
+                $('.unlock_update').remove();
+                $('.upgrade_error').removeClass('upgrade_error');
+            }, 3000);
+            return;
+        }
         if ($(this).hasClass('sell')) $(this).addClass('upgrade_sell'); 
         $('.unlock_update').remove();
          $('.upgrade_error').removeClass('upgrade_error');
@@ -617,6 +768,9 @@ $(document).ready(function () {
             success: function (j) { 
                 if (j.message) {
                     return alert(j.message, 'Result');
+                }
+                if (j.err) {
+                    alert(j.err);
                 }
                 if (j.error) {
                     if (user_me.is_tooltip) {
@@ -660,6 +814,7 @@ $(document).ready(function () {
                         if ($('.flavor.main_container .expand').hasClass('active')) {
                             Icecream.paginate(cached_page);
                         }
+                        Icecream.update_quest_bar();
                     });
                 }
             }, 
@@ -675,6 +830,9 @@ $(document).ready(function () {
     window.onblur = function() {
         window_focus = false;
     };
+    window.onresize = function() {
+        init_canvas();
+    };
     window.onfocus = function() {
         window_focus = true;
         canvas_icecream_sales_dirty = true;
@@ -683,37 +841,50 @@ $(document).ready(function () {
             cached_new_messages = 0;
         }
     };
-    function load_changelog(v) {
-        $('.message_close').click();
+    /*
+    function load_changelog(offset) {
         $.ajax({
-            url: 'changelog_' + v + '.txt?v=' + v,
-            data: 'cache=' + Math.random(),
-            datatype: 'text',
+            url: 'https://s3.amazonaws.com/icecreamstand.com/patch.json.gz',
+            data: { cache: Math.random() },
+            type: 'get',
+            dataType: 'json',
             success: function (j) {
-                if (!j) {
-                    return alert('<small>No changelog for this patch</small>', 'CHANGELOG - ' + v);
+                if (!j || !j.notes[offset]) {
+                    return alert('<small>No changelog for this patch</small>', 'CHANGELOG - ' + offset);
                 }
-                alert('<div class="changelog_container">' + j.replace(/\n/g, '<br />') + '<p><a href="#" id="prev_chagelog" x-patch="' + (v-0.01) + '">View previous changelog (' + (v-0.01) + ')</a></p></div>', 'CHANGELOG');
-                $('#prev_chagelog').click(function () {
-                    load_changelog($(this).attr('x-patch'));
-                });
+                var notes = j.notes[offset];
+                console.log(notes);
+                alert('<div class="changelog_container"><h3>' + notes.title + '</h3>' + notes.changes.join('<br>') + '<p><a href="#" id="prev_chagelog" x-offset="' + (offset+1) + '">View previous changelog</a></p></div>', 'Changelog');
             },
-            error: function (j) {
-                return alert('<small>No changelog for this patch</small>', 'CHANGELOG');
+            error: function (err) {
+                console.log(err);
+                return alert('<small>Error loading changelog for this patch</small>', 'CHANGELOG');
             }
         });
         return false;
     }
+    $('body').on('click', '#prev_chagelog', function () {
+        load_changelog($(this).attr('x-offset'));
+    });
+    
     $('body').on('click', '#version_num', function () {
-        load_changelog(version);
+        $('.message_close:last').click();
+        load_changelog(0);
         return false;
     });
-    $('body').on('click', '.message .button, .message_close', function () {
+    */
+    $('body').on('click', '.message_close, .darkness', function () {
         if ($(this).hasClass('update')) return;
-        $('.message, .darkness').remove();
+        $('.message, .darkness, .alert_shadow:last').remove();
+        $('.alert_shadow').each(function () {
+            var top = $(this).offset().top;
+            var left = parseInt($(this).css('margin-left'));
+            var opac = $(this).css('opacity');
+            $(this).css('top', top + 20).css('margin-left', left + 20 + 'px').css('opacity', opac + 0.2);
+        });
         alert_active = false;
         if (alert_queue.length > 0) { 
-            alert(alert_queue[0].msg, alert_queue[0].title, alert_queue[0].button_text);
+            alert(alert_queue[0].msg, alert_queue[0].title);
             alert_queue.shift();
         }
     });
@@ -733,24 +904,36 @@ $(document).ready(function () {
         $(this).remove();   
         return false;
     });  
+    $('body').on('click', '.settings_tab', function () {
+        var area = $(this).attr('x-area');
+        if ( $(this).attr('x-active') === 'false' ) {
+            $('.settings_tab[x-active="true"], .settings_area[x-active="true"]').attr('x-active', 'false');
+            $(this).attr('x-active', 'true');
+            $('.settings_area[x-area="' + area + '"]').attr('x-active', 'true');
+        }
+    });
     $('body').on('click', '.view_settings', function () {
         alert('<form action="user_update" method="POST" class="alert-form">' +
-        '<h2>Basic</h2>' +
+        '<div class="button_container"><div class="settings_tab" x-area="1" x-active="true">Basic</div><div class="settings_tab" x-area="2" x-active="false">Advanced</div><div class="settings_tab" x-area="3" x-active="false">Email</div></div><div class="settings_area" x-area="1" x-active="true">' +
         '<div class="squish">Username<input type="text" placeholder="USERNAME" name="username" value="' + user_me.name + '"></div>' +
-        '<div class="squish">Password<input type="password" placeholder="OPTIONAL PASSWORD" name="password"></div>' +
         '<div class="squish">Email ' + ((user_me.email_verified)? '(verified)': '(<a href="verify/resend">resend verification</a>)') + '<input type="text" placeholder="OPTIONAL EMAIL" name="email" value=' + ((user_me.email)? user_me.email : '') + '></div>' +
-        '<div class="squish">Cow Name<input type="text" placeholder="COW" name="cow_name" value="' + user_me.cow_name + '"></div>' +
-        '<h2>Advanced</h2>' +
-        '<div class="squish">Release channel <input type="radio" name="release_channel" value="0" />main <input type="radio" name="release_channel" value="1" />beta <input type="radio" name="release_channel" value="2" />alpha</span></div>' +
+        '<div class="squish">Password<input type="password" placeholder="OPTIONAL PASSWORD" name="password"></div>' +
+        '</div><div class="settings_area" x-area="2" x-active="false">' +
+        '<div class="squish">Ignore List (comma seperated)<input type="text" placeholder="ignore list" name="ignore" value="' + ((user_me.ignore)? user_me.ignore : '') + '"></div>' +
+        '<div class="squish">Release channel <input type="radio" name="release_channel" value="0" />Main <input type="radio" name="release_channel" value="1" />Beta ' +
+        ( (user_me.badges.indexOf(1) === -1)? ' &nbsp; <small>You must be a donor to access Alpha</small>' : '<input type="radio" name="release_channel" value="2" />Alpha') + '</span></div>' +
         '<div class="squish">Language: <a href="/en">English</a> <a href="/jp">Japanese</a>' + '</div>' +
         '<div class="squish"><div class="toggle_outer"><div class="toggle_animations toggle_container">animations off</div>' +
         '<div class="toggle_chat toggle_container">Do not Disturb</div>' + 
         '<div class="toggle_night toggle_container">Night Mode</div>' + 
-        '<div class="toggle_tooltips toggle_container">Tooltips</div><div class="toggle_badge toggle_container">Display Badge</div></div><div class="display_settings"></div><input type="submit" value="Update" class="button update" id="settings_update"></div></form>', __('Update Your Settings'), __('Cancel'));
+        '<div class="toggle_tooltips toggle_container">Tooltips</div><div class="toggle_badge toggle_container">Display Badge</div><div class="toggle_second_row toggle_container">New below top row</div></div><div class="display_settings"></div>' +
+        '</div></div>' +
+        '<div class="settings_area" x-area="3" x-active="false"><div class="squish">Email me when...</div><div class="toggle_email_addresschange toggle_container">My email address changes</div></div>' +
+        '<input type="submit" value="Update" class="button update" id="settings_update"></form>', __('Update Your Settings'), __('Cancel'));
         $('.display_settings').html('<div class="toggle_display toggle_container" x-id="flavor">Ice Cream</div>' +
         '<div class="toggle_display toggle_container" x-id="quests">Quests</div><br />' +
         '<div class="toggle_display toggle_container" x-id="achievements">Trending and Event</div>' +
-        '<div class="toggle_display toggle_container" x-id="chat">Chat</div>');
+        '<div class="toggle_display toggle_container" x-id="chat">Chat</div></div>');
 
 
         $('.alert-form input[type="radio"][value="' + user_me.release_channel + '"]').attr('checked', true);
@@ -762,6 +945,7 @@ $(document).ready(function () {
         if (user_me.is_tooltips) $('.toggle_tooltips').addClass('checked');
         if (user_me.chat_off) $('.toggle_chat').addClass('checked');
         if (!user_me.badge_off) $('.toggle_badge').addClass('checked');
+        if (user_me.is_second_row) $('.toggle_second_row').addClass('checked');
         if (user_me.is_night) $('.toggle_night').addClass('checked');
         if (debug_mode) $('.toggle_debug').addClass('checked');
         if (!game_working) $('.toggle_working').addClass('checked'); 
@@ -796,15 +980,15 @@ $(document).ready(function () {
                 '</td></tr><tr><td>Flavours</td><td>' + user_me.flavors.length +
                 '</td></tr><tr><td>Add-ons</td><td>' + user_me.toppings.length +
                 '</td></tr><tr><td>Quests</td><td>' + user_me.quests.length +
-                '</td></tr><tr><td>Cow Clicks</td><td>' + user_me.cow_clicks +
+                '</td></tr><tr><td>Cow Hay</td><td>' + user_me.cow_clicks +
                 '</td></tr><tr><td>Ice cream sold</td><td>' + numberWithCommas(user_me.icecream_sold) +
                 '</td></tr><tr><td>Sales every ' + (5 - (user_me.upgrade_machinery*0.25)) + ' seconds</td><td>' + sales_per + 
-                '</td></tr><tr><td>Average Worker Sale: </td><td>$' + (cached_worker_value).toFixed(2) + 
                 '</td></tr><tr><td>Prestige Values: </td><td>' + user_me.prestige_array.join('<br>') +
                 '</td></tr></table>';
     }
     $('body').on('click', '.vote_box', function () { 
         $(this).css('bottom', -25);
+        var flavour = $(this).attr('x-name');
         $.ajax({
             url: 'vote/' + $(this).attr('x-id'),
             dataType: 'json',
@@ -812,6 +996,7 @@ $(document).ready(function () {
             success: function (j) {
                 if (j.success) {
                     Icecream.update_flavors();
+                    _gaq.push(['_trackEvent', 'Flavour', 'Voted for a flavour', flavour]);
                 } else if (j.error) {
                     alert(j.error);
                 }
@@ -829,15 +1014,14 @@ $(document).ready(function () {
     });
     $('body').on('click', '#message_read', function () { 
         var message = $(this).parent();
-        if ( (message).hasClass('new_message') ) $(message).hide();
         cache_unread_message = false;
         $.ajax({
             url: 'message/read/' + $(message).attr('x-id'),
             dataType: 'json',
             type: 'post',
             success: function (j) { 
+                if ( (message).hasClass('new_message') ) $(message).hide();
                 if ($('.message').length > 0) {
-                    $('.message_close').click(); //exit message alert
                     $('.friends_button_container').click(); //trigger message alert
                 }
             }
@@ -845,14 +1029,14 @@ $(document).ready(function () {
     });
     $('body').on('click', '#message_remove', function () { 
         var message = $(this).parent();
-        if ( (message).hasClass('new_message') ) $(message).hide();
+        
         $.ajax({
             url: 'message/remove/' + $(message).attr('x-id'),
             dataType: 'json',
             type: 'post',
-            success: function (j) {        
+            success: function (j) {
+                if ( (message).hasClass('new_message') ) $(message).hide();        
                 if ($('.message').length > 0) {  
-                    $('.message_close').click(); //exit message alert
                     $('.friends_button_container').click(); //trigger message alert
                 }
             }
@@ -865,41 +1049,14 @@ $(document).ready(function () {
             dataType: 'json',
             type: 'post',
             success: function (j) {
-                $('.message_close').click();
                 if (j.error) return alert(j.error);
+                $('.message_close:last').click();
             }
         });
-    });
-    $('body').on('click', '.cow', function (e) { 
-        if (cow_happiness >= 1)  {
-            $(this).append('<div class="icecream_float cow_float">:|</div>');
-            $('.cow_float').animate({
-                top: -50
-            }, function () {
-                $(this).remove();
-            });
-            cow_happiness = 1;
-            return;
-        }
-        if (cow_happiness > 0.9) {
-            update_sell_value();
-        }
-        cow_happiness += 0.1;
-        if (cow_happiness > 1)  cow_happiness = 1;
-        user_me.cow_clicks++;
-        $(this).trigger('mouseout').trigger('mouseover');
-        $(this).append('<div class="icecream_float cow_float">:)</div>');
-        $('.cow_float').animate({
-            top: -50
-        }, function () {
-            $(this).remove();
-        });
-        return false;
     });
     $('body').on('click', '.toggle_container', function () { 
         $(this).toggleClass('checked');
         var is_checked = $(this).hasClass('checked');
-        console.log('changing.. ' + is_checked);
         if ($(this).hasClass('toggle_animations')) {
             if (disable_animations != is_checked) {
                 $.ajax({
@@ -930,6 +1087,17 @@ $(document).ready(function () {
                     }
                 });
                 user_me.is_night = is_checked;
+            }
+        } else if ($(this).hasClass('toggle_second_row')) {
+            if (user_me.is_second_row != is_checked) { //because disable_chat is when chat is unchecked
+                $.ajax({
+                    url: 'toggle/second_row',
+                    type: 'POST',
+                    sucess: function(j) {
+
+                    }
+                });
+                user_me.is_second_row = is_checked;
             }
         } else if ($(this).hasClass('toggle_tooltips')) {
                 $.ajax({
@@ -983,16 +1151,18 @@ $(document).ready(function () {
     });
     $('body').on('drop', '.flavor.main_container .option', function (e) {
         // Don't do anything if dropping the same column we're dragging.
+        var transfer_data = e.originalEvent.dataTransfer.getData('text/html');
+        if (transfer_data == 'hay' || transfer_data == 'rock') return false;
         if (dragSrcEl != this) {
             // Set the source column's HTML to the HTML of the column we dropped on.
             dragSrcEl.outerHTML = this.outerHTML;
-            this.outerHTML = e.originalEvent.dataTransfer.getData('text/html');
+            this.outerHTML = transfer_data;
             var switch_1 = $('.option.over').attr('x-id');
             var switch_2 = $('.option.drag').attr('x-id');
             
 
-            
-            if ($(this).attr('x-type') === 'addon') {
+            var xtype = $(this).attr('x-type');
+            if (xtype === 'addon') {
                 var switch_1_i = user_me.toppings.indexOf(switch_1);
                 var switch_2_i = user_me.toppings.indexOf(switch_2);
                 user_me.toppings[switch_1_i] = switch_2;
@@ -1003,7 +1173,7 @@ $(document).ready(function () {
                     dataType: 'JSON',
                     type: 'POST'
                 });
-            } else if ($(this).attr('x-type') === 'combo') {
+            } else if (xtype === 'combo') {
                 var switch_1_i = user_me.combos.indexOf(switch_1);
                 var switch_2_i = user_me.combos.indexOf(switch_2);
                 user_me.combos[switch_1_i] = switch_2;
@@ -1014,7 +1184,7 @@ $(document).ready(function () {
                     dataType: 'JSON',
                     type: 'POST'
                 });
-            } else if ($(this).attr('x-type') === 'cone') {
+            } else if (xtype === 'cone') {
                 var switch_1_i = user_me.cones.indexOf(switch_1);
                 var switch_2_i = user_me.cones.indexOf(switch_2);
                 user_me.cones[switch_1_i] = switch_2;
@@ -1057,9 +1227,19 @@ $(document).ready(function () {
         }
         return false;
     });
+    $('body').on('keydown', '#new_message input', function () {
+        socket.emit('typing');
+    });
     $('body').on('submit', '#new_message', function () {
         var badge = (!user_me.badge_off)? $(this).attr('x-badge') : '';
-        $('#new_message').fadeTo(500, 0.5);
+        var msg = {
+            badge: badge,
+            text: $(this).find('input[type="text"]').val()
+        };
+        socket.emit('chat message', msg);
+        $('#new_message input[type=\"text\"]').val('').focus();
+        //load_message(msg);
+        return false;
         $.ajax({ 
             url: 'chat',
             data: {
@@ -1070,9 +1250,12 @@ $(document).ready(function () {
             type: 'POST',
             timeout: 5000,
             success: function (msg) {
-                if (msg.error) return alert(msg.error);
+                if (msg.error) {
+                    return alert(msg.error);
+                }
                 if (msg.text) {
                     //var b64 = window.btoa( msg.created_at );
+                    cached_last_message = msg.created_at;
                     var div = $('<div />', { 'class': 'chat chat_pending', 'x-id': msg._id});
                     var user_name = $('<span />', { text: msg.user, 'class': 'user_card', 'x-user': msg.user });
                     if (msg.badge) $(user_name).prepend('<img src="' + image_prepend + '/badge_' + msg.badge + '.png" class="chat_badge" />');
@@ -1083,8 +1266,6 @@ $(document).ready(function () {
                 } else {
                     Icecream.sync_chat();
                 }
-                clearInterval(interval_chat);
-                interval_chat = setInterval(function () { Icecream.sync_chat(); }, 5000);
                 var objDiv = document.getElementById("chat_window"); //scroll to bottom
                 objDiv.scrollTop = objDiv.scrollHeight;
                 $('#new_message').fadeTo(500, 1);
@@ -1094,7 +1275,9 @@ $(document).ready(function () {
                 $('#new_message').fadeTo(500, 1);
             }
         });
-        setTimeout("$('#new_message input[type=\"text\"]').val('').focus();", 100);
+        setTimeout(function () {
+            $('#new_message input[type=\"text\"]').val('').focus();
+        }, 100);
         return false;
     });
     $('body').on('click', '.individual_badge', function () {
@@ -1157,7 +1340,10 @@ $(document).ready(function () {
                         $('.unlock_update').remove();
                         $('.upgrade_error').removeClass('upgrade_error');
                     }, 2500);
-                } else {
+                    return false;
+                }
+                Icecream.cloud( Math.random() * 2 );
+                _gaq.push(['_trackEvent', 'Quest', 'Completed Quest', user_me.quests.length]);
                     if (user_me.quests.length == 2) {
                         $('.quests').addClass('.half_size');
                         cache_event_trend_enable = true;
@@ -1168,26 +1354,23 @@ $(document).ready(function () {
                     if (id == '526745240fc3180000000002') {
                         alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Congratulations! Successfully completed the final quest of the main storyline, earning + $1.00 when a flavor trends or there is an add-on event.<br /><br /><b>Now onward to dynamic quests!</b>', 'Quest Complete'); 
                     } else if (id == '52577a6288983d0000000001') {
-                        alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Congratulations! Successfully completed the quest, in return the Ice Cream Princess teaches you the wonders of workers and minimum wage. What would you do without her!<br /><br /><b>Unlocked Workers</b>', 'Quest Complete'); 
+                        alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Congratulations! Successfully completed the quest, in return Joy grants you a workers permit. Bring on the minimum wage!<br /><br /><b>Unlocked Workers</b>', 'Quest Complete'); 
                     } else if (id == '52672bedde0b830000000001') {
-                        alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Congratulations! Successfully completed the quest, in return the Ice Cream Princess teaches you trends and events. So much to learn!<br /><br /><b>Unlocked trends and add-on events</b>', 'Quest Complete'); 
+                        alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Congratulations! Successfully completed the quest, in return Joy teaches you trends and events. So much to learn!<br /><br /><b>Unlocked trends and add-on events</b>', 'Quest Complete'); 
                         Icecream.update_trending();
                         Icecream.update_event();
                     } else if (j.name == 'dynamic quest') {
-                        alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Congratulations! Successfully completed the quest, earning + $0.25 when a flavor trends or there is an add-on event.<br /><br /><b>The next quest will unlock soon.</b>', 'Quest Complete'); 
+                        alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Congratulations! Successfully completed the quest, earning + $0.25 when there is an add-on event.<br /><br /><b>The next quest will unlock soon.</b>', 'Quest Complete'); 
                     } else {
-                        alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Congratulations! Successfully completed the quest, earning + $1.00 when a flavor trends or there is an add-on event.<br /><br /><b>The next quest will unlock once you have more money.</b>', 'Quest Complete'); 
+                        alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Congratulations! Successfully completed the quest, earning + $1.00 when there is an add-on event.<br /><br /><b>The next quest will unlock once you have more money.</b>', 'Quest Complete'); 
                     }
-                    main('complete quest', function () {
-                        Icecream.get_quest();
-                    });
+                    main('quest');
                     $(that).addClass('upgrade_success');
                     $('.upgrade_success').append('<div class="unlock_update">QUEST COMPLETE</div>');
                     setTimeout(function () {
                         $('.unlock_update').remove();
                          $('.upgrade_success').removeClass('upgrade_success');
                     }, 2500);
-                }
             }, 
             error: function (xhr) {
                 $(that).addClass('upgrade_error');
@@ -1207,70 +1390,76 @@ $(document).ready(function () {
     });
     $('body').on('click', '#invite', function () {
         var url = 'http://icecreamstand.ca/sign_up?refer=' + btoa(user_me.name);
-        alert('<p><b>Give your friend this URL</b> to sign up with and get 25% of their money for that day whenever they complete a quest!</p><center><a href="' + url + '" target="_blank">' + url + '</a></center>', 'Refer a friend');
+        alert('<p><b>Give your friend this URL</b> to sign up with and get 25% of their money for that day whenever they complete a quest!</p><center><input type"text" id="refer_url" value="' + url + '"></center>', 'Refer a friend');
+        $('#refer_url').select().focus();
         return false;
     });
-    $('body').on('mouseout', '.user_card, user', function () {
-        $('.user_info_card').hide();
-    });
-    $('body').on('mouseover', '.user_card', function () {
-        get_usercard( $(this).attr('x-user'), $(this).offset());
-    });
-    $('body').on('click', 'user', function () {
-        get_usercard( $(this).attr('x-user'), $(this).offset());
+    $('body').on('click', 'user, .user_card', function () {
+        get_usercard( $(this).attr('x-user') );
     });
     function get_usercard(user, offsets) {
-        console.log('getting user card for ' + user);
-        var off_top = offsets.top + 20;
-        if (off_top - $(window).scrollTop() + 250 > $(window).height()) off_top -= 250;
-        var div = $('.user_info_card[x-user="' + user + '"]');
-        if (div.length > 0) {
-            if (div.is(':visible')) {
-                div.remove();
-            } else {
-                div.css('top', off_top).css('left', offsets.left).show();
-            }
-            return;
-        }
-        div = $('<div />', { text: 'loading...', 'class': 'user_info_card', 'x-user' :  user});
-        $(div).css('top', off_top).css('left', offsets.left);
+
         $.ajax({
             url: 'user/' + user,
             success: function (j) {
                 if (j.error) {
-                    $('.user_info_card[x-user="' + j.name + '"]').html(j.error);
+                    alert(j.error, 'Error');
                     return;
                 }
                 var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
-                var friend = '';
+                var friend = 'Add as Friend</div>';
+                var friend_enabled = 'true';
                 if (user_me.friends && user_me.friends.indexOf(j._id) > -1) {
-                    friend = (j.friend)? 'Mutual Friend' : 'Friendly towards';
+                    friend = (j.friend)? 'Mutual Friends!' : 'Your Friend';
+                    friend_enabled = 'false';
                 } else if (j.friend) {
-                    friend = 'Friendly';
+                    friend = 'Return their Friendship';
                 }
-                $('.user_info_card[x-user="' + j.name + '"]').html('<div class="user_info_inner"><h4 class="user_card_name">' + 
-                j.name + ' <span class="user_info_prestige">Prestige ' + j.prestige_level + ' (' + j.prestige_bonus + '%)</span></h4><table>' +
-                '<tr><td class="user_info_type" colspan="2">' + j.title + ' <span class="user_card_friend">' + friend + '</span></td></tr>' +
-                '<tr><td>Flavors: ' + j.flavors + '</td><td>Addons: ' + j.toppings + '</td></tr>' +
-                '<tr><td>Quests: ' + j.quests + '</td><td>Combos: ' + j.combos + '</td></tr>' +
-                '<tr><td>Carts: ' + j.carts + '</td><td>Employees: ' + j.employees + '</td></tr>' +
-                '<tr><td>Trucks: ' + j.trucks + '</td><td>Robots: ' + j.robots + '</td></tr>' +
-                '<tr><td>Rockets: ' + j.rockets + '</td><td>Aliens: ' + j.aliens + '</td></tr>' +
-                '<tr><td>Coldhands: ' + j.cold_hands + '</td><td>Autopilot: ' + j.autopilot + '</td></tr>' +
-                '<tr><td>Cow level: ' + Math.floor(j.cow_level) + '</td><td>Sold: ' + numberWithCommas(j.sold) + '</td></tr>' +
-                '</table><time>Active ' + j.updated_at + ' ago</time><div class="badges"></div></div><div class="user_icecream" style="background-image: url(' + image_prepend + '/' + j.last_flavor.replace(/\s+/g, '') + '.png), url(' + image_prepend + '/cones/' + j.cone + '.png)"></div>');
-                if (j.badges && j.badges.length > 0) {
-                    for (i in j.badges) {
-                        $('.user_info_card[x-user="' + j.name + '"] .badges').append('<img src="' + image_prepend + '/badge_' + j.badges[i] + '.png" class="user_info_badge" />');
+                var online_status = (j.updated_at === '<1 minute')? 'online' : 'offline';
+                var user_cow = '';
+                if (j.cow) {
+                    user_cow = '<div class="user_cow_inner"><img src="http://static.icecreamstand.ca/cow.svg" />';
+                    var rainbow = false;
+                    if (j.cow.items) {
+                        for (var i = 0; i < j.cow.items.length; i++) {
+                            if (j.cow.items[i] == 'wings_rainbow') rainbow = true;
+                            user_cow = user_cow + '<div x-type="' + j.cow.items[i].replace(/"/g, '') + '" class="cow_attachment"></div>';
+                        }
+                    }
+                    var cow_name = j.cow.name.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
+                        return '&#'+i.charCodeAt(0)+';';
+                    });
+                    user_cow = user_cow + '<div class="user_cow_title" x-rainbow="' + rainbow + '">' + cow_name + '</div></div>';
+                }
+                alert('<img src="http://www.gravatar.com/avatar/' + j.gravatar + '?s=100&d=http://static.icecreamstand.ca/vanilla_thumb.png" class="gravatar" /><div class="user_info_inner">' +
+                '<table>' +
+                    '<tr><td><b>Flavors</b>' + j.flavors + '</td><td><b>Add-ons</b>' + j.toppings + '</td></tr>' +
+                    '<tr><td><b>Prestige</b>' + j.prestige_level + ' (' + j.prestige_bonus + '%) ' + '</td><td><b>Achievements</b>' + j.achievements + '</td></tr>' +
+                    '<tr><td><b>Quests</b>' + j.quests + '</td><td><b>Combos</b>' + j.combos + '</td></tr>' +
+                    '<tr><td><b>Carts</b>' + j.carts + '</td><td><b>Employees</b>' + j.employees + '</td></tr>' +
+                    '<tr><td><b>Trucks</b>' + j.trucks + '</td><td><b>Robots</b>' + j.robots + '</td></tr>' +
+                    '<tr><td><b>Rockets</b>' + j.rockets + '</td><td><b>Aliens</b>' + j.aliens + '</td></tr>' +
+                    '<tr><td><b>Coldhands</b>' + j.cold_hands + '</td><td><b>Autopilot</b>' + j.autopilot + '</td></tr>' +
+                    '<tr><td><b>Cow level</b>' + Math.floor(j.cow_level) + '</td><td><b>Sold</b> ' + numberWithCommas(j.sold) + '</td></tr>' +
+                '</table><div class="user_bottom_panel">' +
+                    '<time class="' + online_status + '" title="Last seen ' + j.updated_at + ' ago.">' + online_status + '</time>' +
+                    '<div class="button send_message" x-user="' + j.name + '">Message</div>' +
+                    '<div class="button add_friend" x-enabled="' + friend_enabled + '" x-user="' + j.name + '">' + friend + '</div>' +
+                    '<div class="badges"></div>' +
+                '</div><div class="user_cow" x-user="' + j.name + '" x-night="' + j.is_night + '">' + user_cow + '</div>' +
+                '<div class="user_icecream" style="background-image: url(' + image_prepend + '/' + j.last_flavor.replace(/\s+/g, '') + 
+                '.png), url(' + image_prepend + '/cones/' + j.cone + '.png)"><img src="' + image_prepend + '/toppings/' + j.last_addon.replace(/\s+/g, '') + '.png" class="user_addon" /></div>', j.name.substring(0,1).toUpperCase() + j.name.substring(1) + ', ' + j.title);
+                if (j.badges) {
+                    var b_len = j.badges.length;
+                    for (var i = 0; i < b_len; i++) {
+                        $('.message .badges').append('<img src="' + image_prepend + '/badge_' + j.badges[i] + '.png" class="user_info_badge" />');
                     } 
                 }
             },
             error: function (j) {
-                alert('failed to load user card');
-                $('.user_info_card[x-user="' + j.name + '"]').remove();
+                alert('failed to load user card', 'Error');
             }
         });
-        $('body').append(div);
     }
     $('body').on('mousemove', '#canvas_sales', function (e) {
         var sales_lastmove_stamp_temp = new Date().getTime();
@@ -1283,7 +1472,6 @@ $(document).ready(function () {
             var c = canvas_cache_sales[i];
             var x2 = c[1];
             var y2 = c[2];
-            //console.log(x + 'vs' + x2);
             if (within_z(x, x2, y, y2, c[3])) {
                 if (!cached_canvas_pointer) {
                     $('#canvas_sales').css('cursor', 'pointer');
@@ -1311,7 +1499,6 @@ $(document).ready(function () {
             var c = canvas_cache_sales[i];
             var x2 = c[1];
             var y2 = c[2];
-            //console.log(x + 'vs' + x2);
             if (within_z(x, x2, y, y2, c[3])) {
                 cache_sell_misses = 0;
                 var c_delta = user_me.upgrade_coldhands / 10;
@@ -1364,13 +1551,16 @@ $(document).ready(function () {
     function within_z(x, x2, y, y2, z) {
         return (x > x2 - z && x < x2 + z && y > y2 - z && y < y2 + z);
     } 
-    function message_user(user) {
-        if ($('.message').length > 0) {
-            $('.message_close').click();
-        }
-        alert('<textarea id="friend_message_textarea" placeholder="Message"></textarea><button x-user="' + user + '" id="friend_message_button">Send</button>', 'Message ' + user.substring(0,1).toUpperCase() + user.substring(1), 'Cancel');
+    function message_user(user, message) {
+        alert(( (message)? '<p>' + message + '</p>' : '' ) + '<textarea id="friend_message_textarea" placeholder="Message"></textarea><button x-user="' + user + '" id="friend_message_button">Send</button>', __('Message') +
+        ' ' + user.substring(0,1).toUpperCase() + user.substring(1));
         $('#friend_message_textarea').select().focus();
     }
+    $('body').on('click', '.friend_reply', function () {
+        var u = $(this).attr('x-user');
+        var msg = $(this).closest('tr').find('.message_body').text();
+        message_user(u, msg);
+    });
     $('body').on('click', '#compose_send', function () {
         var u = $('#compose_to').val();
         if (u) {
@@ -1378,10 +1568,11 @@ $(document).ready(function () {
         }
     });
     $('body').on('click', '.view_achievements', function () {
-        alert($('.achievements.main_container .achievement_list').html(), 'Achievements');
+        get_achievements();
         return false;
     });
     $('body').on('click', '.friends_button_container', function () {
+        alert('...', 'Private Messages');
         $.ajax({
             url: 'messages',
             dataType: 'JSON',
@@ -1393,7 +1584,6 @@ $(document).ready(function () {
         });
     });
     function display_messages(start, length) {
-        $('.message_close').click();
         var m_compiled = '';
         if (messages.length == 0) {
             m_compiled = '<tr><td>-</td><td>You have no messages</td></tr>';
@@ -1403,9 +1593,9 @@ $(document).ready(function () {
                 if (m) {
                     var read = (m.is_read)? 'Unread' : 'Read';
                     var d = (new Date(m.created_at)+'').split(' ');
-                    m_compiled = m_compiled + '<tr><td id="message_status_' + read + '"><user x-user="' + m.from + '">' + m.from + '</user><time>' + [d[1], d[2], d[4]].join(' ') + '</time></td><td>' + m.text + '</td><td class="message_options" x-id="' + m._id + '">' +
+                    m_compiled = m_compiled + '<tr><td id="message_status_' + read + '"><user x-user="' + m.from + '">' + m.from + '</user><time>' + [d[1], d[2], d[4]].join(' ') + '</time></td><td class="message_body">' + m.text.replace(/(<|>)/gi, '') + '</td><td class="message_options" x-id="' + m._id + '">' +
                         '<span id="message_read">Mark ' + read + '</span>' + 
-                        '<span class="friend_message" x-user="' + m.from + '"></span>' + 
+                        '<span class="friend_reply" x-user="' + m.from + '"></span>' + 
                         '<span id="message_remove">X</span>' + 
                         '</td></tr>';
                 }
@@ -1414,23 +1604,30 @@ $(document).ready(function () {
         var msg_control = 'Messages ' + start + ' to ' + (start+length) + ' of ' + messages.length;
         if (start > 0) msg_control = '<message-prev>Back</message-prev>' + msg_control;
         if (start + length < messages.length) msg_control = msg_control + '<message-next>Next</message-next>';
-        alert('<table id="message_list">' + m_compiled + '</table><message-controls>' + msg_control + '</message-controls><div id="compose_message"><input id="compose_to" placeholder="Player"><button id="compose_send">Write</button></div>', 'Private Messages');
-        $('message-next').click(function () {
-            display_messages(start + length, length);
-        });
-        $('message-prev').click(function () {
-            display_messages(start - length, length);
-        });
+        alert('<table id="message_list">' + m_compiled + '</table><message-controls x-start="' + start + '" x-len="' + length + '">' + msg_control + '</message-controls><div id="compose_message"><input id="compose_to" placeholder="Player"><button id="compose_send">Write</button></div>', 'Private Messages');
+
     }
-    $('body').on('click', '.friend_message', function () {
-        var u;
-        u = $(this).attr('x-user');
+    $('body').on('click', 'message-next', function () {
+        var start = parseInt($('message-controls').attr('x-start'));
+        var length = parseInt($('message-controls').attr('x-len'));
+        display_messages(start + length, length);
+    });
+    $('body').on('click', 'message-prev', function () {
+        var start = parseInt($('message-controls').attr('x-start'));
+        var length = parseInt($('message-controls').attr('x-len'));
+        display_messages(start - length, length);
+    });
+    $('body').on('click', '.send_message', function () {
+        var u = $(this).attr('x-user');
         if (!u) u = $(this).closest('user').attr('x-user');
         if (u) {
             message_user(u);
+        } else {
+            alert('Could not find player', 'Error');
         }
+        return false;
     });
-    $('body').on('click', '.send_feedback', function () {
+    $('body').on('click', '#feedback', function () {
         message_user('sam');
         return false;
     });
@@ -1445,20 +1642,9 @@ $(document).ready(function () {
         });
     });
     $('body').on('click', '.friends_add', function () {
-        if ($(this).text() == __('Add')) {
-            if ($('.friends_add_text').val() != '') {
-                $.ajax({
-                    url: 'friend/new',
-                    data: {friend: $('.friends_add_text').val()},
-                    type: 'POST',
-                    dataType: 'JSON',
-                    success: function (j) {
-                        if (j.err) alert(j.err);
-                        user_me.friends = j.friends;
-                        cached_online_count = '';
-                        Icecream.sync_friends(); 
-                    }
-                });
+        if ($(this).text() === __('Add')) {
+            if ($('.friends_add_text').val() !== '') {
+                add_friend( $('.friends_add_text').val() );
             }
             $(this).text(__('Add friend'));
             $('.friends_add_text').hide();
@@ -1467,6 +1653,26 @@ $(document).ready(function () {
             $(this).text(__('Add'));
         }
     });
+    $('body').on('click', '.add_friend', function () { //good thing this isn't confusing
+        add_friend($(this).attr('x-user'));
+        return false;
+    });
+    function add_friend(name) {
+        $.ajax({
+            url: 'friend/new',
+            data: {friend: name},
+            type: 'POST',
+            dataType: 'JSON',
+            success: function (j) {
+                var real_name = name.substring(0, 1).toUpperCase() + name.substring(1);
+                if (j.err) return alert(j.err, 'Can not add friend');
+                user_me.friends = j.friends;
+                cached_online_count = '';
+                Icecream.sync_friends(); 
+                alert('Added ' + real_name + ' as a friend!', 'New Friend');
+            }
+        });
+    }
     $('#canvas_main').click(function (e) {
         var x = e.pageX, y = e.pageY;
         var doc = document.documentElement;
@@ -1523,6 +1729,26 @@ $(document).ready(function () {
         });
         e.stopPropagation();
     });
+    $('body').on('submit', '.ajaxify', function () {
+        var update = $(this).attr('x-update');
+        var ajax_update = $(this).serialize();
+        $.ajax({
+            url: $(this).attr('action'),
+            data: ajax_update,
+            type: $(this).attr('method'),
+            success: function (j) {
+                if (j.error) return alert(j.error);
+                $('.darkness').click();
+                if (update === 'refresh') {
+                    location.reload();
+                }
+            },
+            error: function(j) {
+                console.log(j);
+            }
+        });
+        return false;
+    });
     $('body').on('click', '#filter_flavour', function () {
         if ( $('#filter_flavour > div').length === 0) {
             var c = ($('.flavor.main_container .flavor_tab.active').attr('x-id') == 'main_base')? 'filter_flavour_options' : 'filter_addon_options';
@@ -1538,6 +1764,74 @@ $(document).ready(function () {
         }
         
     });
+    $('body').on('click', '.inventory_clear', function () {
+        var num = $(this).attr('x-num');
+        cow.items.splice(num, 1);
+
+        $.ajax({
+            url: 'cow/update',
+            data: { items: cow.items },
+            type: 'post',
+            dataType: 'json'
+        });
+
+        cow_redraw();
+        load_cow(cow);
+    });
+    $('body').on('click', '.user_cow', function () {
+        $.ajax({
+            url: 'user/' + $(this).attr('x-user') + '/cow',
+            dataType: 'json',
+            type: 'get',
+            success: function (j) {
+                load_cow(j);
+            }
+        });
+    });
+    $('body').on('click', '.button_cow', function () {
+        var action = $(this).attr('x-action');
+        if (action == 'rename') {
+            alert('<form class="ajaxify" x-update="refresh" action="cow/update" method="post"><input name="name" value="' + cow.name + '"><input type="submit" value="Rename"></form>', 'Rename ' + cow.name);
+        } else {
+             alert('<form class="ajaxify" x-update="refresh" action="cow/new" method="post">What would you like your new cow named? <input name="name" value="' + cow.name + '"><input type="submit" value="Adopt"></form>', 'Adopting a new Cow');
+        }
+    });
+    $('body').on('click', '.cow', function () {
+        if (!cow || !cow.name) return false;
+        load_cow(cow);
+    });
+    function load_cow(c) {
+        if (!c) {
+            return alert('COuld not find a cow', 'Error');
+        }
+        if (!c.items) {
+            c.items = [];
+        }
+        var days_diff = (new Date() - new Date(c.created_at)) / 86400000;
+        var days_category = 'Young';
+        var button_adopt_text = 'Must be older before you can re-adopt';
+        var button_adopt_enabled = 'false';
+        if (days_diff > 12) days_category = 'Adult';
+        if (days_diff > 32) {
+            days_category = 'Old';
+            button_adopt_text = 'Adopt a new cow';
+            button_adopt_enabled = 'true';
+        }
+        var cow_buttons = (c._id === cow._id)? '<div class="cow_buttons"><div class="button button_cow" x-action="rename">Rename</div><div class="button button_cow" x-action="adopt" x-enabled="' + button_adopt_enabled + '">' + button_adopt_text + '</div></div>': '';
+        var items = '';
+        for (var i = 0; i < c.items.length; i++) {
+            var item = c.items[i].replace(/"/g, '');
+            items = items + '<div class="inventory_slot"><img src="' + image_prepend + '/items/' + item + '.png" x-name="' + item + '" class="inventory_thumb tooltip" x-type="item" />' +
+            ((c._id == cow._id)? '<div class="inventory_clear" x-num="' + i + '">X</div>' : '') + '</div>';
+        }
+        var cow_name = c.name.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
+            return '&#'+i.charCodeAt(0)+';';
+        });
+        alert('<div class="cow_inventory">' + items +
+            '</div><div class="cow_stats"><b class="tooltip" x-type="strength">Strength</b> ' + c.strength + '<br><b class="tooltip" x-type="constitution">Constitution</b> ' + c.constitution + '<br><b class="tooltip" x-type="intelligence">Intelligence</b> ' + c.intelligence + '<br><br>' +
+            '<b>Happiness</b> ' + (c.happiness).toFixed(1) + '<br><b>Age</b> ' + (days_diff).toFixed(1) + ' days (' + days_category + ')' +
+            cow_buttons + '</div>', cow_name);
+    }
     $('body').on('click', '.login a[href="logout"]', function () {
         alert(__('Are you really sure you want to log out?') + ' <a href="/logout" class="button" id="settings_update" style="margin-bottom:10px;">' + __('Log Out') + '</a>', __('Log Out'), __('Cancel'));
         return false;
@@ -1563,7 +1857,8 @@ $(document).ready(function () {
                 var fiveminago = new Date(now.getTime() - 30*60*1000);
                 var limit = 10;
                 if ($('.active#top_100').length > 0) limit = 100;
-                for (i in j) {
+                var j_len = j.length;
+                for (var i = 0; i < j_len; i++){
                     if (i >= limit) break;
                     var user = j[i];
                     var online = (new Date(user.updated_at).getTime() > fiveminago)? 'online' : 'offline';
@@ -1610,16 +1905,172 @@ function populate_cones() {
             $('#main_cone .option#' +  user_me.cones[i]).click();
         }
     }
+    if ( $('.flavor_tab[x-id="main_cone"]').hasClass('active') ) $('.flavor_tab[x-id="main_cone"]').click(); //turn x-src into srcs
     if ($('.cones_inner .unlockable, .cones_inner h3').length === 0) {
         $('.cones_inner').append('<h3>Every cone is unlocked!</h3>');
     }
 }
+function bind_sockets() {
+    socket.on('chat message', function(msg){
+            load_message(msg);
+    });
+    socket.on('join', function(msg){
+            var id = msg._id;
+            console.log(msg);
+            if (user_me.friends.indexOf(id) > -1) {
+                load_message({ _id: Math.random() * 999999, user: ':', badge: '1', text: msg.name + ' has come online' });
+            }
+    });
+    socket.on('typing', function(msg){
+            typing_cache[msg._id] = new Date();
+            setTimeout(function () {
+                if (typing_cache[msg._id] < new Date() - 900) {
+                    $('.is_typing[x-id="' +  msg._id + '"]').remove();
+                }
+            }, 1000);
+            if ($('.is_typing[x-id="' +  msg._id + '"]').length === 0) {
+                $('#typing').append('<span class="is_typing" x-id="' + msg._id + '">' + msg.name + ' is typing.</span>');
+        }
+    });
+}
+function cow_hay() {
+    if ($('.item').length > 5) return;
+    var rand = ( (Math.random() * canvas_width) / 4 ) + canvas_width * 0.75; //randomly in the first half 
+    var type = (Math.random() < .1)? 'rock' : 'hay';
+    if (Math.random() < .01) {
+        type = 'hat_basic';
+    } else if (Math.random() < .015) {
+        type = 'coat_basic';
+    } else if (Math.random() < .0175) {
+        type = 'amulet_basic';
+    } else if (Math.random() < .018) {
+        type = 'wings_rainbow';
+    }
+    var hay = $('<div />', {
+        'class': 'item ' + type,
+        'x-type': type,
+        'x-stats': '',
+        'style': 'left: ' + Math.floor(rand) + 'px',
+        'draggable': true,
+        'text': type
+    });
+    hay.appendTo('body');
+
+    var cols = document.querySelectorAll('.item');
+    [].forEach.call(cols, function(col) {
+        col.addEventListener('dragstart', item_handleDragStart, false);
+        col.addEventListener('dragend', item_handleDragEnd, false);
+        col.addEventListener('drop', item_handleDrop, false);
+        col.addEventListener('dragover', item_handleDragOver, false);
+    });
+}
+function item_handleDragStart(e) {
+    this.style.opacity = '1'; // this / e.target is the source node.
+    dragSrcEl = this;
+
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('name', $(this).text() );
+    e.dataTransfer.setData('type', 'item' );
+
+    $('body').css( 'cursor', $(this).css('background-image') + ', move !important' );
+    item_remove = true;
+}
+function item_handleDragEnd(e) {
+    console.log('drag end');
+    $('.over').removeClass('over');
+    if (item_remove) $(this).remove();
+    $('body').css('cursor', '');
+}
+function item_handleDrop(e) {
+    console.log('dropping on item');
+    $('body').css('cursor', '');
+    if (e.stopPropagation) {
+        e.stopPropagation(); // Stops some browsers from redirecting.
+    }
+    item_remove = false;
+    return false;
+}
+function cow_handleDrop(e) {
+    console.log('dropping on cow');
+    $('body').css('cursor', '');
+    if (e.stopPropagation) {
+        e.stopPropagation(); // Stops some browsers from redirecting.
+
+    }
+    if (dragSrcEl != this && String(e.dataTransfer.getData('type')) == 'item') {
+        var item = String(e.dataTransfer.getData('name'));
+        $(dragSrcEl).remove();
+        if (item == 'rock') {
+            $(this).append('<div class="icecream_float cow_float float_failure">:(</div>');
+            $('.cow_float').animate({
+                    top: -50
+                }, 1000, function () {
+                    $(this).remove();
+                });
+            cow.happiness -= 10;
+            if (cow.happiness < 0) cow.happiness = 0;
+        } else if (item == 'hay') { //make the cow happy
+            if (cow.happiness >= 100)  {
+                $(this).append('<div class="icecream_float cow_float">:|</div>');
+                $('.cow_float').animate({
+                    top: -50
+                }, 1000, function () {
+                    $(this).remove();
+                });
+            cow.happiness = 100;
+            return false;
+            }
+            if (cow.happiness > 90) {
+                update_sell_value();
+            }
+            cow.happiness += 10;
+            if (cow.happiness > 100)  cow.happiness = 100;
+            user_me.cow_clicks++;
+            $(this).trigger('mouseout').trigger('mouseover');
+            $(this).append('<div class="icecream_float cow_float float_success">:)</div>');
+            $('.cow_float').animate({
+                top: -50
+            }, 1000, function () {
+                $(this).remove();
+            });
+        } else {
+            if (!cow.items) cow.items = [];
+            if (cow.items.indexOf( item ) == -1) {
+                cow.items.push( item );
+            }
+            $.ajax({
+                url: 'cow/update',
+                data: { items: cow.items },
+                type: 'post',
+                dataType: 'json'
+            });
+            cow_redraw();
+        }
+        Icecream.sync_cow();
+    }
+    return false;
+}
+function item_handleDragOver(e) {
+    if (e.preventDefault) {
+        e.preventDefault(); // Necessary. Allows us to drop.
+    }
+    e.dataTransfer.dropEffect = 'move';
+    return false;
+}
+function item_handleDragEnter(e) {
+    $('.over').removeClass('over');
+    this.classList.add('over');
+}
+function item_handleDragLeave(e) {
+    $('.over').removeClass('over');
+}
 function update_sell_value() {
-    console.time('update_sell_value()');
     var total_value = 0;
     var f_len = flavors.length;
     var average_sale = 0;
     var t_len = toppings.length;
+    var current_flavor;
+    var is_combo = false;
     cache_combo = null;
     for (var i = 0; i < t_len; i++) {
         var t = toppings[i];
@@ -1636,21 +2087,31 @@ function update_sell_value() {
         }
     }
     $('.banner#trending, .banner#event, .banner#combo').remove();
-    var current_flavor = Icecream.get_flavor(user_me.last_flavor);
-    $('.current_flavor').html(current_flavor.name + ' <br/>' + __('with') + ' ' + $('#main_addon .selected').attr('id'));
+
+    
+    
     for (var i = 0; i < f_len; i++) {
         var flavor = flavors[i];
         if (flavor._id == user_me.last_flavor) { 
+            current_flavor = flavor;
             cached_flavor_value = flavor.value;
+
             var base = parseFloat(flavor.value);
+            if (user_me.last_frankenflavour) {
+                var franken_flavour = Icecream.get_flavor(user_me.last_frankenflavour);
+                base = (flavor.value + franken_flavour.value) * 0.75;
+            }
             base = base + cached_cone_value;
             if (user_me.last_flavor === trending_flavor && trending_bonus) base = base + parseFloat(trending_bonus);
             if (user_me.last_addon === trending_addon && trending_addon) base = base + parseFloat(user_me.trend_bonus);
             for (var k = 0; k < combos.length; k++) {
                 var combo = combos[k];
-                if (combo.flavor_id === user_me.last_flavor &&  combo.topping_id === user_me.last_addon) {
+                if (!combo.franken_id) combo.franken_id = null;
+                if (combo.topping_id === user_me.last_addon && ((combo.flavor_id === user_me.last_flavor &&  combo.franken_id == user_me.last_frankenflavour) 
+                    || (combo.franken_id === user_me.last_flavor &&  combo.flavor_id == user_me.last_frankenflavour)) ) {
                     base += parseFloat(combo.value);
                     $('.current_flavor').text(__(combo.name));
+                    is_combo = true;
                     $('.sell_value').append('<img src="' + image_prepend + '/banner_combo.png" class="banner" id="combo" />'); 
                     cache_combo = combo;
                 }
@@ -1683,13 +2144,25 @@ function update_sell_value() {
                 var expertise_bonus = base * ( .1 * parseInt($('#main_base .option_wrapper').eq(j).find('.expertise_level').text()) );
                 if (isNaN(expertise_bonus)) { console.log('NaN expertise'); expertise_bonus = 0; }
                 var prestige_bonus =  base * (user_me.prestige_bonus / 100);
-                var cow_bonus = (cow_happiness >= 0.9)? base * (0.1 + (user_me.cow_level * 0.05) ) : 0;
+                var cow_bonus = (cow.happiness >= 90)? base * (0.1 + (user_me.cow_level * 0.05) ) : 0;
                 var f_value = cached_worker_addon_value[j] + base + expertise_bonus + prestige_bonus + cow_bonus;
                 //console.log('updating f_value: ' +','+ cached_addon_value +','+ flavor.value +','+ expertise_value +','+ user_me.prestige_bonus);
                 cached_worker_sell_value[j] = f_value;
                 cached_worker_base_value[j] = flavor.value;
                 average_sale += f_value;
                 break;
+            }
+        }
+    }
+    if (!is_combo) {
+        if (user_me.last_frankenflavour) {
+            console.log('updating current flavour name (franken)');
+            $('.current_flavor').html( get_franken( user_me.last_flavor, user_me.last_frankenflavour ).name);
+        } else {
+            if (current_flavor) {
+                var addon_name = ($('#main_addon .selected').attr('id'))?  __('with') + ' ' + $('#main_addon .selected').attr('id') : '';
+                console.log('updating current flavour name to ' + current_flavor.name + ' / ' + addon_name);
+                $('.current_flavor').html(current_flavor.name + ' <br/>' + addon_name);
             }
         }
     }
@@ -1701,18 +2174,17 @@ function update_sell_value() {
     }
     cached_sell_value = parseFloat(total_value).toFixed(2);
     $('.current_value').text( cached_sell_value );
-    var sales_time = (5 - (user_me.upgrade_machinery*0.25));
-    
+
     var ice_creams_sold = (user_me.flavors.length >= 5)? 5 : user_me.flavors.length;
-    average_sale = average_sale / ice_creams_sold;
-    if (isNaN(average_sale)) {
+    cached_worker_value = average_sale / ice_creams_sold;
+    if (isNaN(cached_worker_value)) {
         console.log('avg sale is nan: ' + cached_sell_value);
     } else {
-        cached_worker_value = average_sale;
-        var income_per_minute = ((sales_per/sales_time)*average_sale*60) + (user_me.upgrade_autopilot * 6 * cached_sell_value); //do NOT remove the outer ( )s
+        var sales_time = (5 - (user_me.upgrade_machinery*0.25));
+        var income_per_minute = ((sales_per/sales_time)*cached_worker_value*60) + (user_me.upgrade_autopilot * 6 * cached_sell_value); //do NOT remove the outer ( )s
         $('.gold_sales span').text( numberWithCommas( (income_per_minute).toFixed(0)) );
     }
-    console.timeEnd('update_sell_value()');
+    Icecream.update_quest_bar();
 } 
 
 function update_worker_tiers() {
@@ -1741,9 +2213,11 @@ function update_worker_tiers() {
     $('#unlock_alien .unlock_text span').text(numberWithCommas( (500000+(30 * Math.pow(user_me.aliens,2.5))).toFixed(2) ));
     $('#unlock_alien .sale_level').text(user_me.aliens);
     $('#unlock_prestige .sale_level').text(user_me.prestige_level);
+    $('#unlock_frankenflavour .sale_level').text(user_me.upgrade_frankenflavour);
     if (user_me.upgrade_machinery > 0) $('.option[x-type="machine"]').show();
     if (user_me.upgrade_machinery === 10) $('#unlock_machine').hide();
     if (user_me.upgrade_coldhands === 100) $('#unlock_coldhands').hide();
+    if (user_me.upgrade_frankenflavour === 3) $('#unlock_frankenflavour').hide();
     if (user_me.upgrade_heroic > 0) {
         $('#unlock_heroic .sale_level').text(user_me.upgrade_heroic);
     }
@@ -1775,6 +2249,9 @@ function update_worker_tiers() {
     } else {
         $('#unlock_alien').removeClass('locked');
     }
+    if (user_me.upgrade_frankenflavour > 0) {
+        $('#frankenflavour_tab').show();
+    }
     if (user_me.upgrade_legendary == 2) $('#unlock_legendary .cost,#unlock_legendary button').hide();
     if (user_me.carts > 50) achievement_register('52b535fd174e8f0000000001');
     if (user_me.carts >= 250) achievement_register('52b53613174e8f0000000002');
@@ -1790,10 +2267,9 @@ function main_flavours(update_type, callback) {
         dataType: 'JSON',
         success: function (j) {
             $('#upgrades .flavors_inner').text('');
-            if (update_type === 'sort_flavour') { 
+            if (true || update_type === 'sort_flavour') { 
                 $('#main_base .option_wrapper').remove();
             }
-            console.time('adding flavors');
                 flavors = j; //.sort(function(a, b){ if(a.name < b.name) return -1; if(a.name > b.name) return 1; return 0; });
                     var my_flavors = user_me.flavors.length;
                     var flav_len = flavors.length;
@@ -1815,8 +2291,7 @@ function main_flavours(update_type, callback) {
                             $('#upgrades .flavors_inner').append('<div class="unlockable" id="' + flavor.name + '" x-id="' + flavor._id + '" x-type="base"><img src="' + image_prepend + '/' + f_name + '_thumb.png" class="tooltip" /><div class="unlock_text">' + __(flavor.name) + ' <span class="cost">' + numberWithCommas(flavor.cost) + '</span></div><button>Unlock</button></div>');
                         }
                     }
-                if ($('#main_base > .base_active').length === 0) $('#main_base').prepend('<div class="base_active"></div>');
-                    console.timeEnd('adding flavors');
+                    if ($('#main_base > .base_active').length === 0) $('#main_base').prepend('<div class="base_active"></div>');
                     update_all_expertise();
                     
                     if ($('#upgrades .flavors_inner').text().length == 0) {
@@ -1842,7 +2317,7 @@ function main_flavours(update_type, callback) {
                             }
                             $('#upgrades .flavors_inner').html($('#unlock_legendary')[0].outerHTML);
                         } else {
-                            $('#upgrades .flavors_inner').html('<h3>Every flavour is unlocked!</h3>');
+                            $('#upgrades .flavors_inner').html('<h3>' + __('Every flavour is unlocked!') + '</h3>');
                         }
                     }
                     if (update_type && update_type === 'sort_flavour') { 
@@ -1872,86 +2347,94 @@ function main_toppings(update_type, callback) {
         success: function (j) {
             toppings = j; //.sort(function(a, b){ if(a.name < b.name) return -1; if(a.name > b.name) return 1; return 0; });
             $('#upgrades .toppings_inner').text('');
-            if (update_type === 'sort_addon') { 
+            if (true || update_type === 'sort_addon') { 
                 $('#main_addon .option_wrapper').remove();
             }
-            console.time('adding addons');
             var top_len = user_me.toppings.length;
             for (var i = top_len -1; i >= 0; i--) {
-                                var topping;
-                                for (j in toppings) {
-                                    if (toppings[j]._id == user_me.toppings[i]) { topping = toppings[j]; break; }
-                                }
-                                if ($('.option[x-id="' + topping._id + '"]').length == 0) {
-                                    var topping_name = topping.name.replace(/\s+/g, '');
-                                    var src_attr = (i < 5)? 'src' : 'x-src'; 
-                                    $('.flavor div#main_addon').prepend('<div class="option_wrapper"><img ' + src_attr + '="' + image_prepend + '/toppings/' + topping_name + '_thumb.png" id="' + topping.name + '" x-id="' + topping._id + '" class="option tooltip" x-value="' + topping.value + '" x-type="addon" /></div>');
-                                }
+                var topping = Icecream.get_addon(user_me.toppings[i]);
+                if ($('.option[x-id="' + topping._id + '"]').length == 0) {
+                    var topping_name = topping.name.replace(/\s+/g, '');
+                    var src_attr = (i < 5)? 'src' : 'x-src'; 
+                    $('.flavor div#main_addon').prepend('<div class="option_wrapper"><img ' + src_attr + '="' + image_prepend + '/toppings/' + topping_name + '_thumb.png" id="' + topping.name + '" x-id="' + topping._id + '" class="option tooltip" x-value="' + topping.value + '" x-type="addon" /></div>');
+                }
             }
-                            for (i in toppings) {
-                                var topping = toppings[i];  
-                                if (user_me.toppings.indexOf(topping._id) === -1) {
-                                    $('#upgrades .toppings_inner').append('<div class="unlockable" id="' + topping.name + '" x-id="' + topping._id + '" x-type="addon"><img src="' + image_prepend + '/toppings/' + topping.name.replace(/\s+/g, '') + '_thumb.png" class="tooltip" /><div class="unlock_text">' + __(topping.name) + ' <span class="cost">' + numberWithCommas(topping.cost) + '</span></div><button>' + __('Unlock') + '</button></div>');
-                                }
-                            }
-                            if ($('#main_addon .base_active').length === 0) $('#main_addon').prepend('<div class="base_active"></div>');
-                            console.timeEnd('adding addons');
-                            if (first_time) {
-                                first_time = false;
-                                for (var i = 0; i < user_me.badges.length; i++) {
-                                    var b = user_me.badges[i];
-                                    $('.badge_inner').append('<img src="' + image_prepend + '/badge_' + b + '.png" class="individual_badge" x-badge="' + b + '" />');
-                                }
-                                if (user_me.badges[0]) $('.badge_selector').css('background-image', 'url("' + image_prepend + '/badge_' + user_me.badges[0] + '.png")');
-                                $('form#new_message').attr('x-badge', user_me.badges[0]);
-                                interval_gold = setInterval(function () { Icecream.update_gold()}, 500);
-                                trend_event_active = true;
-                                setTimeout(function () { Icecream.update_flavors(); }, 2000);
-                                setInterval("Icecream.update_flavors();", 45000);
-                                Icecream.get_tutorial();
-                                get_achievements();
-                                var canvas = document.getElementById("canvas_main");
-                                canvas_drop_context = canvas.getContext("2d");
-                                var canvas = document.getElementById("canvas_sales");
-                                canvas_sales_context = canvas.getContext("2d");
-                                var eye_height = Math.random() * 100;
-                                canvas_cache_sales.push( [0, 50, 25 + eye_height, 16, 0] );
-                                canvas_cache_sales.push( [0, 125, 25 + eye_height, 16, 0] );
-                                setInterval(function () { Icecream.canvas_icecream_sales()}, 100);
-                                setInterval(function () { Icecream.canvas_icecream_drop()}, 50);
-                                interval_chat = setInterval(function () { Icecream.sync_chat()}, 15000);
-                                setInterval(function () { Icecream.sync_friends(); Icecream.update_trending(); Icecream.get_quest(); }, 60000);
-                                setInterval(function () { Icecream.cloud()}, 5000);
-                                Icecream.sync_online();
-                                Icecream.sync_friends();
-                                setTimeout(function () { Icecream.update_trending(); }, 100);
-                                Icecream.sync_chat();
-                                interval_sell = setInterval(function () {
-                                    Icecream.process_clicks();
-                                }, 2000);
-                                var channel = ['M', 'B', 'A'];
-                                $('#version_info').html('<span id="online_count">-</span> ' + __('Playing') + ' <a id="version_num">' + __('Changelog ') + ' ' + version + channel[user_me.release_channel] + '</a>');
-                            }
-                            if (user_me.quests.length > 1 || (user_me.quests[0] && user_me.quests[0].split('&')[1] == '0')) $('.tab#employees').removeClass('locked');
-                            if (user_me.quests.length > 2 || (user_me.quests[1] && user_me.quests[1].split('&')[1] == '0')) {
-                                if (!cache_event_trend_enable) {
-                                    cache_event_trend_enable = true;
-                                    Icecream.update_event();
-                                    $('.trending_and_events.main_container').removeClass('hidden');
-                                }
-                            }
-                            Icecream.update_worker_fx();
-                            if (cached_machinery !== user_me.upgrade_machinery) {
-                                clearInterval(interval_employees);
-                                interval_employees = setInterval("Icecream.employees_working();", 5000 - (user_me.upgrade_machinery * 250));
-                            }
-                            cached_machinery = user_me.upgrade_machinery
-                            setTimeout("Icecream.get_quests();", 1000);
-                            $('.flavor .option[x-id="' + user_me.last_flavor + '"]').eq(0).click();  
-                            $('.flavor .option[x-id="' + user_me.last_addon + '"]').eq(0).click();
-                            if (user_me.last_addon == 'undefined') {
-                                $('#main_addon .option').eq(0).click();
-                            }
+            for (var i = 0; i < toppings.length; i++) {
+                var topping = toppings[i];  
+                if (user_me.toppings.indexOf(topping._id) === -1) {
+                    $('#upgrades .toppings_inner').append('<div class="unlockable" id="' + topping.name + '" x-id="' + topping._id + '" x-type="addon"><img src="' + image_prepend + '/toppings/' + topping.name.replace(/\s+/g, '') + '_thumb.png" class="tooltip" /><div class="unlock_text">' + __(topping.name) + ' <span class="cost">' + numberWithCommas(topping.cost) + '</span></div><button>' + __('Unlock') + '</button></div>');
+                }
+            }
+            if ($('#main_addon .base_active').length === 0) $('#main_addon').prepend('<div class="base_active"></div>');
+            if (first_time) {
+                first_time = false;
+                socket = io('http://icecreamstand.ca', { query: "id=" + user_me._id + '&name=' + user_me.name  });
+                bind_sockets();
+                if (user_me.badges) {
+                    for (var i = 0; i < user_me.badges.length; i++) {
+                            var b = user_me.badges[i];
+                            $('.badge_inner').append('<img src="' + image_prepend + '/badge_' + b + '.png" class="individual_badge" x-badge="' + b + '" />');
+                    }
+                    if (user_me.badges[0]) $('.badge_selector').css('background-image', 'url("' + image_prepend + '/badge_' + user_me.badges[0] + '.png")');
+                }
+                $('form#new_message').attr('x-badge', user_me.badges[0]);
+                var cols = document.querySelectorAll('.cow');
+                [].forEach.call(cols, function(col) {
+                    col.addEventListener('dragover', item_handleDragOver, false);
+                    col.addEventListener('drop', cow_handleDrop, false);
+                    col.addEventListener('dragenter', item_handleDragEnter, false);
+                    col.addEventListener('dragleave', item_handleDragLeave, false);
+                });
+                trend_event_active = true;
+                Icecream.get_tutorial();
+                var canvas = document.getElementById("canvas_main");
+                canvas_drop_context = canvas.getContext("2d");
+                var canvas = document.getElementById("canvas_sales");
+                canvas_sales_context = canvas.getContext("2d");
+
+                var eye_height = Math.random() * 100;
+                canvas_cache_sales.push( [0, 50, 25 + eye_height, 16, 0] );
+                canvas_cache_sales.push( [0, 125, 25 + eye_height, 16, 0] );
+
+                setInterval(function () { Icecream.canvas_icecream_sales()}, 100);
+                setInterval(function () { Icecream.canvas_icecream_drop(); }, 50);
+                interval_gold = setInterval(function () { Icecream.update_gold()}, 500);
+                setInterval(function () { 
+                    if (is_deep_sleep) return;
+                    Icecream.sync_friends();
+                    Icecream.update_trending();
+                    Icecream.get_quest();
+                    Icecream.update_flavors();
+                    Icecream.cloud( Math.random() * 2 );
+                    Icecream.sync_cow();
+                }, 60000);
+                Icecream.sync_online();
+                Icecream.sync_friends();
+                setTimeout(function () {
+                    Icecream.update_trending();
+                    Icecream.update_flavors();
+                    Icecream.sync_chat();
+                    Icecream.sync_cow();
+                    Icecream.cloud( Math.random() * 2 );
+                }, 100);
+                interval_sell = setInterval(function () {
+                    Icecream.process_clicks();
+                }, 2000);
+                var channel = ['Main', 'Beta', 'Alpha'];
+                $('#version_info').html('<a href="/stats" id="online_count" target="_blank">-</a> <a href="http://blog.samgb.com/tag/ice-cream-stand/" target="_blank" id="version_num">' + __('View Changelog ') + '</a> V' + version + ' ' + channel[user_me.release_channel]);
+            }
+            Icecream.update_worker_fx();
+            if (!is_deep_sleep &&  cached_machinery !== user_me.upgrade_machinery) {
+                clearInterval(interval_employees);
+                interval_employees = setInterval(function () {
+                    Icecream.employees_working();
+                }, 5000);
+                cached_machinery = user_me.upgrade_machinery;
+                Icecream.get_quests();
+                $('.flavor .option[x-id="' + user_me.last_flavor + '"]').eq(0).click();  
+                $('.flavor .option[x-id="' + user_me.last_addon + '"]').eq(0).click();
+                if (user_me.last_addon == 'undefined') $('#main_addon .option').eq(0).click();
+            }
             if ($('#upgrades .toppings_inner').text().length == 0) {
                 if (user_me.upgrade_addon  < 23) {
                     var src = $('#unlock_addon img').attr('x-src');
@@ -1975,7 +2458,7 @@ function main_toppings(update_type, callback) {
                     }
                     $('#upgrades .toppings_inner').html($('#unlock_legendary')[0].outerHTML);
                 } else {
-                    $('#upgrades .toppings_inner').html('<h3>Every add-on is unlocked!</h3>');
+                    $('#upgrades .toppings_inner').html('<h3>' + __('Every add-on is unlocked!') + '</h3>');
                 }
             }
             if (callback && typeof callback === 'function') {
@@ -2003,23 +2486,37 @@ function main(update_type, callback) {
         success: function (j) {
             if (!j.badges) j.badges = [];
             if (!j.cones) j.cones = [];
+            if (!j.ignore) {
+                j.ignore = '';
+            } else {
+                j.ignore_list = j.ignore.split(',');
+            }
             if (!j.upgrade_coldhands) j.upgrade_coldhands = 0;
             if (j.upgrade_coldhands > 100) j.upgrade_coldhands = 100;
             if (!j.badge_off) j.badge_off = false;
             if (j.is_night) $('body:not(.night)').addClass('night');
             $('.friend_gold').remove();
             if (j.friend_gold) {
-                $('.gold_sales').append('<div class="friend_gold">$' + numberWithCommas( (j.friend_gold).toFixed(0) ) + ' <img src="' + image_prepend + '/moneybag.png" id="moneybag" /></div>');
+                $('.floating_footer').append('<div class="friend_gold"><span class="money_icon">' + numberWithCommas( (j.friend_gold).toFixed(0) ) + '</span><img src="' + image_prepend + '/moneybag.png" id="moneybag" /></div>');
             }
             user_me = j;
             if (!gold) gold = user_me.gold;
             disable_animations = user_me.animations_off;
+            if (disable_animations) {
+                $('#glow').hide();
+            }
             if (user_me.release_channel > 0) debug_mode = true;
-            if (j.is_guest) {
+            if (user_me.is_guest && user_me.total_gold > 100) {
                 $('body').append('<h4 class="inline-message view_settings" id="guest" style="cursor:pointer;">' + __('Set a name and password!') + '<br />' +
                 '<small>' + __('Secure your account, hover over your name at the bottom left and click settings') + '</small></h4>'); 
             }
-            $('.login #name').text(j.name).prepend('<span class="name_tri_up"></span>').css('display', 'inline-block');
+            $('.login #name').text(j.name).attr('x-user', j.name).prepend('<span class="name_tri_up"></span>').css('display', 'inline-block');
+            $('.inventory_item').remove();
+            var items_len = user_me.items;
+            for (var i = 0; i < items_len; i++) {
+                var item = user_me.items[i];
+                $('.floating_footer').append('<div class="inventory_item tooltip" x-type="inventory" x-name="' + item + '"><img src="' + image_prepend + '/items/' + item.replace(/\s+/g, '') + '.png" /></div>');
+            }
             update_worker_tiers();
             
             if (user_me.carts == 1000) achievement_register('52b5361e174e8f0000000003');
@@ -2043,14 +2540,26 @@ function main(update_type, callback) {
                 $('.quests.main_container:not(.half_size)').addClass('half_size');
                 $('.trending_and_events.main_container:not(.half_size)').addClass('half_size');
             }
+            if (user_me.quests.length > 1 || (user_me.quests[0] && user_me.quests[0].split('&')[1] == '0')) $('.tab#employees').removeClass('locked');
+            if (user_me.quests.length > 2 || (user_me.quests[1] && user_me.quests[1].split('&')[1] == '0')) {
+                if (!cache_event_trend_enable) {
+                    cache_event_trend_enable = true;
+                    Icecream.update_event();
+                    $('.trending_and_events.main_container').removeClass('hidden');
+                }
+            }
             cached_flavor_length = user_me.flavors.length;
             get_prestige_bonus(user_me);   
             if (update_type && (update_type === 'cart' || update_type === 'employee' || update_type === 'truck' || update_type === 'robot' || update_type === 'rocket' || update_type === 'alien' || update_type === 'repaint' )) {
-                if (callback && typeof callback === 'function') {
-                    callback();
-                }
                 Icecream.update_worker_fx();
                 update_sell_value();
+                if (callback && typeof callback === 'function') callback();
+                return;
+            }
+            if (update_type && (update_type === 'quest')) {
+                console.log('getting quests...');
+                Icecream.get_quests();
+                Icecream.get_quest();
                 return;
             }
             populate_cones();
@@ -2065,7 +2574,7 @@ function main(update_type, callback) {
                 }
                 var timeout = connect_fails * 10;
                 $('.inline-message').remove();
-                $('body').append('<h4 class="inline-message" id="updated">Connectivity issue<br /><small>Trying again in ' + timeout + ' seconds</small></h4>'); 
+                $('body').append('<h4 class="inline-message" id="updated">Connectivity issue<br /><small>' + __('Trying again in') + ' ' + timeout + ' ' + __('seconds') + '</small></h4>'); 
                 for (var i = 0; i <= timeout; i++) {
                     setTimeout("Icecream.reconnect(" + (timeout - i) + ")", 1000 * i);
                 }
@@ -2091,7 +2600,7 @@ function sell_icecream(amount, workers) {
         if (cached_worker_base_value[i] > 0.1 && !disable_animations && window_focus && canvas_drop_cache_len < 30 && i < user_me.flavors.length) {
             var i_x = (Math.random() * canvas_width) * 0.25;
             canvas_drop_cache.push([i, (Math.random() > 0.5)? i_x : canvas_width - i_x, -90 + (-100 * i), 1]);
-            canvas_drop_cache_len++;
+            canvas_drop_cache_len = canvas_drop_cache.length;
         }
 
         if (outofstock > -1 && user_me.flavors.length > 5) {
@@ -2137,7 +2646,10 @@ function sell_icecream(amount, workers) {
         }
         var net_gold = parseFloat(sales_per * cached_worker_value);
         user_me.gold += parseFloat(sales_per * cached_worker_value);
-        if (cow_happiness > 0) cow_happiness -= 0.001;
+        if (cow.happiness > 0) {
+            cow.happiness -= 0.001;
+            if (Math.random() < .3) cow_hay();
+        }
     }   
     $.ajax({
         url : '/me',
@@ -2155,7 +2667,9 @@ function sell_icecream(amount, workers) {
             cone: cached_cone_value,
             fp: cached_flavor_index,
             ha: cache_sell_float,
-            cc: user_me.cow_clicks //cow clicks
+            cc: user_me.cow_clicks, //cow clicks
+            ds: (is_deep_sleep)? is_deep_sleep : null,
+            v: version,
         },
         dataType: 'JSON',
         type: 'POST',
@@ -2190,6 +2704,9 @@ function sell_icecream(amount, workers) {
                     $('#trend_sold_inner').css('width', ((j.trend / 75000.00) * 100) + '%');
                 }
             }
+            if (j.ifr) {
+                main('flavor');
+            }
             if (j._id && j.value) {
                 var f_len = flavors.length;
                 for (var i = 0; i < f_len; i++) {
@@ -2205,7 +2722,6 @@ function sell_icecream(amount, workers) {
             }
             if (j.cow) {
                 user_me.cow_level = j.cow;
-                console.log('cow level: ' + user_me.cow_level);
             }
         },
         error: function (j) {
@@ -2216,24 +2732,35 @@ function sell_icecream(amount, workers) {
         }
     });  
 }
-function alert(msg, title, button_text) {
-    if (alert_active) {
-        alert_queue.push({
-            'msg': msg,
-            'title': title,
-            'button_text': button_text
+function alert(msg, title) {
+    if (alert_active && alert_current) {
+        if (alert_current.title === title) {
+            $('.message #description').html(msg);
+            alert_current.msg = msg;
+            var height_diff = win_height - $('.message').height();
+            alert_current.top = (height_diff < 0)? 0 : height_diff / 2;
+            $('.message').css('top', alert_current.top);
+            return;
+        }
+        $('body').append('<div class="alert_shadow" style="top: ' + alert_current.top + 'px;"><h4>' + alert_current.title + '</h4><span id="description">' + alert_current.msg + '</span></div>');
+        $('.alert_shadow').each(function () {
+            var top = $(this).offset().top;
+            var left = parseInt($(this).css('margin-left'));
+            var opac = $(this).css('opacity');
+            $(this).css('top', top - 20).css('margin-left', left - 20 + 'px').css('opacity', opac - 0.2);
         });
-        return;
+        alert_queue.unshift( Object.create(alert_current) );
+        console.log(alert_queue);
     }
+    alert_current = { 'msg': msg, 'title': title };
     alert_active = true;
     $('.hovercard').remove();
     if (typeof title == 'undefined') title = __('New Message');
     $('.message, .darkness').remove();
     $('body').append('<div class="message"><div class="message_close">x</div><h4 id="title">' + title + '</h4><span id="description">' + msg + '</span></div></div><div class="darkness"></div>');
     var height_diff = win_height - $('.message').height();
-    height_diff = (height_diff < 0)? 0 : height_diff / 2;
-    console.log('setting modal top to ' + height_diff);
-    $('.message').css('top', height_diff);
+    alert_current.top = (height_diff < 0)? 0 : height_diff / 2;
+    $('.message').css('top', alert_current.top);
 }
 function achievement(title, msg) {
     $('.achievement_bubble').remove();
@@ -2292,33 +2819,40 @@ function achievement_register(id) {
             } else {
                 console.log(j);
             }
-            get_achievements();
         }
     });
 }
 function get_achievements() {
+    alert('. . .', 'Achievements');
     $.ajax({
         url: 'achievements',
         dataType: 'JSON',
         type: 'GET',
         success: function (j) {
-            $('.achievement_list p').text('');
-            for (i in j) {
+            var text_unlocked = '';
+            var text_locked = '';
+            var a_len = j.length;
+            var b_len = user_me.achievements.length;
+            for (var i = 0; i < a_len; i++) {
                 var a = j[i];
                 var unlocked = false;
-                for (n in user_me.achievements) {
-                    if (user_me.achievements[n] == a._id) unlocked = true;
+                for (var p = 0; p < b_len; p++) {
+                    if (user_me.achievements[p] === a._id) {
+                        unlocked = true;
+                        break;
+                    }
                 }
                 if (unlocked) {
-                    $('.achievement_list .unlocked').append('<tr><td>' + a.name + '<td><td>' + a.description + '</td></tr>');
+                    text_unlocked = text_unlocked + '<div><b>' + a.name + '</b> ' + a.description + '</div>';
                 } else {
-                    $('.achievement_list .locked').append('<tr><td>' + a.name + '</td><td>' + a.description + '</td></tr>');
+                    text_locked = text_locked + '<div><b>' + a.name + '</b> ' + a.description + '</div>';
                 }
             }
+            alert('<h5>Achievement points: ' + (user_me.achievements.length * 10) + '</h5><div class="achievements_unlocked">' + text_unlocked + '</div><h5>Remaining Achievements...</h5><div class="achievements_locked">' + text_locked + '</div>', 'Achievements');
         }
     });
 }
-function update_expertise() {
+function update_expertise(cb) {
     if (cached_flavor_value == 0 || cached_flavor_index === -1) { console.log('expertise bp1'); return; }
     var sold = user_me.flavors_sold[cached_flavor_index];
     //console.log('expertise sold: '  +sold + ' index: ' + cached_flavor_index);
@@ -2345,6 +2879,7 @@ function update_expertise() {
         if (expertise == 1) achievement_register('52857dd1def8030000000001');
         if (expertise == 5) achievement_register('5287a8051834ee0000000003');
         if (expertise == 10) achievement_register('5287a7dd1834ee0000000002');
+        if (expertise == 15) achievement_register('53eac41538574559408a53e1');
         Icecream.update_worker_fx();
         cached_expertise = expertise;
         $('#main_base .option[x-id="' + user_me.last_flavor + '"]').parent().find('.expertise_level').text(expertise);
@@ -2364,6 +2899,9 @@ function update_expertise() {
         $('.expertise_bar_inner').css('height', (100-remaining) + '%');
         $('.expertise_number').text(expertise);
         $('.expertise_hover').text(info_stats);
+    }
+    if (cb && typeof cb === 'function') {
+        cb();
     }
 }
 function update_all_expertise() {
@@ -2391,7 +2929,9 @@ function do_click(a) {
     user_me.gold += parseFloat(cached_sell_value);
     if (cached_flavor_index > -1) {
         user_me.flavors_sold[cached_flavor_index] = parseInt(user_me.flavors_sold[cached_flavor_index]) + a;
-        update_expertise();
+        update_expertise(function () {
+            Icecream.update_quest_bar();
+        });
     }
 }
 function init_canvas() {
@@ -2409,7 +2949,7 @@ function init_canvas() {
         canvas_cache_cone.src = image_prepend + "/cone_thumb.png";
     }
     var cloud_type = '';
-    if (user_me.badges && user_me.badges[0] === 4) cloud_type = '_hell';
+    if (user_me && user_me.badges && user_me.badges[0] === 4) cloud_type = '_hell';
     canvas_cache_cloud[0] = new Image();
     canvas_cache_cloud[0].src = image_prepend + "/heartcloud" + cloud_type + ".png";
     
@@ -2425,22 +2965,101 @@ function init_canvas() {
     canvas_cache_addon[6] = document.getElementById("topping");
     canvas_icecream_sales_dirty = true;
 }
+function get_franken_info() {
+        var f_1 = $('.col_3.franken_left .option').attr('x-id');
+        var f_2 = $('.col_3.franken_right .option').attr('x-id');
+        if (!f_1 || !f_2) {
+            return 'Select your flavours';
+        }        
+        var f = get_franken(f_1, f_2);
+        return '<span id="franken_name">' + f.name + '</span><br>$' + f.value + '<br>Duration: 20 minutes';
+}
+function get_franken(id_1, id_2) {
+        var f_1, f_2;
+        for (var i = 0; i < flavors.length; i++) {
+            var f = flavors[i];
+            if (id_1 === f._id) f_1 = f;
+            if (id_2 === f._id) f_2 = f;
+            if (f_1 && f_2) break;
+        }
+        if (!f_1 || !f_2) return {
+            name: 'Mystery',
+            value: '?'
+        };
+        var f_1_half = f_1.name.substring( 0, f_1.name.length / 2);
+        var f_2_half = f_2.name.substring(f_2.name.length / 2);
+        var compiled_value = ((f_1.value + f_2.value) * .75).toFixed(2);
+        return {
+            name: f_1_half + f_2_half,
+            value: compiled_value
+        };
+}
+function get_franken_image() {
+        var f_1 = $('.col_3.franken_left .option').attr('src');
+        var f_2 = $('.col_3.franken_right .option').attr('src');
+        if (!f_1 || !f_2) {
+            return '&lt; - - - - - &gt;';
+        }
+        return '<div class="franken_composite"><div class="franken_img" style="background-image: url(' + f_1 + ')"></div><div class="franken_img second" style="background-image: url(' + f_2 + ');"></div></div>';
+}
+function cow_redraw() {
+    $('#unlock_cow, .cow_attachment').remove();
+    if (cow.items) {
+        for (var i = 0; i < cow.items.length; i++) {
+            $('.cow').append('<div class="cow_attachment" x-type="' + cow.items[i].replace(/"/, '') + '">');
+        }
+    }
+}
 function __(input) {
     if (lang === 'en') return input;
     var resp = cached_language[input];
     if (!resp) {
         console.log('language cache miss for: ' + input);
-        return input;
+        resp = cached_language[input] = input;
     }
     return resp;
 }
+function load_message(msg) {
+    if (!msg.user) { return console.log('No user attached to this message'); }
+    if ($('.chat[x-id="' + msg._id + '"]').length > 0) { return console.log('Message already loaded'); }
+    if (user_me.ignore_list && user_me.ignore_list.indexOf(msg.user) > -1) {
+        return false;
+    }
+    if (!window_focus) { 
+        cached_new_messages++;
+        var msg_alert = (cached_new_messages == 1)? __('Chat Message') : __('Chat Messages');
+        document.title = cached_new_messages + ' ' + msg_alert + ' - ' + __('Ice Cream Stand');
+    }
+    if (cache_unread_message) {
+        var msg_alert = __('Unread Message!');
+        document.title = msg_alert + ' - ' + __('Ice Cream Stand');
+    }
+
+    var div = $('<div />', { 'class': 'chat ' + ((msg.is_admin)? 'admin':'normal'), 'x-id': msg._id, 'title': msg.created_at});
+    $(div).prepend($('<span />', { html: msg.text.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
+        return '&#'+i.charCodeAt(0)+';';
+    }).replace( /(https?:\/\/[^\s]*)/g, '<a href="$1" target="_blank">$1</a>'), 'class': 'chat_textbody'}));
+    var user_name = $('<span />', { text: msg.user, 'class': 'user_card', 'x-user': msg.user });
+    if (msg.badge) $(user_name).prepend('<img src="' + image_prepend + '/badge_' + msg.badge + '.png" class="chat_badge" />');
+    $(div).prepend(user_name);
+    $('#chat_window').append(div);
+
+    var msg_len = $('#chat_window > .chat').length;
+    while (msg_len > 10) {
+        $('#chat_window > .chat:first').slideUp(250, function () { 
+            $(this).remove();
+        });
+        msg_len--;
+    }
+}
+
 /* public methods */
 return {
     paginate: function(index) {
         var len = $('.inner_flavor_container:visible .option_wrapper').length;
         if (len < 20) { 
             $('.filter_box').remove();
-            $('.inner_flavor_container:visible .option_wrapper:visible img').each(function () { //lazy load them images
+            $('.inner_flavor_container:visible .option_wrapper:visible img[x-src]').each(function () { //lazy load them images
                 var img = $(this);
                 var xsrc = $(img).attr('x-src');
                 if (typeof xsrc !== 'undefined') {
@@ -2461,7 +3080,7 @@ return {
         $('.inner_flavor_container:visible .option_wrapper').slice(((index + 1) * 15) + offset, len).hide();
         if (index > 0) $('.inner_flavor_container:visible .option_wrapper').slice(offset, ((index + 1) * 15) - 10).hide();
 
-        $('.inner_flavor_container:visible .option_wrapper:visible img').each(function () { //lazy load them images
+        $('.inner_flavor_container:visible .option_wrapper:visible img[x-src]').each(function () { //lazy load them images
             var img = $(this);
             var xsrc = $(img).attr('x-src');
             if (typeof xsrc !== 'undefined') {
@@ -2485,21 +3104,63 @@ return {
             sell_icecream(sales_per, true);
         }
     },
-    cloud: function() {
-        if (disable_animations || !window_focus || canvas_drop_clouds_len > 10) return;
-        var speed = (Math.floor(Math.random() * 6) - 3);
-        if (speed === 0) speed = 5;
-        var x = (speed > 0)? 0-w : canvas_cache_width;
-        var w = 200 + (Math.random() * 75);
-        canvas_drop_clouds.push({
-            x: x,
-            y: Math.floor(Math.random() * (canvas_cache_height - 150) ),
-            width: w,
-            height: w * 0.75,
-            speed: speed,
-            variation: Math.floor( Math.random() * 2 )
-        });
-        canvas_drop_clouds_len++;
+    update_quest_bar: function() {
+        if (!user_me.quests || user_me.quests.length === 0) return false;
+        var last_quest = user_me.quests[user_me.quests.length - 1];
+        var progress;
+        var quest_split = last_quest.split('&');
+
+        if (last_quest.substring(0,1) === '!') { //dynamic
+            var starting_point = parseInt(quest_split[2]);
+            var dynamic = quest_split[0].split(',');
+            var cost = parseInt(dynamic[5]);
+            var type = dynamic[4];
+            var current = user_me.flavors.indexOf( type );
+            var current_sold = (current > -1)? user_me.flavors_sold[ current ] : 0;
+            progress = 100 * ((current_sold - starting_point) / cost);
+        } else {
+            var real_cost = parseInt(quest_split[2]);
+            if (quest_split[0] === '52577a6288983d0000000001') {
+                var position_of_strawberry = user_me.flavors.indexOf('5238d9d376c2d60000000002');
+                if (position_of_strawberry > -1) {
+                    var flavor_sold = user_me.flavors_sold[position_of_strawberry];
+                    progress = 100 * (flavor_sold / expertise_reqs[real_cost-1]);
+                }
+            } else if (quest_split[0] === '52672bedde0b830000000001') {
+                progress = 100 * (user_me.carts / real_cost);
+            } else if (quest_split[0] === '52672dea3a8c980000000001') {
+                progress = 100 * (user_me.combos.length / real_cost);
+            } else if (quest_split[0] === '526744f40fc3180000000001') {
+                progress = 100 * (user_me.trucks / real_cost);
+            } else if (quest_split[0] === '526745240fc3180000000002') {
+                var num_above_100 = 0;
+                var f_len = user_me.flavors_sold.length;
+                for (var i = 0; i < f_len; i++) {
+                    if (user_me.flavors_sold[i] > 99) num_above_100++;
+                }
+                progress = 100 * (num_above_100 / real_cost);
+            }
+        }
+        if (progress > 100) progress = 100;
+        $('#complete_quest_progress').css('width', progress + '%');
+    },
+    cloud: function(num) {
+        if (is_deep_sleep || disable_animations || !window_focus || canvas_drop_clouds_len > 10 - num) return;
+        for (var i = 0; i < num; i++) {
+            var speed = (Math.floor(Math.random() * 4) - 2);
+            if (speed === 0) speed = 1;
+            var w = 200 + (Math.random() * 175);
+            var x = (speed > 0)? 0-w : canvas_cache_width;
+            canvas_drop_clouds.push({
+                x: x,
+                y: Math.floor(Math.random() * (canvas_cache_height - 300) ),
+                width: w,
+                height: w * 0.75,
+                speed: speed,
+                variation: Math.floor( Math.random() * 2 )
+            });
+        }
+        canvas_drop_clouds_len = canvas_drop_clouds.length;
     },
     canvas_icecream_sales: function() {
         if (!canvas_icecream_sales_dirty) { return false; }
@@ -2580,15 +3241,18 @@ return {
         }
     },
     update_gold: function() {
-        gold = (sales_per === 0 || gold >= user_me.gold)? user_me.gold : gold + ((cached_worker_value / (50 - user_me.upgrade_machinery * 3)) + ((user_me.gold - gold) / 10));
-        //if ( isNaN(gold)) { gold = user_me.gold; }
-        var new_gold = numberWithCommas((gold).toFixed( (gold > 1000000)? 0 : 2  ));
-        $('.gold').text(new_gold);
+        if ((sales_per === 0 || gold >= user_me.gold)) {
+            gold = user_me.gold;
+        } else {
+            gold += (cached_worker_value / (50 - user_me.upgrade_machinery * 3)) + ((user_me.gold - gold) / 10);
+        }
+        var new_gold = numberWithCommas( (gold).toFixed(2) );
+        $('body > .gold').text(new_gold);
         if (cached_new_messages === 0) {
             if (cache_unread_message) {
-                $('title').text(__('Unread Message') +  ' - ' + __('Ice Cream Stand'));
+                $('title').text('Unread Message Ice Cream Stand');
             } else {
-                $('title').text('$' + new_gold + ' - ' + __('Ice Cream Stand'));
+                $('title').text('$' + new_gold + ' Ice Cream Stand');
             }
         }
     },
@@ -2642,7 +3306,7 @@ return {
             } else {
                 canvas_drop_cache.push([6, parseInt((Math.random() * canvas_width) / 50) * 50, 90 * Math.floor(Math.random() * -3), 1.5]);
             }
-            canvas_drop_cache_len++;
+            canvas_drop_cache_len = canvas_drop_cache.length;
         }
         if (false && trending_flavor != '' && user_me.last_flavor === trending_flavor) {
             var left = parseInt($('.trending #trend_left').text().replace(/,/g, ''));
@@ -2654,7 +3318,7 @@ return {
         return false;
     },
     process_clicks: function() {
-        if (process_clicks_iteration === 10) { //TODO: timegate this to every 10s
+        if (process_clicks_iteration >= 10) { //TODO: timegate this to every 10s
             if (game_working && user_me.upgrade_autopilot > 0) {
                 do_click(user_me.upgrade_autopilot);
                 Icecream.icecream_mousedown(user_me.upgrade_autopilot);
@@ -2663,10 +3327,31 @@ return {
         } else {
             process_clicks_iteration += 2;
         }
-        if (cache_sell_num == 0) return;
+        if (cache_sell_num == 0) {
+            if (!window_focus) {
+                if (cache_sell_inactive > 10) {
+                    if (!is_deep_sleep) Icecream.deep_sleep();
+                } else {
+                    cache_sell_inactive++;
+                }
+            } else {
+                cache_sell_inactive = 0;
+            }
+            return;
+        }
+        
         user_me.icecream_sold += cache_sell_num;
         sell_icecream(cache_sell_num, false);
-        
+        if (user_me.tutorial === 0) {
+            user_me.tutorial++;
+            Icecream.get_tutorial();
+            $.ajax({
+                url: 'tutorial',
+                data: 'tutorial=' + user_me.tutorial,
+                dataType: 'JSON',
+                type: 'POST'
+            });
+        }
         if (user_me.icecream_sold >= 2000000) { achievement_register('5280ef1cb61b420000000009'); }
         if (user_me.icecream_sold >= 1000000) { achievement_register('5280ef12b61b420000000008'); }
         else if (user_me.icecream_sold >= 500000) {  achievement_register('5280ef02b61b420000000006'); }
@@ -2675,53 +3360,53 @@ return {
         else if (user_me.icecream_sold >= 1000) {  achievement_register('5280ee78b61b420000000003'); }
         else if (user_me.icecream_sold >= 100) {  achievement_register('5280ee5fb61b420000000001'); }
         cache_sell_num = 0;
+        if (window_focus) {
+            cache_sell_inactive = 0;
+            if (is_deep_sleep) Icecream.deep_sleep();
+        }
     },
     update_event: function () {
         if (!cache_event_trend_enable) return;
-    $.ajax({
-        url: '/event',
-        data: 'cache=' + Math.random(),
-        dataType: 'JSON',
-        type: 'GET',
-        success: function (j) {
-            var x = new Date().getSeconds();
-            var addon_amount = (user_me.trend_bonus).toFixed(2);
-            if (j._id) {
-                trending_addon = j._id;
-                var desc = (j.event)? j.event : j.event = j.name + ' is HOT!';
-                if ($('.event_title[x-id="' + trending_addon + '"]').length == 0) {
-                    $('.event #event_name').text(desc);
-                    $('.event #trend_time').html('<span id="trend_bonus">' + addon_amount + '</span><div class="clock"><img src="'+image_prepend+'/clock_hand.svg" class="clock_hand" /></div><span class="event_time">' + x + '</span>').show();
+        $.ajax({
+            url: '/event',
+            data: 'cache=' + Math.random(),
+            dataType: 'JSON',
+            type: 'GET',
+            success: function (j) {
+                var x = new Date().getSeconds();
+                var addon_amount = (user_me.trend_bonus).toFixed(2);
+                if (j._id) {
+                    trending_addon = j._id;
+                    var desc = (j.event)? j.event : j.event = j.name + ' is HOT!';
+                    if ($('.event_title[x-id="' + trending_addon + '"]').length == 0) {
+                        $('.event #event_name').text( __(desc) );
+                        $('.event #trend_time').html('<span id="trend_bonus" class="money_icon">' + addon_amount + '</span><div class="clock"><img src="'+image_prepend+'/clock_hand.svg" class="clock_hand" /></div><span class="event_time">' + x +
+                        '</span>').show();
+                    }
+
+                    var seconds_left = (60 - x) + ( parseInt(j.mins) * 60 );
+                    for (var i = seconds_left; i >= 0; i--) {
+                        setTimeout("Icecream.update_clock('.event_time', " + i + ");" , 1000 * (seconds_left - i));
+                    }
+
+                    clearInterval(interval_events);
+                    interval_events = setInterval(function() {
+                        Icecream.update_event();
+                    }, (seconds_left && seconds_left > 2)? seconds_left * 1000 : 60000);
                 } else {
-                    $('.event_title[x-id="' + trending_addon + '"] #trend_time').html('<span id="trend_bonus">' + addon_amount + '</span><div class="clock"><img src="'+image_prepend+'/clock_hand.svg" class="clock_hand" /></div>' + j.mins + ':<span class="trend_time">' + x + '</span>');
+                    $('.event #event_name').html('<span id="noevent">There is currently no add-on event</span>');
+                    $('.event #trend_time').text('');
+                    trending_addon = '';
                 }
-                var seconds_left = (60 - x) + ( parseInt(j.mins) * 60 );
-                for (var i = seconds_left; i >= 0; i--) {
-                    setTimeout("Icecream.update_clock('.event_time', " + i + ");" , 1000 * (seconds_left - i));
-                }
-                if (seconds_left > 10) {
-                    setTimeout("Icecream.update_event()", seconds_left * 1000);
-                } else {
-                    setTimeout("Icecream.update_event()", 60000);
-                }
-            } else {
-                $('.event #event_name').html('<span id="noevent">There is currently no add-on event</span>');
-                $('.event #trend_time').text('');
-                trending_addon = '';
-                setTimeout("Icecream.update_event()", 60000);
+                update_sell_value();
             }
-            update_sell_value();
-        },
-        error: function (j) { 
-            setTimeout("Icecream.update_event()", 60000);
-        }
-    });
+        });
     },
     update_flavors: function() {
         if (!cache_event_trend_enable) return false;
         $.ajax({
             url : '/flavors',
-            data: { sort: '-votes last_trend_at', limit: 5 },
+            data: { sort: '-votes last_trend_at', limit: 5, show_mine: true },
             type: 'GET',
             dataType: 'JSON',
             success: function (j) {
@@ -2743,11 +3428,40 @@ return {
             }
         });
     },
+    sync_cow: function() {
+        if (!game_working) { return; }
+        if (cow && cow.name) {
+            $.ajax({
+                url: '/cow/update',
+                data: { h: cow.happiness },
+                dataType: 'json',
+                type: 'post',
+                success: function (j) {
+                    if (j && j.name) {
+                        cow = j;
+                    }
+                }
+            });
+        } else {
+            $.ajax({
+                url: '/me/cow',
+                dataType: 'json',
+                type: 'get',
+                success: function (j) {
+                    if (j && j.name) {
+                        if (!j.happiness) j.happiness = 75;
+                        cow = j;
+                        cow_redraw();
+                    }
+                }
+            });
+        }
+    },
     sync_chat: function() {
         if (!$('.chat.main_container').is(':visible') || !game_working) { return; }
         if (user_me.chat_off) { 
             $('#chat_window').html('<div class="chat_disclaimer">' +
-            '<br><p>' + __('Never give out personal information.') + '<br>' + __('Be safe, Appropriate and respectful to others.') + '</p>' +
+            '<br><p>' + __('Do Not Disturb is <b>On</b>.') + '<br><br></p>' +
             '<p>' + __('If you like the Ice Cream Stand') + ', <span id="invite">' + __('invite your friends') + '</span></p><span class="button">' + __('I Understand') + '</span></div>');
             $('.chat_disclaimer .button').click(function () {
                 $('.chat_disclaimer').remove();
@@ -2761,7 +3475,7 @@ return {
             });
             return;
         }
-        var expanded = $('.chat.main_container .expand').hasClass('active')? 75 : 8;
+        var expanded = $('.chat.main_container .expand').hasClass('active')? 75 : 10;
         $.ajax({
             url: 'chat',
             data: {
@@ -2770,39 +3484,24 @@ return {
             dataType: 'JSON',
             type: 'GET',
             success: function (j) { 
-                if (j[0].created_at === cached_last_message) { return; }
-                cached_last_message = j[0].created_at;
+                //if (j[0].created_at === cached_last_message) { return; }
+                //cached_last_message = j[0].created_at;
                 
-                if (cached_last_message !== '' && !window_focus) { 
-                    cached_new_messages++;
-                    var msg_alert = (cached_new_messages == 1)? __('Chat Message') : __('Chat Messages');
-                    document.title = cached_new_messages + ' ' + msg_alert + ' - ' + __('Ice Cream Stand');
-                }
-                if (cache_unread_message) {
-                    var msg_alert = __('Unread Message!');
-                    document.title = msg_alert + ' - ' + __('Ice Cream Stand');
-                }
-                $('.chat.main_container .chat_pending').remove();
-                var c_len = $('#chat_window .chat').length;
+                // if (!user_me.ignore_list || (user_me.ignore_list.indexOf(j[0].user) === -1 && cached_last_message !== '' && !window_focus) ) { 
+                //     cached_new_messages++;
+                //     var msg_alert = (cached_new_messages == 1)? __('Chat Message') : __('Chat Messages');
+                //     document.title = cached_new_messages + ' ' + msg_alert + ' - ' + __('Ice Cream Stand');
+                // }
+                // if (cache_unread_message) {
+                //     var msg_alert = __('Unread Message!');
+                //     document.title = msg_alert + ' - ' + __('Ice Cream Stand');
+                // }
+                //$('.chat.main_container .chat_pending').remove();
+                //var c_len = $('#chat_window .chat').length;
                 var j_len = j.length - 1;
                 for (var i = j_len; i >= 0; i--) {
-                        var msg = j[i];
-                        //var b64 = window.btoa(msg.created_at);
-                        if ($('#chat_window .chat[x-id="' + msg._id + '"]').length === 0) {
-                            var div = $('<div />', { 'class': 'chat ' + ((msg.is_admin)? 'admin':'normal'), 'x-id': msg._id});
-                            var d = (new Date(msg.created_at)+'').split(' ');
-                            $(div).append('<time  class="timeago">' + [d[1], d[2], d[4]].join(' ') + '</time>');
-                            $(div).prepend($('<span />', { text: msg.text, 'class': 'chat_textbody'}));
-                            var user_name = $('<span />', { text: msg.user, 'class': 'user_card', 'x-user': msg.user });
-                            if (msg.badge) $(user_name).prepend('<img src="' + image_prepend + '/badge_' + msg.badge + '.png" class="chat_badge" />');
-                            $(div).prepend(user_name);
-                            $('#chat_window').append(div);
-                            c_len++;
-                            if (c_len > expanded) $('#chat_window .chat:first').remove();
-                        }
+                    load_message(j[i]);
                 }
-                win_height = window.innerHeight;
-                doc_height = $(document).height();
             }
         });
     },
@@ -2817,6 +3516,14 @@ return {
         main('reconnect', function () {
             $('.inline-message').remove();
         });
+    },
+    deep_sleep: function () {
+        return false;
+        is_deep_sleep = !is_deep_sleep;
+        var employees_period = 5000 - (user_me.upgrade_machinery * 250);
+        var multiplier = (is_deep_sleep)? 10 : 1;
+        clearInterval(interval_employees);
+        interval_employees = setInterval(function () { Icecream.employees_working(); }, employees_period * multiplier);
     },
     sync_friends: function() {
     if ($('#message_list').length > 0) return false;
@@ -2848,12 +3555,19 @@ return {
             for (var i = 0; i < f_l; i++) {
                 var user = j.friends[i];
                 var online = (new Date(user.updated_at).getTime() > fiveminago)? 'online' : 'offline'; 
-                if ($('.friends_counter user[x-user="' + j.friends[i].name + '"]').length === 0) {
+                var user_container = $('.friends_counter user[x-user="' + j.friends[i].name + '"]');
+                if (user_container.length === 0) {
                     var usertag = $('<user />', { text: j.friends[i].name, 'class': online, 'x-user': j.friends[i].name });
-                    usertag.append('<span class="friend_options"><span class="friend_message"></span><span class="friend_delete"></span></span>');
-                    $('.friends_counter div').append(usertag);
+                    usertag.append('<span class="friend_options"><span class="friend_delete"></span></span>');
+                    $( (online == 'online')? '.friends_list_online' : '.friends_list_offline' ).append(usertag);
                 } else {
-                    $('.friends_counter user[x-user="' + j.friends[i].name + '"]').attr('class', online);
+                    if (online == 'online' && user_container.parent().hasClass('friends_list_offline')) {
+                        user_container.detach().appendTo('.friends_list_online');
+                    } 
+                    if (online == 'offline' && user_container.parent().hasClass('friends_list_online')) {
+                        user_container.detach().appendTo('.friends_list_offline');
+                    } 
+                    user_container.attr('class', online);
                 }
                 if (online === 'online') { friend_count++; }
             }
@@ -2881,50 +3595,53 @@ return {
                 }
             } */
             if (j.c > cached_online_peak) cached_online_peak = j.c;
-            $('#online_count').text(j.c).attr('x-peak', cached_online_peak);
+            $('#online_count').text(j.c + ' ' + __('Playing')).attr('x-peak', cached_online_peak);
         }
     });
     },
     get_quest: function () {
-    $.ajax({
-        url : 'new_quest',
-        dataType: 'JSON',
-        success: function (j) {
-            if (j && j.name && $('.quests.main_container:visible').length > 0) {
-                var reward = 'Extra $1 add-on event bonus';
-                if (j.name == 'Bargaining Time') reward = 'Unlock Workers';
-                if (j.name == 'Delusions of Grandeur') reward = 'Unlock Trends and Events';
-                if (j.dynamic_quest) {
-                    reward = 'Extra $0.25 add-on event bonus';
-                    j.description = parse_dynamic(j.dynamic_quest);
-                } 
-                alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">' + j.description + '<br /><br /><b>Reward:</b> ' + reward, 'New Quest! ' + j.name);
-                main(); 
+        $.ajax({
+            url : 'new_quest',
+            dataType: 'JSON',
+            success: function (j) {
+                if (j && j.name && $('.quests.main_container:visible').length > 0) {
+                    var reward = 'Extra $1 add-on event bonus';
+                    if (j.name == 'Bargaining Time') reward = 'Unlock Workers';
+                    if (j.name == 'Delusions of Grandeur') reward = 'Unlock Trends and Events';
+                    if (j.dynamic_quest) {
+                        reward = 'Extra <span class="money_icon">0.25</span> add-on event bonus';
+                        j.description = parse_dynamic(j.dynamic_quest);
+                    } 
+                    alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">' + j.description.replace(/\n/g, '<br>') + '<br /><br /><b>' + __('Reward') + '</b> ' + reward, __('New Quest') + '! ' + j.name);
+                    main('quest'); 
+                }
             }
-        }
-    });
+        });
 },
 get_quests: function() {
+    console.log('getting quests');
     if (user_me.quests.length == 0) {
         $('.quest_default').remove(); 
-        $('.quest_list').append('<p class="quest_default">Earn some money first by selling Ice Cream.<br>Click on the ice cubes to the left on the large cone.');
+        $('.quest_list').append('<p class="quest_default">You aren\'t currently on any quests...</p>');
         return;
     }
     $.ajax({
         url : 'quests',
         dataType: 'JSON',
         success: function (j) {
+            if (!j) return false;
             quests = j;
-            var last_quest = user_me.quests[user_me.quests.length - 1].split('&');
+            var q_len = user_me.quests.length - 1;
+            var last_quest = user_me.quests[q_len].split('&');
             $('.quest_default').remove(); 
-            for (i in user_me.quests) {
+            for (var i = 0; i <= q_len; i++) {
                 var q = user_me.quests[i];
                 if (q.substring(0,2) == '!d') {
                     var user_progress = q.split('&');
-                    var complete = (user_progress[1] == '0')? '<center><img src="'+image_prepend+'/star.png" class="quest_star" /><b>' + __('Completed') + '</b></center>' : '<div class="button complete_quest">' + __('Complete Quest') + '</div>';
+                    var complete = (user_progress[1] == '0')? '<center><img src="'+image_prepend+'/star.png" class="quest_star" /><b>' + __('Completed') + '</b></center>' : '<div class="button complete_quest"><div id="complete_quest_progress"></div><b>' + __('Complete Quest') + '</b></div>';
                     $('.quest[x-dynamic="' + q + '"]').remove();
                     $('.quest_list').prepend('<div class="quest" x-dynamic="' + q + '" x-num="' + i + '">' +
-                    '<div class="quest_body">' + parse_dynamic(q) + '<div class="quest_goal"><b>Reward</b>: + $0.25 Event Bonus</div></div>' + complete + '</div>');
+                    '<div class="quest_body">' + parse_dynamic(q) + '<div class="quest_goal"><b>' + __('Reward') + '</b> <span class="money_icon">0.25</span> Event Bonus</div></div>' + complete + '</div>');
                   } else {
                     var quest = j[i];
                     if (typeof quest == 'undefined') break;
@@ -2941,21 +3658,21 @@ get_quests: function() {
                     
                     if (user_progress[1] != '0') {
                         if (quest.level == 0) {
-                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Become an expert ' + ((cost)? cost : 5 )+ ' with her favourite flavor<br /><b>Reward</b>: Unlock Workers</div>');
+                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Become an expert ' + ((cost)? cost : 5 )+ ' with her favourite flavor<br /><b>Reward</b> Unlock Workers</div>');
                         }
                         if (quest.level == 1) {
-                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Buy ' + cost + ' carts<br /><b>Reward</b>: Unlock Trends</div>');
+                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Buy ' + cost + ' carts<br /><b>Reward</b> Unlock Trends</div>');
                         }
                         if (quest.level == 2) { 
-                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Discover ' + cost + ' combos<br /><b>Reward</b>: + $1 event bonus</div>');
+                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Discover ' + cost + ' combos<br /><b>Reward</b> + <span class="money_icon">1.00</span> event bonus</div>');
                         }
                         if (quest.level == 3) {
-                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Buy ' + ((cost)? cost : 2 ) + ' trucks<br /><b>Reward</b>: + $1 trending and event bonus</div>');
+                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Buy ' + ((cost)? cost : 2 ) + ' trucks<br /><b>Reward</b> Unlock Frankenflavours</div>');
                         }
                         if (quest.level == 4) {
                             $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Sell 100 of ' + ((cost)? cost : 5 ) + ' flavors<br /><b>Reward</b>: Unlocks next prestige tier, + $1 event bonus</div>');
                         }
-                        $('.quest[x-id="' + quest._id + '"]').append('<div class="button complete_quest">' + __('Complete') + ' ' + quest.name + '</div>');
+                        $('.quest[x-id="' + quest._id + '"]').append('<div class="button complete_quest"><div id="complete_quest_progress"></div><b>' + __('Complete') + ' ' + quest.name + '</b></div>');
                     } else {
                         $('.quest[x-id="' + quest._id + '"]').append('<center><img src="'+image_prepend+'/star.png" class="quest_star" /><b>' + __('Completed') + ' ' + quest.name + '</b></center>');
                     }
@@ -2969,11 +3686,15 @@ get_quests: function() {
             }
             $('.quest').hide();
             $('.quest:first').show();
+            Icecream.update_quest_bar();
         }
     });
 },
 update_trending: function() {
-    if (!cache_event_trend_enable) return;
+    if (!cache_event_trend_enable) {
+        console.log('cache event trend enable is OFF');
+        return;
+    }
     $.ajax({
         url: '/trending',
         data: 'cache=' + Math.random(),
@@ -3021,18 +3742,18 @@ update_clock: function(item, seconds_left) {
     }
 },
 update_worker_fx: function() {
-    console.time('update_worker_fx()');
     $('.wrapper_addon_thumb').remove();
     for (var i = 0; i < 5; i++) {
         var topping = user_me.toppings[i];
         if (topping) {
-            for (var j = 0; j < toppings.length; j++) {
+            var t_len = toppings.length;
+            for (var j = 0; j < t_len; j++) {
                 if (toppings[j]._id === topping) {
                     topping = toppings[j].name;
                     break;
                 }
             }
-            $('#main_base .option_wrapper').eq(i).append('<img src="'+image_prepend+'/toppings/' + topping.replace(/\s+/g, '') + '.png" class="wrapper_addon_thumb" />');
+            $('#main_base .option_wrapper').eq(i).append('<img src="'+image_prepend+'/toppings/' + topping.replace(/\s+/g, '') + '_thumb.png" class="wrapper_addon_thumb" />');
         }
     }
     if (disable_animations || !game_working) return;
@@ -3055,22 +3776,22 @@ update_worker_fx: function() {
                 canvas_cache_addon[last_worker_fx].src = image_prepend + "/toppings/" + addon_to_fx.attr('id').replace(/\s+/g, '') + '_thumb.png';
             }
     }
-    console.timeEnd('update_worker_fx()');
 },
 get_tutorial: function() {
     $('.tutorial').remove();
     if (user_me.tutorial == 0) {
-        $('body').append('<div class="tutorial tutorial_0"><h2>' + __('Selling Ice cream') + ' - 1/2</h2><b>' + __('Click Ice Cubes') + '</b> ' + __('(the blue cubes) to sell ice cream and get money!') + 
-            '<div class="button next_tutorial">' + __('Got it') + '</div><div class="triangle-left"></div></div>');
+        $('body').append('<div class="tutorial tutorial_0"><h2>' + __('Click Ice Cubes') + '</h2><p class="tutorial_text">' +
+            __('This sells your Ice Cream and gets you money.') + '<br><b>' + __('Try it out by clicking the blue cubes to the left!') +
+            '</b></p><div class="triangle-left"></div></div>');
     }
     if (user_me.tutorial == 1) {
-        $('body').append('<div class="tutorial tutorial_2"><h2>' + __('Buy all the things!') + ' - 2/2</h2>' +
-        __('Buy better flavors, add-ons (which increase the value of your ice cream), upgrades, and more.') + '<div class="button next_tutorial">' + __("Let's Start") + '</div><div class="triangle-right"></div></div>');
+        $('body').append('<div class="tutorial tutorial_2"><h2>' + __('Buy All The Things') + '</h2>' +
+        __('Unlock upgrades! Research new flavours, add-ons, and cones.') + '<div class="button next_tutorial">' + __("Let's Start") + '</div><div class="triangle-right"></div></div>');
     }
-    if (user_me.total_gold > 250 && user_me.tutorial == 2) {
+    if (user_me.total_gold > 500 && user_me.tutorial == 2) {
         $('body').append('<div class="tutorial tutorial_3" style="top: ' + (window.innerHeight / 2) + 'px;"><h2>' + __('Sharing is caring') + '</h2>' +
-        __('If you enjoy Ice Cream Stand - please tell and invite your friends. Any time someone you invite completes a quest, you earn money!') +
-        '<div class="clearfix"></div><div class="button next_tutorial">' + __('No thanks I hate fun') + '</div><div id="invite" class="button next_tutorial">' + __('Sure') + '</div></div>');
+        __('If you enjoy Ice Cream Stand <b>please tell your friends</b>. Any time someone you invite completes a quest, you earn money!') +
+        '<div class="clearfix"></div><div class="button next_tutorial">' + __('No thanks :*(') + '</div><div id="invite" class="button next_tutorial">' + __('Sure') + '</div></div>');
     } else if (user_me.tutorial == 2) { 
         setTimeout("Icecream.get_tutorial()", 60000); //not enough gold, check in a minute
     }
@@ -3083,7 +3804,26 @@ get_flavor: function(id) {
         }
     }
     return { name: 'mystery'};
-}
+},
+get_combo: function(id) {
+    console.log('getting combo with id ' + id);
+    var len = combos.length;
+    for (var i = 0; i < len; i++) {
+        if (combos[i]._id === id) {
+            return combos[i];
+        }
+    }
+    return { name: 'mystery'};
+},
+get_addon: function(id) {
+    var len = toppings.length;
+    for (var i = 0; i < len; i++) {
+        if (toppings[i]._id === id) {
+            return toppings[i];
+        }
+    }
+    return { name: 'mystery'};
+},
 };
 
 })(); //end encapsulate

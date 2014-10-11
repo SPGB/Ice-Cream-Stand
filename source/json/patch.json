@@ -1,0 +1,20 @@
+{
+	"current": 1.38,
+	"notes": [
+		{
+			"title": "PATCH 1.38 - August 22th",
+			"changes": [
+				"Added an indicator of how close you are to completing a quest",
+				"Increased the friend list size to 75",
+				"Moved the hay spawn zones to be closer to the cow",
+				"Added item: backpack",
+				"Added mechanic: Items. Items are random drops alongside hay and rocks",
+				"Cows must be purchased from a breeder",
+				"Cows now grow and age - when they are old enough you can breed a new cow that will be stronger (similar to prestige).",
+				"Cows have the following stats: Strength (10-18), Constitution (10-18), Intelligence (10-18). ",
+				"Strength determines how much of a bonus they give \n Constitution determines the cows health \n Intelligence determines how long a cow will stay happy",
+				"Fixed the Ice cream tooltip"
+			]
+		}
+	]
+}
