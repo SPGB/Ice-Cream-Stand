@@ -2074,6 +2074,9 @@ function cow_hay() {
         if (user_me.last_flavor == '523a1948750f2c0000000002' && user_me.last_addon == '525baaf765c3460000000007') {
             uncommon_drops.push('hat_rainbow afro/1/2/1/uncommon');
         }
+        if (user_me.last_flavor == '524dd6ce8c8b720000000002' && user_me.last_frankenflavour == '52390634971a180000000003') {
+            uncommon_drops.push('wings_bat/1/0/1/uncommon');
+        }
         if (user_me.last_flavor === '523901fba4cc590000000007' && user_me.last_addon == '525bab2165c3460000000009') {
             rare_drops.push('hat_astronaut/2/0/2/rare');
             rare_drops.push('suit_astronaut/2/0/2/rare');
