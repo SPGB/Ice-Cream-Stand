@@ -323,6 +323,9 @@ $(document).ready(function () {
         if (isNaN(cost) || user_me.gold < cost) {
             return alert('<p>You need more money to buy this item!</p>', 'Can not Afford');
         }
+        if (!cow) {
+            return alert('<p>"Come back when you have a cow."</p><p>Who said that? You only see a cart.</p>', 'A talking cart?');
+        }
         user_me.gold = user_me.gold - parseInt(cost);
         if (item) {
             alert('<p>Success! You have purchased <b class="tooltip" x-type="item" x-name="' + item + '">' + item.replace(/_/g, ' - ') + '</b> for ' + cow.name + '.</p>', 'Purchased');
@@ -439,7 +442,7 @@ $(document).ready(function () {
         } else if (xtype == 'friend') {
             $('.hovercard').html('<div>Friend</div><p>Make the Ice Cream Stand more exciting and play with friends. Every day your friends get a bonus .01% of any money you earn. This doesn\'t take away from what you earn. It\'s a fascimile of social interaction that gives you some of the benefits.</p>');
         } else if (xtype == 'item') {
-            var intelligence = 0, strength = 0, constitution = 0;
+            var intelligence = 0, strength = 0, constitution = 0, special = '';;
             var item = $(this).attr('x-name');
             var item_split = item.split('/');
             var name = item_split[0].replace(/_/g, ': ');
@@ -453,8 +456,14 @@ $(document).ready(function () {
                 constitution = item_split[3];
             }
             var rarity = (item_split[4])? '<p class="rarity" x-rarity="' + item_split[4] + '">This item is ' + item_split[4] + '</p>' : '';
-            $('.hovercard').html('<div style="padding-left: 40px;"><img src="' + image_prepend + '/items/' + item_split[0].replace(/ /g, '') + '.png" class="tooltip_item" />' + name + '</div><p><b>Intelligence</b>: ' + intelligence + '<br><b>Strength</b>: ' + strength + '<br><b>Constitution</b>: ' + constitution + '</p>' +
-                rarity + '<p class="flavor_text">This is an item equippable by cows.</p>');
+            if (name == 'hat: jester' || name == 'accessory: marotte') {
+                special = '<p class="flavor_text">Improves your chances of finding rare items by 5%</p>';
+            }
+            $('.hovercard').html('<div style="padding-left: 40px;"><img src="' + image_prepend + '/items/' + item_split[0].replace(/ /g, '') + '.png" class="tooltip_item" />' + name + '</div><p><b>Strength</b>: ' + strength + '<br><b>Constitution</b>: ' + constitution + '<br><b>Intelligence</b>: ' + intelligence + '</p>' +
+                rarity + special);
+            $('.hovercard').css('z-index',12);
+        } else if (xtype == 'gamble') {
+            $('.hovercard').html('<div>Mystery Item</div><p>This will give you a mystery item, including items not normally available.</p>');
             $('.hovercard').css('z-index',12);
         } else if (xtype == 'strength') {
             $('.hovercard').html('<div>Strength</div><p>Strength increases the % bonus increase of your cow. Every 1 point of strength gives an additional 1% bonus to income.</p>');
@@ -896,6 +905,11 @@ $(document).ready(function () {
                         }
                         Icecream.update_quest_bar();
                     });
+                }
+                if (j.cow) {
+                    cow = j.cow;
+                    Icecream.sync_cow();
+                    alert('<p>You have adopted a new cow. Cows need to be fed hay to be happy, but a happy cow is a happy life and will help make your ice cream better. Drag hay to your cow to make it happy. Click your cow to see stats.</p>', 'You have adopted ' + cow.name);
                 }
             }, 
             error: function (xhr, status, error) {
@@ -2050,37 +2064,30 @@ function cow_hay() {
     var rand = ( Math.random() * (canvas_width * 0.20) ) + (canvas_width * 0.75); //randomly in the first half 
     var type = (Math.random() < .1)? 'rock' : 'hay';
 
-    var item_chance = Math.random();
-    if (item_chance < 0.03) {
+    var item_chance = (Math.random() + cow.magic_find);
+    if (item_chance > 0.8) {
+        var drop_table = [];
+        var common_drops = ['hat_basic', 'coat_basic', 'accessory_pipe/1/0/0', 'shoes_basic', 'hat_deerstalker', 'shoes_basic', 'shoes_cowboy'];
+        var uncommon_drops = ['accessory_monocle/2/0/0/uncommon', 'wings_rainbow/0/0/0/uncommon', 'hat_fedora/1/0/0', 'hat_beerhat/0/0/2/uncommon', 'accessory_lei/0/0/1/uncommon'];
+        var rare_drops = ['hat_afro/0/2/0/rare', 'tutu_pink/1/0/1/rare'];
+
         if (user_me.last_flavor == '523a1948750f2c0000000002' && user_me.last_addon == '525baaf765c3460000000007') {
-            type = 'hat_rainbow afro/1/2/1';
-        } else {
-            type = 'hat_basic';
+            uncommon_drops.push('hat_rainbow afro/1/2/1/uncommon');
         }
-    } else if (item_chance < 0.035) {
-        type = 'coat_basic';
-    } else if (item_chance < 0.0375) {
-        type = 'accessory_pipe/1/0/0';
-    } else if (item_chance < 0.04) {
-        type = 'wings_rainbow';
-    } else if (item_chance < 0.045) {
-        type = 'shoes_basic';
-    } else if (item_chance < 0.0475) {
-        
-        if (user_me.last_flavor == '523a1948750f2c0000000002' && user_me.last_addon == '525baaf765c3460000000007') {
-            type = 'hat_rainbow afro/1/2/1';
-        } else {
-            type = 'hat_deerstalker';
-        }
-    } else if (item_chance < 0.049) {
         if (user_me.last_flavor === '523901fba4cc590000000007' && user_me.last_addon == '525bab2165c3460000000009') {
-            type = (Math.random() < 0.5)? 'hat_astronaut/2/0/2' : 'suit_astronaut/2/0/2';
-        } else if (user_me.cones[user_me.cones.length - 1] == 'sprinkle') {
-            type = 'hat_cone/1/1/1';
-        } else {
-            type = 'accessory_monocle/2/0/0';
+            rare_drops.push('hat_astronaut/2/0/2/rare');
+            rare_drops.push('suit_astronaut/2/0/2/rare');
         }
-    } 
+        if (cached_cone_value == 0.35) { //sprinkle cone's value
+            uncommon_drops = 'hat_cone/1/1/1/uncommon';
+        }
+
+        if (item_chance > 0.8) drop_table.push.apply(drop_table, common_drops);
+        if (item_chance > 0.925) drop_table.push.apply(drop_table, uncommon_drops);
+        if (item_chance > 0.975) drop_table.push.apply(drop_table, rare_drops);
+        type = drop_table[ Math.floor( Math.random() * drop_table.length ) ];
+    }
+
     var hay = $('<div />', {
         'class': 'item ' + type,
         'x-num': cache_item_pool.length,
@@ -2210,9 +2217,20 @@ function item_handleDragStart(e) {
     item_remove = true;
 }
 function item_handleDragEnd(e) {
-    console.log('drag end');
+    console.log('item drag complete, cleaning up');
     $('.over').removeClass('over');
-    if (item_remove) $(this).remove();
+    if (item_remove) {
+        var num = parseInt(e.dataTransfer.getData('num') );
+        $(this).remove();
+        if ( $('.background_hill > .item').length === 0 ) {
+            cache_item_pool = [];
+        } else {
+            cache_item_pool.splice(num, 1);
+            for (var i = num; i <= cache_item_pool.length; i++) {
+                $('.background_hill > .item[x-num="' + i + '"]').attr('x-num', i - 1);
+            }
+        }
+    }
     $('body').css('cursor', '');
 }
 function item_handleDrop(e) {
@@ -2234,11 +2252,8 @@ function cow_handleDrop(e) {
     if (dragSrcEl != this && String(e.dataTransfer.getData('type')) == 'item') {
         var num = parseInt(e.dataTransfer.getData('num') );
         var item = cache_item_pool[ num ];
-        cache_item_pool.splice(num, 1);
         $(dragSrcEl).remove();
-        for (var i = num; i <= cache_item_pool.length; i++) {
-            $('.background_hill > .item[x-num="' + i + '"]').attr('x-num', i - 1);
-        }
+        console.log(cache_item_pool);
         if (item == 'rock') {
             $(this).append('<div class="icecream_float cow_float float_failure">:(</div>');
             $('.cow_float').animate({
@@ -2280,6 +2295,7 @@ function cow_handleDrop(e) {
             if (cow.items.indexOf( item ) == -1) {
                 cow.items.push( item );
             }
+            achievement_register('545dad616c43abdf66d01472');
             // if (item == 'wings_bat' && user_me.badges.indexOf(7) == -1) {
             //     alert('<img src="' + image_prepend + '/badge_7.png" /><p>You have found the halloween badge! Congratulations.', 'New Badge!');
             //     user_me.badges.push(7);
@@ -2629,7 +2645,7 @@ function main_toppings(update_type, callback) {
                     socket = io('http://icecreamstand.ca', { query: "id=" + user_me._id + '&name=' + user_me.name  });
                     bind_sockets();
                 }
-                if (user_me.friends.length < 25 && Math.random() < .25 && user_me.total_gold > 200 && !user_me.is_guest) {
+                if (user_me.friends.length < 2 && Math.random() < .25 && user_me.total_gold > 200 && !user_me.is_guest) {
                     setTimeout(function () {
                         $.ajax({
                             url: '/suggestion/user',
@@ -3295,6 +3311,29 @@ function get_franken_image() {
         }
         return '<div class="franken_composite"><div class="franken_img" style="background-image: url(' + f_1 + ')"></div><div class="franken_img second" style="background-image: url(' + f_2 + ');"></div></div>';
 }
+function cow_item_stats() {
+    if (!cow.experience) cow.experience = 1;
+    if (!cow.happiness) cow.happiness = 75;
+    var int_mod = 0, str_mod = 0, magicfind_mod = 0;;
+    for (var j = 0; j < cow.items.length; j++) {
+        var split = cow.items[j].split('/');
+        if (split[1]) int_mod += parseInt(split[1]);
+        if (split[2]) str_mod += parseInt(split[2]);
+        if (split[0] == 'hat_jester' || split[0] == 'accessory_marotte') {
+            magicfind_mod += .05;
+        }
+        if (j == 2) break;
+    }
+    cow.magic_find = magicfind_mod;
+    cow.total_bonus = 10 + (cow.level / 2) + cow.strength + str_mod;
+    cow.total_happiness = 100 + Math.floor((cow.intelligence + int_mod) / 2);
+
+    var days_old = (new Date() - new Date(cow.created_at)) / 86400000;
+    if (days_old > 20 && cow.memories.length == 0) {
+    alert('<p>If your cow could talk, what would it say? </p><textarea id="cow_memory"></textarea>' + 
+        '<input type="submit" class="button" value="Teach" id="cow_teach">', 'Teaching ' + cow.name + ' to talk');
+    }
+}
 function cow_redraw() {
     $('#unlock_cow, .cow > .cow_attachment').remove();
     if (cow.items) {
@@ -3742,7 +3781,23 @@ return {
         if (!game_working) { return; }
         if (cow && cow.name) {
             var d = { h: cow.happiness, experience: cow.experience };
-            if (is_sync_items) d.items = cow.items;
+            if (is_sync_items) {
+                d.items = cow.items;
+                var all_rares = true;
+                for (var i = 0; i < 2; i++) {
+                    var item = cow.items[i];
+                    if (item) {
+                        var rarity = cow.items[i].split('/')[4];
+                        if (!rarity || rarity != 'rare') {
+                            all_rares = false;
+                            break;
+                        }
+                    }
+                }
+                if (all_rares) {
+                    register_achievement('545dad806c43abdf66d01473');
+                }
+            }
             $.ajax({
                 url: '/cow/update',
                 data: d,
@@ -3753,16 +3808,7 @@ return {
                         var total_happiness
                         cow = j;
 
-                        var int_mod = 0, str_mod = 0;
-                        for (var j = 0; j < cow.items.length; j++) {
-                            var split = cow.items[j].split('/');
-                            if (split[1]) int_mod += parseInt(split[1]);
-                            if (split[2]) str_mod += parseInt(split[2]);
-                            if (j == 2) break;
-                        }
-                        cow.total_happiness = 100 + Math.floor((cow.intelligence + int_mod) / 2);
-                        cow.total_bonus = 10 + (cow.level / 2) + cow.strength + str_mod;
-                        console.log('bonus: ' + cow.total_bonus + ', str: ' + str_mod);
+                        cow_item_stats();
                         if (cb && typeof cb == 'function') {
                             cb();
                         }
@@ -3779,22 +3825,7 @@ return {
                         var temp_cow = cows[i];
                         if (temp_cow.is_active) {
                             cow = temp_cow;
-                            if (!cow.experience) cow.experience = 1;
-                            if (!cow.happiness) cow.happiness = 75;
-                            var int_mod = 0, str_mod = 0;
-                            for (var j = 0; j < cow.items.length; j++) {
-                                var split = cow.items[j].split('/');
-                                if (split[1]) int_mod += parseInt(split[1]);
-                                if (split[2]) str_mod += parseInt(split[2]);
-                                if (j == 2) break;
-                            }
-                            cow.total_bonus = 10 + (cow.level / 2) + cow.strength + str_mod;
-                            cow.total_happiness = 100 + Math.floor((cow.intelligence + int_mod) / 2);
-                            var days_old = (new Date() - new Date(cow.created_at)) / 86400000;
-                            if (days_old > 20 && cow.memories.length == 0) {
-                                alert('<p>If your cow could talk, what would it say? </p><textarea id="cow_memory"></textarea>' + 
-                                '<input type="submit" class="button" value="Teach" id="cow_teach">', 'Teaching ' + cow.name + ' to talk');
-                            }
+                            cow_item_stats();
                             cow_redraw();
                         } else {
                             //draw in background
