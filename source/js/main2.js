@@ -1520,9 +1520,19 @@ $(document).ready(function () {
         return false;
     });
     $('body').on('click', 'user, .user_card', function () {
+        if ($(this).attr('x-cow')) {
+            $.ajax({
+                url: '/cow/' + $(this).attr('x-cow'),
+                dataType: 'json',
+                success: function (j) {
+                    load_cow(j.cow, j.user);
+                }
+            });
+            return;
+        }
         get_usercard( $(this).attr('x-user') );
     });
-    function get_usercard(user, offsets) {
+    function get_usercard(user) {
 
         $.ajax({
             url: 'user/' + user,
@@ -1989,9 +1999,8 @@ $(document).ready(function () {
                     if (user.week_gold) gold = user.week_gold;
                     if (user.highest_accumulation) {
                         $('.highscores ol').append('<li class="' + online + '"><user x-user="' + user.name + '" class="highscore_user">' + user.name + '</user> ' + ' &nbsp; ' + numberWithCommas(user.highest_accumulation.toFixed(2)) + '</span></li>');
-                    } else if (user.cow_level) {
-                        if (!user.cow_name) user.cow_name = 'Cow';
-                        $('.highscores ol').append('<li class="' + online + '"><user x-user="' + user.name + '" class="highscore_user">' + user.name + '</user> ' + ' &nbsp; ' + user.cow_level.toFixed(2) + ' (' + user.cow_name + ')</span></li>');
+                    } else if (user.level) {
+                        $('.highscores ol').append('<li><user x-cow="' + user._id + '" class="highscore_user">' + user.name + '</user> ' + ' &nbsp; ' + user.level.toFixed(2) + '</span></li>');
                     } else if (user.prestige_bonus) {
                         $('.highscores ol').append('<li class="' + online + '" ><user x-user="' + user.name + '" class="highscore_user">' + user.name + '</user> ' + ' &nbsp; ' + user.prestige_bonus.toFixed(5) + '</span></li>');
                     } else {
@@ -2059,7 +2068,7 @@ function bind_sockets() {
     });
 }
 function cow_hay() {
-    if (cache_item_pool.length > 5) return;
+    if (cache_item_pool.length > 5 || !cow) return;
     var variance = Math.floor( Math.random() * 4);
     var rand = ( Math.random() * (canvas_width * 0.20) ) + (canvas_width * 0.75); //randomly in the first half 
     var type = (Math.random() < .1)? 'rock' : 'hay';
@@ -2094,6 +2103,7 @@ function cow_hay() {
     var hay = $('<div />', {
         'class': 'item ' + type,
         'x-num': cache_item_pool.length,
+        'x-name': type,
         'style': 'left: ' + Math.floor(rand) + 'px',
         'draggable': true,
         'html': '<div class="type_item" x-variance="' + variance + '" x-type="' + type.split('/')[0] + '"></div>'
@@ -2108,7 +2118,7 @@ function cow_hay() {
         col.addEventListener('dragover', item_handleDragOver, false);
     });
 }
-function load_cow(c) {
+function load_cow(c, user) {
         if (!c) { return alert('Could not find a cow', 'Error'); }
         if (!c.items) { c.items = []; }
         var days_diff = (new Date() - new Date(c.created_at)) / 86400000;
@@ -2121,8 +2131,11 @@ function load_cow(c) {
                 button_adopt_text = 'Adopt a new cow';
                 button_adopt_enabled = 'true';
         }
-            var cow_buttons = (c._id === cow._id)? '<div class="cow_buttons"><div class="button button_cow" x-action="rename">Rename</div><div class="button button_cow" x-action="adopt" x-enabled="' + button_adopt_enabled + '">' + button_adopt_text + '</div></div>': '';
-            var items = '';
+        var cow_buttons = (c._id === cow._id)? '<div class="cow_buttons"><div class="button button_cow" x-action="rename">Rename</div><div class="button button_cow" x-action="adopt" x-enabled="' + button_adopt_enabled + '">' + button_adopt_text + '</div></div>': '';
+        if (user) {
+            cow_buttons = '<div class="cow_buttons"><user x-user="' + user.name + '">View ' + user.name + '\'s profile</user></div>';
+        }
+        var items = '';
             var additional_int = 0, additional_str = 0, additional_con = 0;
             for (var i = 0; i < c.items.length; i++) {
                 var item_split = c.items[i].split('/');
@@ -2208,12 +2221,15 @@ function inventory_handleDrop(e) {
     return false;
 }
 function item_handleDragStart(e) {
+    var num = parseInt($(this).attr('x-num'));
+    if (cache_item_pool[ num ] != $(this).attr('x-name')) {
+        console.log('pickup ERROR - found ' + cache_item_pool[ num ] + ' but picked up ' + $(this).attr('x-name') );
+    };
     this.style.opacity = '1'; // this / e.target is the source node.
     dragSrcEl = this;
 
     e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('name', $(this).text() );
-    e.dataTransfer.setData('num', $(this).attr('x-num') );
+    e.dataTransfer.setData('num', num );
     e.dataTransfer.setData('type', 'item' );
 
     $('body').css( 'cursor', $(this).css('background-image') + ', move !important' );
@@ -2223,12 +2239,14 @@ function item_handleDragEnd(e) {
     console.log('item drag complete, cleaning up');
     $('.over').removeClass('over');
     if (item_remove) {
-        var num = parseInt(e.dataTransfer.getData('num') );
+        var num = parseInt( $(this).attr('x-num') );
+        console.log('removing item ' + num);
         $(this).remove();
         if ( $('.background_hill > .item').length === 0 ) {
             cache_item_pool = [];
         } else {
             cache_item_pool.splice(num, 1);
+            console.log(cache_item_pool);
             for (var i = num; i <= cache_item_pool.length; i++) {
                 $('.background_hill > .item[x-num="' + i + '"]').attr('x-num', i - 1);
             }
@@ -2246,17 +2264,16 @@ function item_handleDrop(e) {
     return false;
 }
 function cow_handleDrop(e) {
-    console.log('dropping on cow');
+    
     $('body').css('cursor', '');
     if (e.stopPropagation) {
         e.stopPropagation(); // Stops some browsers from redirecting.
 
     }
     if (dragSrcEl != this && String(e.dataTransfer.getData('type')) == 'item') {
-        var num = parseInt(e.dataTransfer.getData('num') );
+        var num = parseInt( e.dataTransfer.getData('num') );
         var item = cache_item_pool[ num ];
-        $(dragSrcEl).remove();
-        console.log(cache_item_pool);
+        console.log('dropping ' + item + ' (' + num + ') on cow');
         if (item == 'rock') {
             $(this).append('<div class="icecream_float cow_float float_failure">:(</div>');
             $('.cow_float').animate({
@@ -2275,29 +2292,30 @@ function cow_handleDrop(e) {
                 }, 1000, function () {
                     $(this).remove();
                 });
-            cow.happiness = cow.total_happiness;
-            return false;
+                cow.happiness = cow.total_happiness;
+            } else {
+                if (cow.happiness > 90) {
+                    update_sell_value();
+                }
+                cow.happiness += 10;
+                if (cow.happiness > cow.total_happiness)  cow.happiness = cow.total_happiness;
+                user_me.cow_clicks++;
+                $(this).trigger('mouseout').trigger('mouseover');
+                $(this).append('<div class="icecream_float cow_float float_success">:)</div>');
+                $('.cow_float').animate({
+                    top: -50
+                }, 1000, function () {
+                    $(this).remove();
+                });
             }
-            if (cow.happiness > 90) {
-                update_sell_value();
-            }
-            cow.happiness += 10;
-            if (cow.happiness > cow.total_happiness)  cow.happiness = cow.total_happiness;
-            user_me.cow_clicks++;
-            $(this).trigger('mouseout').trigger('mouseover');
-            $(this).append('<div class="icecream_float cow_float float_success">:)</div>');
-            $('.cow_float').animate({
-                top: -50
-            }, 1000, function () {
-                $(this).remove();
-            });
-            
             
         } else {
             if (!cow.items) cow.items = [];
-            if (cow.items.indexOf( item ) == -1) {
-                cow.items.push( item );
+            if (cow.items.length > 8) {
+                item_remove = false;
+                return alert('<p>Your cow can\'t carry any more.</p>', 'Inventory Full');
             }
+            cow.items.push( item );
             achievement_register('545dad616c43abdf66d01472');
             // if (item == 'wings_bat' && user_me.badges.indexOf(7) == -1) {
             //     alert('<img src="' + image_prepend + '/badge_7.png" /><p>You have found the halloween badge! Congratulations.', 'New Badge!');
@@ -2317,8 +2335,9 @@ function cow_handleDrop(e) {
         var next_level = Math.ceil( cow.level );
         var progress =  100 + ( (cow.level - next_level) / .01 );
         $('.cow_level_bar > #experience').css('width', progress + '%');
-        $('.cow_level_bar > #happiness').css('width', (cow.happiness / cow.total_happiness / 0.01) + '%');
+        $('.cow_level_bar > #happiness').attr('x-full', (cow.happiness == cow.total_happiness) ).css('width', (cow.happiness / cow.total_happiness / 0.01) + '%');
         Icecream.sync_cow();
+        //$(dragSrcEl).remove();
     }
     return false;
 }
@@ -2950,11 +2969,11 @@ function sell_icecream(amount, workers) {
             if (Math.random() < 0.8) {     
                 cow_hay();
             }
-            if (Math.random() < 0.5) {
-                var decrease_by = (cow.constitution / 50);
+            if (Math.random() < 0.25) {
+                var decrease_by = (cow.constitution / 40);
                 if (decrease_by > .9) decrease_by = 0.9;
                 cow.happiness -= 1 - decrease_by;
-                $('.cow_level_bar > #happiness').css('width', (cow.happiness / cow.total_happiness / 0.01) + '%');
+                $('.cow_level_bar > #happiness').attr('x-full', false).css('width', (cow.happiness / cow.total_happiness / 0.01) + '%');
             }
         }
     }   
@@ -3787,7 +3806,7 @@ return {
             if (is_sync_items) {
                 d.items = cow.items;
                 var all_rares = true;
-                for (var i = 0; i < 2; i++) {
+                for (var i = 0; i < 3; i++) {
                     var item = cow.items[i];
                     if (item) {
                         var rarity = cow.items[i].split('/')[4];
@@ -3798,7 +3817,7 @@ return {
                     }
                 }
                 if (all_rares) {
-                    register_achievement('545dad806c43abdf66d01473');
+                    achievement_register('545dad806c43abdf66d01473');
                 }
             }
             $.ajax({
@@ -3838,6 +3857,7 @@ return {
                                 items = items + '<div x-type="' + item + '" class="cow_attachment type_item"></div>';
                                 if (j === 2) break;
                             }
+                            $('.cow').show();
                             $('.background_hill').append('<div class="cow_background" x-id="' + temp_cow._id + '" title="' + temp_cow.name + '" x-num="' + i + '">' + items + '</div>');
                         }
                     }
