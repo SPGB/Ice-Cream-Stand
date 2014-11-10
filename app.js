@@ -3,7 +3,7 @@
 	* | |/  ___}| {_     /  ___}| {}  }| {_   / {} \ |  `.'  |   { {__ {_   _}/ {} \ |  `| || {}  \
 	* | |\     }| {__    \     }| .-. \| {__ /  /\  \| |\ /| |   .-._} } | | /  /\  \| |\  ||     /
 	* `-' `---' `----'    `---' `-' `-'`----'`-'  `-'`-' ` `-'   `----'  `-' `-'  `-'`-' `-'`----'
-	* NOW OPEN SOURCED - V 1.33
+	* NOW OPEN SOURCED - V 1.42
  */
  
 var express = require('express.io')
@@ -14,6 +14,7 @@ var express = require('express.io')
   , SALT_WORK_FACTOR = 10
   , crypto = require('crypto')
   , assert = require('assert')
+  , fs = require('fs')
   , nodemailer = require("nodemailer");
 
 var app = express();
@@ -42,6 +43,7 @@ var sessionStore = session( {
 	secret: config.secret,
 	cookie: { maxAge: 86400000 },
 });
+var cache_trend_id;
 mongoose.connect('mongodb://localhost:' + config.db.port + '/admin', { auto_reconnect: true, user: config.db.username, pass: config.db.password });
 
 
@@ -119,6 +121,7 @@ var userSchema = new mongoose.Schema({
 	friends: { type: [String] }, 
 	friend_gold: { type: Number },
 	friend_last: { type: Number },
+	is_friend_notify: { type: Boolean, default: true }, 
 	is_tooltip: { type: Boolean, default: true }, 
 	is_night: { type: Boolean }, 
 	is_second_row: { type: Boolean }, 
@@ -305,13 +308,15 @@ var cowSchema = new mongoose.Schema({
 	name: { type: String, required: true, },
 	happiness: { type: Number, default: 100},
 	level: { type: Number, default: 1},
+	experience: { type: Number, default: 1},
 	strength: { type: Number, default: 10 },
 	constitution: { type: Number, default: 10 },
 	intelligence: { type: Number, default: 10 },
 	memories: { type: [String] },
 	items: { type: [String] },
 	user_id: { type: String, required: true },
-	created_at: { type: Date }
+	created_at: { type: Date },
+	is_active: { type: Boolean, default: true }
 });
 var Cow = mongoose.model('Cow', cowSchema);
 cowSchema.pre('save', function(next) {
@@ -392,9 +397,50 @@ io.on('connection', function ( socket ) {
   		var t = msg.text;
   		Message.find().sort({$natural:-1}).limit(1).lean(true).exec(function (err, messages) {
 			if (t == messages[0].text) return res.json({error: 'This message has already been sent!'});
-	  		User.findOne({ _id: socket.handshake.query.id }).select('shadow_ban').lean(true).exec(function (err, user) {
+	  		User.findOne({ _id: socket.handshake.query.id }).select('shadow_ban last_flavor badges').lean(true).exec(function (err, user) {
 		  		if (user.shadow_ban) return false;
+		  		if (msg.badge && user.badges && user.badges.indexOf(parseInt(msg.badge) ) === -1) {
+		  			console.log('user ' + user.badges + ', ' + msg.badge);
+		  			return false;
+		  		}
+		  		/*
+		  		if (tgives.indexOf(socket.id) > -1 && user.last_flavor == '523d5e603095960000000001' && t.toLowerCase().indexOf('thanksgiving') > -1) {
+		  			console.log('Badge!');
+		  			
+		  			User.findOne({ _id: socket.handshake.query.id }).exec(function (err, user_badge) {
+		  				if (!user_badge.badges) user_badge.badges = [];
+		  				user_badge.badges.push(6);
+		  				user_badge.save();
 
+		  				io.emit("chat message", {
+			  				_id: Math.random() * 9999999 + 'TGives',
+			  				text: socket.handshake.query.name + ' has earned their Thanksgiving badge',
+			  				badge: 6,
+			  				user: ':',
+			  				created_at: new Date(),
+			  				add_badge: 6,
+			  				add_badge_id: socket.handshake.query.id
+			  			});
+			  			tgives.splice(tgives.indexOf(socket.id), 1);
+
+		  			});
+		  			if (!user.badges) user.badges = [];
+		  			user.badges.push(6);
+		  		}
+
+		  		if (user.last_flavor == '523d5e603095960000000001' && (!user.badges || user.badges.indexOf(6) == -1) && tgives.indexOf(socket.id) == -1) {
+		  			tgives.push( socket.id );
+		  			console.log(tgives);
+		  			io.sockets.connected[ socket.id ].emit("chat message", {
+		  				_id: Math.random() * 9999999 + 'TGives',
+		  				text: socket.handshake.query.name + ', in the spirit of thanksgiving, what are you grateful for?',
+		  				badge: 6,
+		  				user: ':',
+		  				created_at: new Date()
+		  			});
+		  		}
+		  		*/
+		  		
 		  		var patt = /(fuck|shit|damn|pussy|penis|blowjob|cunt|bitch|nigger|slut|asshole)/g;
 					if (patt.test(t.toLowerCase().replace(/\s/g, ''))) {
 					var motivationals = [
@@ -411,7 +457,7 @@ io.on('connection', function ( socket ) {
 				}
 				t = t.trim();
 		  		var newmessage = new Message({
-		  				is_admin: (socket.handshake.query.name === 'sam'),
+		  				is_admin: (socket.handshake.query.name === 'sam' || socket.handshake.query.name === 'babyboo'),
 						text: t,
 						badge: msg.badge,
 						user: socket.handshake.query.name,
@@ -475,7 +521,7 @@ app.post('/me', function(req, res){
 	var query_select_user;
 	var workers = (post.w == 'true');
 	var version = post.v;
-	if (!version) {
+	if (!version || parseFloat(version) < 1.42) {
 		console.log('user has an older version');
 		return res.send('{"error": "Please update to the latest version.","reload":true}');
 	}
@@ -489,7 +535,7 @@ app.post('/me', function(req, res){
 			console.log(req.session.user_id + ' workers clicking too quickly -' + dif + 'ms');
 			return res.send('{"notice":"Customers aren\'t interested in your workers ice cream (' + dif + 'ms)"}');
 		}
-		query_select_user = 'gold total_gold today_gold week_gold carts cow_clicks cow_level';
+		query_select_user = 'gold total_gold today_gold week_gold carts';
 	} else {
 		if (!req.session.last_click) req.session.last_click = 0;
 		var dif = now_time - req.session.last_click;
@@ -522,13 +568,15 @@ app.post('/me', function(req, res){
 			u.total_gold += infer_change;
 			u.today_gold += infer_change;
 			u.week_gold += infer_change;
-			if (!isNaN(cow_clicks) && cow_clicks != u.cow_clicks) {
-				if (cow_clicks < u.cow_clicks || cow_clicks > u.cow_clicks + 50) {
-					return res.send('{"notice":"invalid cow clicks (' + cow_clicks + ' vs ' + u.cow_clicks + ')"}');
-				}
-				u.cow_clicks = cow_clicks;
-				u.cow_level = 100 * ( cow_clicks / ( cow_clicks + 1000 ) );
-			}
+
+			// if (!isNaN(cow_clicks) && cow_clicks != u.cow_clicks) {
+			// 	if (cow_clicks < u.cow_clicks || cow_clicks > u.cow_clicks + 50) {
+			// 		return res.send('{"notice":"invalid cow clicks (' + cow_clicks + ' vs ' + u.cow_clicks + ')"}');
+			// 	}
+			// 	u.cow_clicks = cow_clicks;
+			// 	u.cow_level = 100 * ( cow_clicks / ( cow_clicks + 1000 ) );
+			// }
+
 			u.save(function (err) {
 				if (!u || err) {
 					console.log(req.session.user_id + ': cant update user, err: ' + err);
@@ -606,7 +654,7 @@ app.post('/me', function(req, res){
 
 				u.save(function (err) {
 					var randomnumber = Math.random()*10000; 
-					if (randomnumber < 5) {
+					if (randomnumber < 10) {
 						Flavor.findOne({ _id: u.last_flavor}).select('value base_value name').exec(function (err, flavor) {
 							if (flavor.value > 0.10 && flavor.base_value > 1) {
 								flavor.value = Math.round( (flavor.value - 0.05) * Math.pow(10,3) ) / Math.pow(10,3);
@@ -640,7 +688,7 @@ app.post('/me', function(req, res){
 								var newmessage = new Message({
 									text: u.name + ' has unlocked the St. Patrick\'s Day badge!',
 									user: ':',
-									created_at: new Date,
+									created_at: new Date(),
 									badge: 3
 								});
 								newmessage.save(function (err, m) {
@@ -656,7 +704,7 @@ app.post('/me', function(req, res){
 								var newmessage = new Message({
 									text: u.name + ' has discovered the second Lab Part.',
 									user: ':',
-									created_at: new Date,
+									created_at: new Date(),
 									badge: 0
 								});
 								newmessage.save(function (err, m) {
@@ -672,7 +720,7 @@ app.post('/me', function(req, res){
 								var newmessage = new Message({
 									text: u.name + ' has discovered the final Lab Part.',
 									user: ':',
-									created_at: new Date,
+									created_at: new Date(),
 									badge: 0
 								});
 								newmessage.save(function (err, m) {
@@ -681,26 +729,24 @@ app.post('/me', function(req, res){
 									res.json({reload:true});
 								});
 							});
-					} else {
+					} else if (cache_trend_id === u.last_flavor) {
 						Trend.findOne({
 							$and: [ {total_sold: {$lt: 75000}}, {total_sold: {$gte: 0}} ]
 						}, function (err, trend) {
 							if (!trend) return res.send('{"gold":' + infer_gold + '}');
-							if (u.last_flavor === trend.flavour_id) {
-								var next_bonus = 76000 - (20000 * trend.bonus);
-								var delta = (amount > 100 || amount < 0)? 100 : amount;
-								trend.total_sold += delta;
-								if (trend.total_sold > next_bonus) {
-									trend.bonus = trend.bonus - 0.05;
-								}
-								trend.save(function (err, trend) {
-									 return res.send('{"gold":' + infer_gold + ',"trend":' + trend.total_sold + ',"ifr":' + is_franken_refresh + '}');
-								});
-							} else {
-								if (u.icecream_sold < 20 && u.icecream_sold > 10) return res.send('{"quest":true}');
-								return res.send('{"gold":' + infer_gold + ',"ifr":' + is_franken_refresh + '}');
+							var next_bonus = 76000 - (20000 * trend.bonus);
+							var delta = (amount > 100 || amount < 0)? 100 : amount;
+							trend.total_sold += delta;
+							if (trend.total_sold > next_bonus) {
+								trend.bonus = trend.bonus - 0.05;
 							}
+							trend.save(function (err, trend) {
+									return res.send('{"gold":' + infer_gold + ',"trend":' + trend.total_sold + ',"ifr":' + is_franken_refresh + '}');
+							});
 						});
+					} else {
+						if (u.icecream_sold < 20 && u.icecream_sold > 10) return res.send('{"quest":true}');
+						return res.send('{"gold":' + infer_gold + ',"ifr":' + is_franken_refresh + '}');
 					}
 				});
 		}
@@ -773,6 +819,7 @@ app.get('/trending', function(req, res){
 			$and: [ {total_sold: {$lt: 75000}}, {total_sold: {$gte: 0}} ]
 		}).lean(true).exec(function (err, trend) {
 		if (trend) {
+			if (cache_trend_id !== trend._id) cache_trend_id = trend.flavour_id;
 			return res.send(trend);
 		} else {
 			Trend.find({ 
@@ -808,6 +855,7 @@ app.get('/trending', function(req, res){
 						bonus_max: bonus
 					});
 					t.save(function (err, t) {
+						cache_trend_id = t._id;
 						flavour.value = flavour.base_value;
 						flavour.votes = 0;
 						flavour.last_trend_at = new Date();
@@ -992,7 +1040,7 @@ app.post('/user_update', function(req, res){
 		user.name = username;
 		if (post.password) user.password = post.password;
 		if (post.email && user.email != post.email) {
-			user.email = post.email;
+			user.email = post.email.toLowerCase();
 			user.email_verified = false;
 			var verify_url = 'http://icecreamstand.ca/verify/' + user.name + '/' + ( new Buffer(user.email).toString('base64') );
 			var name = user.name.substring(0,1).toUpperCase() + user.name.substring(1);
@@ -1024,7 +1072,7 @@ app.post('/user_update', function(req, res){
 			if (post.cow_name.length < 2 || post.cow_name.length > 12) return res.send('Invalid Cow Name');
 			user.cow_name = post.cow_name.replace(/(<|>)/gi, '');
 		}
-		user.ignore = post.ignore.replace(/\s/g, '');
+		user.ignore = post.ignore.trim().toLowerCase();
 		user.is_guest = false;
 		user.save(function (err, u) {
 			if (err) return res.send('can\'t update - maybe the username is taken?');
@@ -1216,6 +1264,75 @@ app.post('/toppings', checkAdmin, function(req, res){
 		}
 	});
 	} catch (err) { res.send(500, err); }
+});
+app.post('/shop/item', function(req, res){
+	User.findOne({ _id: req.session.user_id }, function (err, user) {
+		fs.readFile('source/json/shop.json', 'utf8', function (err, data) {
+			if (err) throw err;
+			items = JSON.parse(data);
+		    var buying = req.body.item;
+		    var final_item;
+		    if (buying) {
+		    	var intelligence = 0, strength = 0, constitution = 0;
+	        	var cost;
+	        	for (var item in items) {
+	        		if (buying == item ) {
+	        			cost = items[item].cost;
+	        			if (items[item].int) intelligence = items[item].int;
+	        			if (items[item].str) strength = items[item].str;
+	        			if (items[item].con) constitution = items[item].con;
+	        			break;
+	        		}
+	        	}
+	        	final_item = buying + '/' + intelligence + '/' + strength + '/' + constitution;
+        	} else {
+        		cost = 250000;
+        		var chance = {
+        			"common": 0,
+        			"uncommon": 0.75,
+        			"rare": 0.9,
+        		};
+        		var rand = Math.random();
+        		var item_pool = [];
+        		for (var item in items) {
+        			if (items[item].rarity && rand > chance[ items[item].rarity ] ) {
+        				var intelligence = 0, strength = 0, constitution = 0;
+        				if (items[item].int) intelligence = items[item].int;
+	        			if (items[item].str) strength = items[item].str;
+	        			if (items[item].con) constitution = items[item].con;
+        				item_pool.push(item + '/' + intelligence + '/' + strength + '/' + constitution + '/' + items[item].rarity);
+        			}
+        		}
+        		final_item = item_pool [ Math.floor(Math.random() * item_pool.length) ];
+        		if (!final_item) return res.send('{"error":"Your mystery item box was empty"}');
+        		
+        	}
+			if (!cost) return res.send('{"error":"No item found"}');
+			if (isNaN(cost) || user.gold < cost) return res.send('{"error":"Need money"}');
+			user.gold = user.gold - parseInt(cost);
+
+			user.save(function (err) {
+
+			});
+			Cow.findOne({ user_id: user._id, is_active: true }, function (err, cow) {
+				if (!cow) return res.send('{"error":"No cow found"}');
+				cow.items.push(final_item);
+				cow.markModified('items');
+				if (cow.items.length > 9) {
+					return res.send('{"error":"Your Inventory is Full"}');
+				}
+				cow.save(function (err, cow) {
+					if (err) return res.send(err);
+					if (!buying) {
+						return res.json({ 'gamble' : final_item, 'cow': cow });
+					}
+					res.send(cow);
+				});
+			}); //end cow
+		}); //end user
+
+
+	});
 });
 app.post('/unlock', function(req, res){
 	var post = req.body;
@@ -1417,7 +1534,9 @@ app.post('/unlock', function(req, res){
 				for (var i = 0; i < amount; i++) {
 					var cost = 500000+(30 * Math.pow(user.aliens,2.5));
 					if (user.gold < cost) {
-						if (amount == 10 || i == 0) { return res.json({ error: ( (cost * (amount - i)) - user.gold ).toFixed(0) }); }
+						if (amount == 10 || i === 0) {
+							return res.json({ error: ( (cost * (amount - i)) - user.gold ).toFixed(0) });
+						}
 						ret = 'Bought ' + i;
 						break;
 					}
@@ -1425,7 +1544,7 @@ app.post('/unlock', function(req, res){
 					user.gold -= Math.round(cost*Math.pow(10,2))/Math.pow(10,2);
 					user.aliens++;
 				}
-			if (amount == 0) return res.json({ error: 'Need money'});
+			if (amount === 0) return res.json({ error: 'Need money'});
 			if (!ret) ret = 'Bought ' + amount;
 			user.save(function (err, u) {
 				if (err) return res.send(err);
@@ -1437,19 +1556,16 @@ app.post('/unlock', function(req, res){
 			if (err || !user) return res.send(500);
 			var cost = 1000;
 			if (user.gold < cost) return res.json({ error: 'Not enough money'});
-			Cow.findOne({ user_id: req.session.user_id}).lean(true).exec(function (err, cow) {
+			Cow.findOne({ user_id: req.session.user_id, is_active: true }).lean(true).exec(function (err, cow) {
 				if (cow) return res.json({ error: 'You already have a cow! What would ' + cow.name + ' think.'});
 				user.gold -= cost;
 				user.save(function (err) {
-					var cow_bonus = 0;
-					if (user.cow_level > 50) cow_bonus = 1;
-					if (user.cow_level > 90) cow_bonus = 2;
 					var newCow = new Cow({
-						name: (user.cow_name)? user.cow_name : 'Betty',
+						name: 'Betty',
 						user_id: req.session.user_id,
-						strength: Math.floor((Math.random() * 8) + 8 + cow_bonus),
-						intelligence: Math.floor((Math.random() * 8) + 8 + cow_bonus),
-						constitution: Math.floor((Math.random() * 8) + 8 + cow_bonus),
+						strength: Math.floor((Math.random() * 8) + 8 ),
+						intelligence: Math.floor((Math.random() * 8) + 8 ),
+						constitution: Math.floor((Math.random() * 8) + 8 ),
 					});
 					newCow.save(function (err, cow) {
 						if (err) return res.send(err);
@@ -1702,32 +1818,131 @@ app.get('/me', function(req, res){
 		}
 	});
 });
-app.get('/me/cow', function(req, res){
-	Cow.findOne({ user_id: req.session.user_id }).lean(true).exec(function (err, cow) {
+app.get('/cow/:id', function(req, res){
+	Cow.findOne({ _id: req.params.id}).lean(true).exec(function (err, cow) {
+		User.findOne({ _id: cow.user_id}).select('name').lean(true).exec(function (err, user) {
+			res.json({
+				cow: cow,
+				user: user
+			});
+		});
+	});
+});
+app.get('/cow/:id/delete', checkAdmin, function(req, res){
+	Cow.findOne({ _id: req.params.id}).exec(function (err, cow) {
+		cow.remove();
+		res.send('y');
+	});
+});
+app.get('/cow/:id/activate', checkAdmin, function(req, res){
+	Cow.findOne({ _id: req.params.id}).exec(function (err, cow) {
+		cow.is_active = !cow.is_active;
+		cow.save();
 		res.send(cow);
 	});
 });
+app.get('/me/cow', function(req, res){
+	Cow.findOne({ user_id: req.session.user_id, is_active: true }).lean(true).exec(function (err, cow) {
+		res.send(cow);
+	});
+});
+app.get('/me/cows', function(req, res){
+	Cow.find({ user_id: req.session.user_id, }).lean(true).exec(function (err, cows) {
+		res.send(cows);
+	});
+});
 app.post('/cow/update', function(req, res){
-	Cow.findOne({ user_id: req.session.user_id }).exec(function (err, cow) {
+	Cow.findOne({ user_id: req.session.user_id, is_active: true }).exec(function (err, cow) {
+		if (!cow) return res.json({ err: 'no cow found' });
+		if (err) return res.send(err);
 		if (req.body.h) cow.happiness = req.body.h;
 		if (req.body.name) cow.name = req.body.name;
+		if (req.body.experience && (!cow.experience || cow.experience > req.body.experience - 10)) {
+			cow.level = 100 * ( cow.experience / ( cow.experience + 1000 ) );
+			cow.experience = req.body.experience;
+		}
+		if (req.body.memory) {
+			if (!cow.memories) cow.memories = [];
+			cow.memories.push(req.body.memory);
+			cow.markModified('memories');
+		}
 		if (req.body.items) {
 			cow.items = req.body.items;
-			if (cow.items.length > 3) {
-				cow.items = cow.items.slice(0, 3);
+			if (false && cow.items[cow.items.length - 1] == 'wings_bat') {
+				User.findOne({ _id: req.session.user_id }, function (err, user) {
+					if (user.badges.indexOf(7) == -1) {
+						user.badges.unshift(7);
+						user.markModified('badges');
+						user.save();
+					}
+				});
+			}
+			if (cow.items.length > 9) {
+				cow.items = cow.items.slice(0, 9);
 			}
 			cow.markModified('items');
 		}
+		//cow.is_active = true;
 		cow.save(function (err) {
 			if (err) return res.send(err);
 			res.send(cow);
 		});
 	});
 });
+app.post('/cow/new', function(req, res){
+	Cow.find({ user_id: req.session.user_id }).exec(function (err, cows) {
+		var len = cows.length;
+		for (var i = 0; i < len; i++) {
+			if (cows[i].is_active) {
+				cows[i].is_active = false;
+				cows[i].save();
+			}
+		}
+		var newcow = new Cow({
+			name: req.body.name,
+			user_id: req.session.user_id,
+			strength: Math.floor((Math.random() * 8) + 8 + len),
+			intelligence: Math.floor((Math.random() * 8) + 8 + len),
+			constitution: Math.floor((Math.random() * 8) + 8 + len),
+		});
+		newcow.save(function (err, newcow) {
+			if (err) return res.send(err);
+			res.send(newcow);
+		});
+	});
+});
+app.get('/suggestion/user', function(req, res){
+	User.findOne({ _id: req.session.user_id }).select('friends').exec(function (err, me) {
+		var now = new Date();
+		var dayago = new Date(now.getTime() - 24*60*60*1000);
+		User.find({ 
+			email: {'$ne': null },
+			_id: {'$ne': me._id },
+			_id: { '$nin': me.friends },
+			updated_at: { $gt: dayago}
+		}).lean(true).sort('-updated_at').select('name friends').limit(25).exec(function (err, users) {
+
+			for (var i = 0; i < users.length; i++) {
+				if (users[0].friends.length < 2) {
+					return res.json({ user: users[i].name });
+				}
+			}
+
+			return res.json({ user: users[0].name });
+		});
+	});
+});
 app.get('/user/:name/cow', function(req, res){
 	User.findOne({ name: req.params.name }).lean(true).exec(function (err, user) {
-		Cow.findOne({ user_id: user._id }).lean(true).exec(function (err, cow) {
+		Cow.findOne({ user_id: user._id, is_active: true }).lean(true).exec(function (err, cow) {
 			res.send(cow);
+		});
+	});
+});
+app.get('/user/:name/cows', function(req, res){
+	User.findOne({ name: req.params.name }).lean(true).exec(function (err, user) {
+		Cow.find({ user_id: user._id }).lean(true).exec(function (err, cows) {
+			res.send(cows);
 		});
 	});
 });
@@ -1745,6 +1960,7 @@ app.get('/reward', checkAdmin, function(req, res){
 	var n = req.param('n', null);  // second parameter is default
 	var a = parseInt(req.param('a', 0));  // second parameter is default
 	var badge = req.param('badge', null);  // second parameter is default
+	var item = req.param('item', null);  // second parameter is default
 	var cone = req.param('cone', null);  // second parameter is default
 	var mod = req.param('mod', null);  // second parameter is default
 	var title = req.param('title', null);  // second parameter is default
@@ -1797,9 +2013,21 @@ app.get('/reward', checkAdmin, function(req, res){
 			if (!user) return res.send('user not found!');
 			if (err || !user) return res.send('err ' + err);
 			if (badge) {
+				if (user.badges.indexOf(badge) > -1) { return res.send('already has that badge.'); }
+				var pm = new PrivateMessage({
+					to: user._id,
+					from: ':',
+					text: 'The mighty : has given you a badge.'
+				});
+				pm.save();
 				user.badges.push(parseInt(badge));
-			} else if (cone) {
-				user.cones.push(cone);
+			} else if (item) {
+				Cow.findOne({ user_id: user._id, is_active: true }, function (err, cow) {
+					if (!cow) return res.send('no cow');
+					cow.items.push(item);
+					cow.save();
+					res.send(cow);
+				});
 			} else if (accumulation) {
 				user.highest_accumulation = 0;
 			} else if (mod) {
@@ -1810,8 +2038,7 @@ app.get('/reward', checkAdmin, function(req, res){
 				user.friend_gold = friend_gold;
 			} if (item) {
 				user.items.push(item);
-			} else {
-				if (a > 0) {
+			} else if (a > 0) {
 					var pm = new PrivateMessage({
 						to: user._id,
 						from: ':',
@@ -1819,9 +2046,6 @@ app.get('/reward', checkAdmin, function(req, res){
 						money: a
 					});
 					pm.save();
-				} else {
-					user.today_date = 0;
-				}
 			}
 			user.save(function (err, u) {
 				if (err) return res.send('err' + err);
@@ -1966,6 +2190,20 @@ app.post('/toggle/night', function(req, res){
 		if (err || !u) return res.send(500, err);
 		if (!u.is_night) u.is_night = false;
 		u.is_night = !u.is_night;
+		u.save(function (err,u) {
+			if (err) return res.send(500, err);
+			res.send(200, '{}');
+		}); 
+	});
+	} catch (err) { res.send(500, err); }
+});
+app.post('/toggle/friend_notify', function(req, res){
+	try {
+	var post = req.body;
+	User.findOne({ _id: req.session.user_id }).exec(function (err, u) {
+		if (err || !u) return res.send(500, err);
+		if (!u.is_friend_notify) u.is_friend_notify = false;
+		u.is_friend_notify = !u.is_friend_notify;
 		u.save(function (err,u) {
 			if (err) return res.send(500, err);
 			res.send(200, '{}');
@@ -2402,7 +2640,7 @@ app.get('/highscores', function(req, res){
 		});
 	} else if (h_type == 'cow') {
 		var now = new Date();
-		User.find({cow_level : {$gt:0}, shadow_ban:null, is_guest: false}).sort('-cow_level').limit(lim).lean(true).select('name cow_level cow_name updated_at').exec(function (err, u) {
+		Cow.find({level : {$gt:1}, is_active: true}).sort('-level').limit(lim).lean(true).select('name level user_id').exec(function (err, u) {
 			if (err) return res.send(err);
 			res.send(u);
 		});
@@ -2756,7 +2994,8 @@ app.post('/message/read/:message', function(req, res) {
 			if (!user.message_count || user.message_count < 1) user.message_count = 1;
 			user.save(function (err) {
 				pm.is_read = !pm.is_read;
-				pm.save(function () {
+				pm.save(function (err) {
+					if (err) return res.json({error:err});
 					res.json({success:true});
 				});
 			});
@@ -2945,7 +3184,7 @@ app.get('/user/:name', function(req, res){
 		if (err || !user) return res.json({error: 'can\'t find user'});
 		Flavor.findOne({_id:user.last_flavor}).select('name').lean(true).exec(function (err, f) {
 			Topping.findOne({_id:user.last_addon }).select('name').lean(true).exec(function (err, a) {
-				Cow.findOne({ user_id: user._id }).lean(true).exec(function (err, cow) {
+				Cow.findOne({ user_id: user._id, is_active: true }).lean(true).exec(function (err, cow) {
 					if (err || !f) return res.send(err);
 					var release = ['main', 'beta', 'alpha'];
 					var t = 'Ice Creamizen';
@@ -2967,6 +3206,8 @@ app.get('/user/:name', function(req, res){
 					if (user.prestige_bonus > 398) t = t_array[2];
 					if (user.is_mod) t = 'Moderator';
 					if (user.is_admin) t = 'Admin';
+					if (user._id == '536b8c9d769cf0202d501e4e') t = 'Lore Master';
+					if (user._id == '543d5b077a4c5bd020298ff1') t = 'Designer';
 					if (user.title) t = user.title;
 
 					var gravatar_hash;
