@@ -1,7 +1,13 @@
 #Ice Cream Stand
-*OPEN SOURCED - V 1.39*
+*OPEN SOURCED*
 
-Here is the full source code for Ice Cream Stand v 1.39c
+Here is the full source code for Ice Cream Stand v 1.44B. The client side js can be found at source/js/main2.js which gets uglyified/minified at build time with gulp to the js that users see. main1.js follows main2.js (main1 is the beta release channel, main2 is the alpha) and finally main0.js follows main1.js which is the main channel.
+
+server side js can be found at app.js. 
+
+###found a bug?
+
+If you found something that is not intended or needs attention, please either open an issue here or if it is a high-impact issue please contact me directly.
 
 ###About
 
