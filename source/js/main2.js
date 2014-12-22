@@ -355,13 +355,15 @@ $(document).ready(function () {
         }
         if (!cow) {
             return alert('<p>"Come back when you have a cow."</p><p>Who said that? You only see a cart.</p>', 'A talking cart?');
-        }
-        if (cow.items.length >= 12) {
-            return alert('<p>Your inventory is full</p>', 'Inventory Full');
-        }
-        user_me.gold = user_me.gold - parseInt(cost);
+        }        
         if (item && !is_skin) {
+            if (cow.items.length >= 12) {
+                return alert('<p>Your inventory is full</p>', 'Inventory Full');
+            }
             alert('<p>Success! You have purchased <b class="tooltip" x-type="item" x-name="' + item + '">' + item.replace(/_/g, ' - ') + '</b> for ' + cow.name + '.</p>', 'Purchased');
+        }
+        if (is_skin && cow.skins_unlocked && cow.skins_unlocked.indexOf(item) > -1) {
+            return alert('<p>You already own the <b>' + item + '</b> cow skin.</p>', 'Already own');
         }
         $.ajax({
             url: '/shop/item',
@@ -370,6 +372,7 @@ $(document).ready(function () {
             type: 'post',
             success: function(j) {
                 if (j.error) return alert(j.error);
+                if (!isNaN(cost)) user_me.gold = user_me.gold - parseInt(cost);
                 if (j.gamble) {
                     cow = {}; //resync
                     Icecream.sync_cow(function () {
@@ -378,7 +381,7 @@ $(document).ready(function () {
                     });
                     return alert('<p>Success! You have found a <b class="tooltip" x-type="item" x-name="' + j.gamble + '">' + j.gamble.split('/')[0].replace(/_/g, ' - ') + '</b> for ' + j.cow.name + '.</p>', 'Mystery Item');
                 }
-                if (j.skin) {
+                if (j.unlocked_skin) {
                     if (!cow.skins_unlocked) cow.skins_unlocked = [];
                     cow.skins_unlocked.push(j.skin);
                     return alert('<p>Success! You have unlocked the <b>' + j.skin + '</b> skin for ' + cow.name + '.</p>', 'Skin Unlocked');
@@ -472,8 +475,11 @@ $(document).ready(function () {
             var flavour = Icecream.get_flavor( item['match-expertise'] );
             req = 'Requires level 15 expertise with ' + flavour.name;
         }
+        if (item.note) {
+            req = item.note;
+        }
         return compiled + '<tr><td><img src="https://s3.amazonaws.com/icecreamstand.com/skins/' + i.replace(/\s/g, '') + '.png" class="tooltip inventory_thumb thumb_wide" x-type="skin" x-name="' + i + '" /></td><td>' + i.replace(/_/g, ' - ') + '<div class="item_req">' + req + '</div>' +
-        '</td><td><div class="shop_button button" x-cost="' + item.cost + '" x-item="' + i + '" x-is-skin="true"><span class="money_icon is_white">' + numberWithCommas(item.cost) + '</span></div></td></tr>';
+        '</td><td><div class="shop_button button" x-cost="' + item.cost + '" x-item="' + i + '" x-is-skin="true" x-unlocked="' + (cow.skins_unlocked && cow.skins_unlocked.indexOf(i) > -1) + '"><span class="money_icon is_white">' + numberWithCommas(item.cost) + '</span></div></td></tr>';
     }
     $('body').on('click', '.inline-message', function () {
         $(this).hide();
@@ -1237,7 +1243,9 @@ $(document).ready(function () {
                 data: {type: $(this).attr('x-id')},
                 type: 'POST',
                 success: function (j) {
-                    main('repaint');
+                    main('repaint', function () {
+                        init_canvas();
+                    });
                 }
             });
         }
@@ -3642,7 +3650,8 @@ function init_canvas() {
         });
     
         var chat_height = ($('.chat.main_container').attr('x-expand') == 'true')? $('.chat.main_container').height() : 460;
-        $('.background_hill').css('top', $(document).height() - $('.chat.main_container').height() + chat_height - 152);
+        if (!$('.chat.main_container').is(':visible')) chat_height = 0;
+        $('.background_hill').css('top', $(document).height() - $('.chat.main_container:visible').height() + chat_height - 152);
         canvas_cache_width = parseInt($('canvas#canvas_main').attr('width'));
         if ( cached_cone && !canvas_cache_cone ) {
             canvas_cache_cone = new Image();
@@ -3937,11 +3946,11 @@ return {
 
         $('.shop_table:visible').attr('x-index', new_index);
         var ele_to_show = (new_index + 1) * 5;
-        $('.shop_table tr').show();
-        $('.shop_table tr:gt(' + (ele_to_show) + ')').hide();
-        $('.shop_table tr:lt(' + (ele_to_show - 5) + ')').hide();
+        $('.shop_table:visible tr').show();
+        $('.shop_table:visible tr:gt(' + (ele_to_show) + ')').hide();
+        $('.shop_table:visible tr:lt(' + (ele_to_show - 5) + ')').hide();
 
-        if ($('.shop_table tr:gt(' + (ele_to_show) + ')').length == 0) {
+        if ($('.shop_table:visible tr:gt(' + (ele_to_show) + ')').length == 0) {
             $('.shop_table:visible').attr('x-index', new_index - 1);
         }
     },

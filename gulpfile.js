@@ -3,14 +3,25 @@ var uglify = require('gulp-uglify');
 var jsValidate = require('gulp-jsvalidate');
 var awspublish = require('gulp-awspublish');
 var sass = require('gulp-sass');
+var imagemin = require('gulp-imagemin');
+var pngcrush = require('imagemin-pngcrush');
+var rename = require("gulp-rename");
+var imageResize = require('gulp-image-resize');
 
 var config = require('./config.js');
 var paths = {
   scripts: ['source/js/*.js'],
   css: ['source/css/*.scss'],
   scripts_public: ['public/js/*.js'],
+  flavours: ['source/img/flavours/*.png'],
+  addons: ['source/img/addons/*.png'],
+  cones: ['source/img/cones/*.png'],
   css_public: ['public/css/*.css'],
   json: ['source/json/*.json'],
+};
+var headers_image = {
+  'Cache-Control': 'max-age=315350000, no-transform, public',
+  'Content-Type': 'image/png'
 };
 
 gulp.task('js', function() {
@@ -51,7 +62,192 @@ gulp.task('publish_js', ['js'], function() {
      // print upload updates to console
     .pipe(awspublish.reporter());
 });
+gulp.task('flavours', ['publish_js', 'flavours_thumb'], function() {
+  // create a new publisher
+  var publisher = awspublish.create(config.aws);
 
+  // define custom headers
+  
+
+  return gulp.src(paths.flavours)
+
+    .pipe(imagemin({
+            optimizationLevel: 2,
+            use: [pngcrush()]
+    }))
+    .pipe(rename(function (path) {
+      path.dirname += '/flavours';
+    }))
+     // gzip, Set Content-Encoding headers and add .gz extension
+    .pipe(awspublish.gzip({ ext: '.gz' }))
+
+    // publisher will add Content-Length, Content-Type and  headers specified above
+    // If not specified it will set x-amz-acl to public-read by default
+    .pipe(publisher.publish(headers_image))
+
+    // create a cache file to speed up consecutive uploads
+    .pipe(publisher.cache())
+
+     // print upload updates to console
+    .pipe(awspublish.reporter());
+});
+gulp.task('addons', ['publish_js', 'addons_thumb'], function() {
+  // create a new publisher
+  var publisher = awspublish.create(config.aws);
+
+  // define custom headers
+  
+
+  return gulp.src(paths.addons)
+
+    .pipe(imagemin({
+            optimizationLevel: 2,
+            use: [pngcrush()]
+    }))
+    .pipe(rename(function (path) {
+      path.dirname += '/addons';
+    }))
+     // gzip, Set Content-Encoding headers and add .gz extension
+    .pipe(awspublish.gzip({ ext: '.gz' }))
+
+    // publisher will add Content-Length, Content-Type and  headers specified above
+    // If not specified it will set x-amz-acl to public-read by default
+    .pipe(publisher.publish(headers_image))
+
+    // create a cache file to speed up consecutive uploads
+    .pipe(publisher.cache())
+
+     // print upload updates to console
+    .pipe(awspublish.reporter());
+});
+gulp.task('addons_thumb', function() {
+  // create a new publisher
+  var publisher = awspublish.create(config.aws);
+
+
+  return gulp.src(paths.addons)
+    .pipe(imageResize({ 
+      width : 100,
+      height : 100,
+      crop : false,
+      gravity: 'South',
+      imageMagick: true
+    }))
+    .pipe(imagemin({
+            optimizationLevel: 2,
+            use: [pngcrush()]
+    }))
+    .pipe(rename(function (path) {
+      path.dirname += '/addons/thumb';
+    }))
+     // gzip, Set Content-Encoding headers and add .gz extension
+    .pipe(awspublish.gzip({ ext: '.gz' }))
+
+    // publisher will add Content-Length, Content-Type and  headers specified above
+    // If not specified it will set x-amz-acl to public-read by default
+    .pipe(publisher.publish(headers_image))
+
+    // create a cache file to speed up consecutive uploads
+    .pipe(publisher.cache())
+
+     // print upload updates to console
+    .pipe(awspublish.reporter());
+});
+gulp.task('flavours_thumb', function() {
+  // create a new publisher
+  var publisher = awspublish.create(config.aws);
+
+
+  return gulp.src(paths.flavours)
+    .pipe(imageResize({ 
+      width : 100,
+      height : 100,
+      crop : false,
+      gravity: 'South',
+      imageMagick: true
+    }))
+    .pipe(imagemin({
+            optimizationLevel: 2,
+            use: [pngcrush()]
+    }))
+    .pipe(rename(function (path) {
+      path.dirname += '/flavours/thumb';
+    }))
+     // gzip, Set Content-Encoding headers and add .gz extension
+    .pipe(awspublish.gzip({ ext: '.gz' }))
+
+    // publisher will add Content-Length, Content-Type and  headers specified above
+    // If not specified it will set x-amz-acl to public-read by default
+    .pipe(publisher.publish(headers_image))
+
+    // create a cache file to speed up consecutive uploads
+    .pipe(publisher.cache())
+
+     // print upload updates to console
+    .pipe(awspublish.reporter());
+});
+gulp.task('cones', ['publish_js', 'cones_thumb'], function() {
+  // create a new publisher
+  var publisher = awspublish.create(config.aws);
+
+  // define custom headers
+  
+
+  return gulp.src(paths.cones)
+
+    .pipe(imagemin({
+            optimizationLevel: 2,
+            use: [pngcrush()]
+    }))
+    .pipe(rename(function (path) {
+      path.dirname += '/cones';
+    }))
+     // gzip, Set Content-Encoding headers and add .gz extension
+    .pipe(awspublish.gzip({ ext: '.gz' }))
+
+    // publisher will add Content-Length, Content-Type and  headers specified above
+    // If not specified it will set x-amz-acl to public-read by default
+    .pipe(publisher.publish(headers_image))
+
+    // create a cache file to speed up consecutive uploads
+    .pipe(publisher.cache())
+
+     // print upload updates to console
+    .pipe(awspublish.reporter());
+});
+gulp.task('cones_thumb', function() {
+  // create a new publisher
+  var publisher = awspublish.create(config.aws);
+
+
+  return gulp.src(paths.cones)
+    .pipe(imageResize({ 
+      width : 100,
+      height : 100,
+      crop : false,
+      gravity: 'South',
+      imageMagick: true
+    }))
+    .pipe(imagemin({
+            optimizationLevel: 2,
+            use: [pngcrush()]
+    }))
+    .pipe(rename(function (path) {
+      path.dirname += '/cones/thumb';
+    }))
+     // gzip, Set Content-Encoding headers and add .gz extension
+    .pipe(awspublish.gzip({ ext: '.gz' }))
+
+    // publisher will add Content-Length, Content-Type and  headers specified above
+    // If not specified it will set x-amz-acl to public-read by default
+    .pipe(publisher.publish(headers_image))
+
+    // create a cache file to speed up consecutive uploads
+    .pipe(publisher.cache())
+
+     // print upload updates to console
+    .pipe(awspublish.reporter());
+});
 gulp.task('publish_css', ['css'], function() {
 
   // create a new publisher

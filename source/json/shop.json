@@ -1,0 +1,179 @@
+{
+    "hat_basic": {
+        "type": "hat",
+        "cost": 1000,
+        "rarity": "common"
+    },
+    "hat_beerhat": {
+        "type": "hat",
+        "con": 2,
+        "rarity": "uncommon"
+    },
+    "hat_deerstalker": {
+        "type": "hat",
+        "con": 1,
+        "cost": 10000000,
+        "rarity": "common"
+    },
+    "coat_basic": {
+        "type:": "coat",
+        "cost": 2000,
+        "rarity": "common"
+    },
+    "accessory_pipe": {
+        "type": "accessory",
+        "int": 1,
+        "cost": 5000,
+        "rarity": "common"
+    },
+    "accessory_monocle": {
+        "type": "accessory",
+        "int": 2,
+        "cost": 5000000,
+        "rarity": "uncommon"
+    },
+    "shoes_basic": {
+        "type": "shoes",
+        "cost": 100000,
+        "rarity": "common"
+    },
+    "shoes_cowboy": {
+        "type": "shoes",
+        "rarity": "common"
+    },
+    "tutu_pink": {
+        "type": "tutu",
+        "int": 1,
+        "con": 1,
+        "rarity": "rare"
+    },
+    "hat_afro": {
+        "type": "hat",
+        "str": 2,
+        "rarity": "rare"
+    },
+    "hat_fedora": {
+        "type": "hat",
+        "int": -1,
+        "rarity": "uncommon"
+    },
+    "hat_horns": {
+        "type": "hat",
+        "str": 3,
+        "rarity": "rare"
+    },
+    "accessory_lei": {
+        "type": "accessory",
+        "con": 1,
+        "rarity": "uncommon"
+    },
+    "skirt_grass": {
+        "type": "skirt",
+        "int": 1,
+        "rarity": "uncommon"
+    },
+    "accessory_coconut": {
+        "type": "accessory",
+        "str": 1,
+        "rarity": "uncommon"
+    },
+    "hat_jester": {
+        "type": "hat",
+        "int": 1,
+        "rarity": "rare"
+    },
+    "accessory_marotte": {
+        "type": "accessory",
+        "int": 1,
+        "rarity": "rare"
+    },
+    "cloak_designer": {
+        "type": "cloak",
+        "int": 2,
+        "con": 2,
+        "str": 2,
+        "rarity": "unique",
+        "match-name": "creeperkitty"
+    },
+    "cloak_of the wolf": {
+        "type": "cloak",
+        "int": 2,
+        "con": 2,
+        "str": 2,
+        "rarity": "unique",
+        "match-name": "xenko"
+    },
+    "cloak_of the sun": {
+        "type": "cloak",
+        "int": 2,
+        "con": 2,
+        "str": 2,
+        "rarity": "unique",
+        "match-name": "sunbucks"
+    },
+    "cloak_gamemaster": {
+        "type": "cloak",
+        "int": 2,
+        "con": 2,
+        "str": 2,
+        "rarity": "unique",
+        "match-name": "sam"
+    },
+    "cloak_loremaster": {
+        "type": "cloak",
+        "int": 2,
+        "con": 2,
+        "str": 2,
+        "rarity": "unique",
+        "match-name": "beepboop"
+    },
+    "cloak_donor": {
+        "type": "cloak",
+        "rarity": "unique",
+        "match-badge": 1
+    },
+    "cloak_superdonor": {
+        "type": "cloak",
+        "rarity": "unique",
+        "match-badge": 11
+    },
+    "hat_moose": {
+        "type": "hat",
+        "int": 2,
+        "con": 2,
+        "rarity": "winter",
+        "match-epic": "5481118619e7a1c726d1b3f6"
+    },
+    "hat_winter": {
+        "type": "winter",
+        "int": 2,
+        "con": 2,
+        "rarity": "winter",
+        "match-epic": "5481119c19e7a1c726d1b3f7"
+    },
+    "accessory_winter": {
+        "type": "accessory",
+        "con": 2,
+        "str": 2,
+        "rarity": "winter",
+        "match-epic": "5481119c19e7a1c726d1b3f7",
+        "match-epic-collected": 1000
+    },
+    "coat_canada": {
+        "type": "coat",
+        "con": 2,
+        "str": 2,
+        "rarity": "winter",
+        "match-epic": "5481118619e7a1c726d1b3f6",
+        "match-epic-collected": 1000
+    },
+    "digital": {
+        "type": "skin",
+        "match-expertise": "523d5ea90a0d080000000002",
+        "cost": 500000000
+    },
+    "toy": {
+        "type": "skin",
+        "note": "Chance to unlock from a Frankenflavour"
+    }
+}
