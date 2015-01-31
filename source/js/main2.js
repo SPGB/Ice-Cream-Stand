@@ -116,14 +116,20 @@ var cache_rooms_avail = [];
 var cache_buffs = [];
 var event_time_left = 0;
 var cache_worker_sales_to_send = 0; //if AFK these will pile up
+var epic_last_attack;
+var quest_interval;
+var cache_chapter;
+var cache_civvie_attack = 0;
 var new_art_addons = ['cherries', 'sprinkles', 'jelly beans', 'peanuts', 'gummy worms', 'peanut butter', 'onions', 'honey', 'berry jelly',
 'gummy sodas', 'blackberries', 'raspberries', 'chopped strawberries', 'marshmallow cream', 'vanilla frosting', 'chocolate frosting', 'crumbled candy bars', 'sugar cookies',
 'crumbled brownies', 'crumbled fudge', 'red velvet cake', 'cookie dough', 'm&m\'s', 'oreo',
 'chocolate chips', 'white chocolate chips', 'dark chocolate chips', 'pecans', 'acorns', 'almonds', 'gumballs', 'mini marshmallows', 'candied lemon rinds',
 'rice', 'chili peppers', 'gravy', 'coconut', 'peas', 'fudge ripple', 'chopped peaches', 'chopped pineapple',
-'croutons', 'fries', 'olives', 'candied bacon', 'bacon', 'shrimp', 'blueberries', 'raisins', 'waffles', 'cheese'];
+'croutons', 'fries', 'olives', 'candied bacon', 'bacon', 'shrimp', 'blueberries', 'raisins', 'waffles', 'cheese',
+ 'eyeballs', 'bat wings', 'nuts and bolts', 'warts', 'oil', 'sausage', 'pepperoni', 'ram', 'egg'];
 
 $(document).ready(function () {
+
     lang = $('html').attr('lang');
     canvas_cache_height = $(document).height();
     if (lang !== 'en') {
@@ -138,7 +144,73 @@ $(document).ready(function () {
             }
         });
     }
-    main('start', function () {
+    if (user_start) {
+        me_callback(user_start, 'start');
+    } else {
+        main();
+    }
+
+
+    $('body').on('click', '.lore_pback, .lore_pnext', function () {
+        $('.message_close:visible').click();
+        lore_load_page( Number($(this).attr('x-page')) );
+    });
+    $('body').on('click', '.lore_chap_pback, .lore_chap_pnext', function () {
+        $('.message_close:visible').click();
+        lore_load_chapter( Number($(this).attr('x-page')) );
+    });
+    $('body').on('click', '.lore_view_chapter', function () {
+        $.ajax({
+            url: '/chapter/' + $(this).attr('x-id'),
+            dataType: 'json',
+            success: function (chapter) {
+                cache_chapter = chapter;
+                lore_load_page(0);
+            }
+        });
+    });
+    function lore_load_page(page) {
+        if (page < 0) page = 0;
+        var words = cache_chapter.text.split(' ');
+        var max_pages = Math.floor(words.length / 140);
+        if (page > max_pages) page = max_pages;
+        var current_page = page;
+        var current_text = words.slice(current_page * 140, (current_page * 140) + 140).join(' ').replace(/\n/g, '<br>');
+        var page_controls = '<div class="lore_page_controls"><div class="lore_pback button" x-page="' + (page - 1) + '">Previous Page</div>' +
+                '<b>' + current_page + ' of ' + max_pages + '</b><div class="lore_pnext button" x-page="' + (page + 1) + '" x-is-max="' + (page == max_pages) + '">Next Page</div></div>';
+
+        alert('<p class="lore_p">' + current_text + '</p>' + page_controls, cache_chapter.title);
+        $('.message').addClass('fullscreen');
+    }
+    function lore_load_chapter(offset) {
+        $.ajax({
+            url: '/chapters',
+            data: { offset: offset },
+            dataType: 'json',
+            success: function (chapters) {
+                var compiled = '';
+                for (var i = 0; i < chapters.length; i++) {
+                    var chapter = chapters[i];
+                    compiled = compiled + '<div class="lore_view_chapter" x-id="' + chapter._id + '"><div class="lore_bubble"></div>' +
+                    ( (chapter.badge_id)? '<img src="' + image_prepend + '/badges/' + chapter.badge_id + '.png" class="chapter_badge" />' : '') + 
+                    '<div class="lore_inner"><b>' + 
+                    chapter.title + '</b>' + chapter.saga + '</div></div>';
+                }
+                var page_controls = '';
+                var total_chapters = user_me.chapters_unlocked.length;
+                var current_page = (offset/6);
+                if (chapters.length === 0) {
+                    compiled = '<center>No chapters unlocked yet.</center>';
+                } else {
+                    page_controls = '<div class="lore_chapter_controls"><div class="lore_chap_pback button" x-page="' + (offset - 6) + '">Previous Page</div>' +
+                    '<b>' + current_page + ' of ' + Math.floor(total_chapters/6) + '</b><div class="lore_chap_pnext button" x-page="' + (offset + 6) + '" x-is-max="' + (current_page == Math.floor(total_chapters/6)) + '">Next Page</div></div>';
+                }
+                alert(compiled + page_controls, '<img class="lore_in_title" src="http://static.icecreamstand.ca/lore_noglow.png"> Lore Journal');
+            }
+        });
+    }
+    $('body').on('click', '.lore, [x-link="lore"]', function () {
+        lore_load_chapter(0);
     });
     $('body').on('click', '.flavor .flavor_tab', function () {
         var xid = $(this).attr('x-id');
@@ -158,8 +230,8 @@ $(document).ready(function () {
         } else if (xid == 'main_franken') {
             $('#main_franken').remove();
             $('.flavor').append('<div class="inner_flavor_container" id="main_franken">' +
-                '<div class="col_3 franken_left"><div class="option_wrapper"></div></div>' +
-                '<div class="col_3 franken_center"><b>&lt; - - - - - &gt;</b><p>Select your flavours<br><br></p><button class="button_green">Combine!</button></div><div class="col_3 franken_right"><div class="option_wrapper"></div></div></div>');
+                '<div class="col_3 franken_left"><div class="option_wrapper" x-franken="franken_left"></div></div>' +
+                '<div class="col_3 franken_center"><b>&lt; - - - - - &gt;</b><p>Select your flavours<br><br></p><button class="button_green">Combine!</button></div><div class="col_3 franken_right"><div class="option_wrapper" x-franken="franken_right"></div></div></div>');
         }
         init_canvas();
     });
@@ -235,7 +307,7 @@ $(document).ready(function () {
         }
         var f_name = f.name.replace(/\s+/g, '');
         
-        $(this).closest('.col_3').find('.option_wrapper').html('<img x-type="base" x-value="' + f.value + '" x-base-value="' + f.base_value + '" class="option tooltip" x-id="' + f._id + '" id="' + f_name + '" src="' + image_prepend + '/flavours/thumb/' + f_name + '.png.gz">');
+        $('.option_wrapper[x-franken="' + $(this).closest('.franken_selector').attr('x-franken') + '"]').html('<img x-type="base" x-value="' + f.value + '" x-base-value="' + f.base_value + '" class="option tooltip" x-id="' + f._id + '" id="' + f_name + '" src="' + image_prepend + '/flavours/thumb/' + f_name + '.png.gz">');
         $('.franken_selector').remove();
         $('.franken_center p').html( get_franken_info() );
         $('.franken_center b').html( get_franken_image() );
@@ -266,7 +338,7 @@ $(document).ready(function () {
     });
     $('body').on('click', '#main_franken .option_wrapper', function (e) {
         $('.franken_selector').remove();
-        $(this).after('<div class="franken_selector"><div class="selector_nav"><div class="col_3 active" x-show="selector_normal">Normal</div><div class="col_3" x-show="selector_heroic">Heroic</div><div class="col_3" x-show="selector_legendary">Legendary</div></div>' +
+        $('.flavor.main_container').after('<div class="franken_selector" x-franken="' + $(this).attr('x-franken') + '"><div class="selector_nav"><div class="col_3 active" x-show="selector_normal">Normal</div><div class="col_3" x-show="selector_heroic">Heroic</div><div class="col_3" x-show="selector_legendary">Legendary</div></div>' +
             '<p id="selector_normal"></p><p id="selector_heroic" style="display: none;"></p><p id="selector_legendary" style="display: none;"></p><div class="franken_close">Close</div></div>');
         var f_len = flavors.length;
         for (var i = 0; i < f_len; i++) {
@@ -365,6 +437,7 @@ $(document).ready(function () {
     $('body').on('click', '.shop_button', function () {
         var item = $(this).attr('x-item');
         var is_skin = $(this).attr('x-is-skin') == 'true';
+        var is_badge = $(this).attr('x-is-badge') == 'true';
         var cost = parseInt($(this).attr('x-cost'));
         if (!isNaN(cost) && user_me.gold < cost) {
             return alert('<p>You need more money to buy this item!</p>', 'Can not Afford');
@@ -372,7 +445,7 @@ $(document).ready(function () {
         if (!cow) {
             return alert('<p>"Come back when you have a cow."</p><p>Who said that? You only see a cart.</p>', 'A talking cart?');
         }        
-        if (item && !is_skin) {
+        if (item && !is_skin && !is_badge) {
             if (cow.items.length >= 12) {
                 return alert('<p>Your inventory is full</p>', 'Inventory Full');
             }
@@ -399,8 +472,13 @@ $(document).ready(function () {
                 }
                 if (j.unlocked_skin) {
                     if (!cow.skins_unlocked) cow.skins_unlocked = [];
-                    cow.skins_unlocked.push(j.skin);
+                    cow.skins_unlocked.push(j.unlocked_skin);
                     return alert('<p>Success! You have unlocked the <b>' + j.unlocked_skin + '</b> skin for ' + cow.name + '.</p>', 'Skin Unlocked');
+                }
+                if (j.unlocked_badge) {
+                    user_me.badges.push(msg.add_badge);
+                    main();
+                    return alert('<p>Success! You have unlocked a new badge.</p>', 'Badge Unlocked');
                 }
                 cow = j;
                 cow_redraw();
@@ -447,7 +525,9 @@ $(document).ready(function () {
                     if (!cost || isNaN(cost) ) cost = 0;
                     if (item.type == 'skin') {
                         skin_compiled = shop_skin_add(skin_compiled, i, item);
-                    } else if (item['match-name']) {
+                    } else if (item.type == 'badge') {
+                        badge_compiled = shop_badge_add(badge_compiled, i, item);
+                    }else if (item['match-name']) {
                         if (item['match-name'] == user_me.name) {
                             compiled = shop_item_add(compiled, i, item);
                         }
@@ -488,12 +568,22 @@ $(document).ready(function () {
         return compiled + '<tr><td><img src="https://s3.amazonaws.com/icecreamstand.com/items/' + i.replace(/\s/g, '') + '.png" class="tooltip inventory_thumb" x-type="item" x-name="' + i + '/' + item.int + '/' + item.str + '/' + item.con + '/' + item.rarity + '" /> ' + i.replace(/_/g, ' - ') +
         '</td><td><div class="shop_button button" x-cost="' + item.cost + '" x-item="' + i + '"><span class="money_icon is_white">' + numberWithCommas(item.cost) + '</span></div></td></tr>';
     }
+    function shop_badge_add(compiled, i, item) {
+        console.log(item);
+        var badge = item.badge;
+        return compiled + '<tr><td><img src="https://s3.amazonaws.com/icecreamstand.com/badges/' + badge + '.png" class="inventory_thumb" x-type="badge" /> ' + i.replace(/_/g, ' - ') +
+        '</td><td><div class="shop_button button" x-cost="' + item.cost + '" x-item="' + i + '" x-is-badge="true"><span class="money_icon is_white">' + numberWithCommas(item.cost) + '</span></div></td></tr>';
+    
+    }
     function shop_skin_add(compiled, i, item) {
         console.log('displaying skin: ' + i);
         var req = '';
         if (item['match-expertise']) {
             var flavour = Icecream.get_flavor( item['match-expertise'] );
             req = 'Requires level 15 expertise with ' + flavour.name;
+        }
+        if (item['match-item']) {
+            req = 'Requires the item: ' + item['match-item'];
         }
         if (item.note) {
             req = item.note;
@@ -552,6 +642,8 @@ $(document).ready(function () {
             $('.hovercard').html('<div class="hover_title">' + __('Adopt a Cow') + '</div>Adopt a helper to increase your Ice Cream sales. Cows can equip items, and have ability scores (Strength, Constitution, Intelligence).<p class="flavor_text">Cows persist through prestige. Adoption has a $100 fee.</p>'); 
         } else if (xtype == 'friend') {
             $('.hovercard').html('<div class="hover_title">' + __('Friend') + '</div><p>Make the Ice Cream Stand more exciting and play with friends. Every day your friends get a bonus .01% of any money you earn. This doesn\'t take away from what you earn. It\'s a fascimile of social interaction that gives you some of the benefits.</p>');
+        } else if (xtype == 'search') {
+            $('.hovercard').html('<div class="hover_title">' + __('Search') + '</div><p>Search for a player...</p>');
         } else if (xtype == 'skin') {
             $('.hovercard').html('<div class="hover_title">' + $(this).attr('x-name') + '</div><p>This is a skin for your cow.</p>');
             $('.hovercard').css('z-index',12);
@@ -933,6 +1025,13 @@ $(document).ready(function () {
         $('.unlock_update').remove();
     });
     $('body').on('click', '#upgrades .unlockable button', function () {
+        if (is_cube) {
+            cubebar_end();
+            $(this).attr('x-cube-pend', true);
+            setTimeout(function () {
+                $('button[x-cube-pend]').click().removeAttr('x-cube-pend');
+            }, 500);
+        }
         var t = $(this).closest('.unlockable').attr('x-type');
         var that = this;
         if (t == 'prestige') {
@@ -1043,6 +1142,10 @@ $(document).ready(function () {
         }
         if (is_deep_sleep) Icecream.deep_sleep();
     };
+    $('body').attr('x-scroll-down', window.pageYOffset > 400);
+    $(document).scroll(function () {
+        $('body').attr('x-scroll-down', window.pageYOffset > 400);
+    });
     $('body').on('click', '.message_close, .darkness', function () {
         if ($(this).hasClass('update')) return;
         var scr = document.body.scrollTop;
@@ -1091,14 +1194,16 @@ $(document).ready(function () {
         '<div class="squish"><div class="toggle_outer">' +
         '<div class="toggle_container" x-key="chat_off">Do not Disturb</div>' + 
         '<div class="toggle_container" x-key="is_night">Night Mode</div>' + 
-        '<div class="toggle_container" x-key="is_tooltip">Tooltips</div><div class="toggle_container" x-key="is_friend_notify">Notify when friends come online</div>' +
-        '<div class="toggle_container" x-key="badge_off">Hide Badge</div><div class="toggle_container" x-key="is_second_row">New below top row</div></div><div class="display_settings"></div>' +
+        '<div class="toggle_container" x-key="is_display_friendcows">Display friends cows</div>' + 
+        '<div class="toggle_container" x-key="is_tooltip">Tooltips</div><div class="toggle_container" x-key="is_friend_notify">Notify on friend activity</div>' +
+        '<div class="toggle_container" x-key="badge_off">Hide Badge</div><div class="toggle_container" x-key="is_second_row">New below top row</div><div class="toggle_container" x-key="is_auto_daynight">Auto day/night</div></div><div class="display_settings"></div>' +
         '</div></div>' +
         '<div class="settings_area" x-area="3" x-active="false">' +
         '<div class="squish"><div class="toggle_container" x-key="is_animation_clouds">Clouds</div></div>' +
         '<div class="squish"><div class="toggle_container" x-key="is_animation_cones">Falling Cones</div></div>' +
         '<div class="squish"><div class="toggle_container" x-key="is_animation_workers">Worker Sales</div></div>' +
         '<div class="squish"><div class="toggle_container" x-key="is_animation_money">Money Updates</div></div><br>' +
+        '<div class="squish"><div class="toggle_container" x-key="is_animation_lore">Lore books</div></div><br>' +
         '</div><div class="settings_area" x-area="4" x-active="false">' +
         '<div class="squish"><div class="toggle_container" x-key="is_email_holiday">Email me with Holiday Events</div></div>' +
         '<div class="squish"><div class="toggle_container" x-key="is_email_holiday">Email me when my password changes</div></div>' +
@@ -1164,16 +1269,13 @@ $(document).ready(function () {
     $('body').on('click', '#cow_teach', function () { 
         var memory = $('#cow_memory').val();
         cow.memories.push(memory);
-        $.ajax({
-            url: 'cow/update',
-            data: { memory: memory },
-            type: 'post',
-            dataType: 'json'
+        socket.emit('cow/update', {
+            memory: memory
         });
         $('.message_close:last').click();
     });
     $('body').on('click', '.vote_box', function () { 
-        $(this).css('bottom', -25);
+        $(this).css('bottom', -15);
         var flavour = $(this).attr('x-name');
         $.ajax({
             url: 'vote/' + $(this).attr('x-id'),
@@ -1438,7 +1540,7 @@ $(document).ready(function () {
             }
         });
     });
-    $('body').on('click', '.next_tutorial', function () {
+    $('body').on('click', '.next_tutorial, .tutorial_shadow', function () {
         user_me.tutorial++;
         Icecream.get_tutorial();
         $.ajax({
@@ -1515,7 +1617,7 @@ $(document).ready(function () {
                     } else if (j.name == 'dynamic quest') {
                         alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Boo-Yah! Successfully completed the quest, earning + $0.25 when there is an add-on event.<br /><br /><b>The next quest will unlock soon.</b>', 'Quest Complete'); 
                     } else {
-                        alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Huzzah! Successfully completed the quest, earning + $1.00 when there is an add-on event.<br /><br /><b>The next quest will unlock in a couple minutes.</b>', 'Quest Complete'); 
+                        alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Huzzah! Successfully completed the quest, earning + $1.00 when there is an add-on event.<br /><br /><b>The next quest will unlock soon.</b>', 'Quest Complete'); 
                     }
                     main('quest');
                     $(that).addClass('upgrade_success');
@@ -1586,110 +1688,6 @@ $(document).ready(function () {
         }
         get_usercard( $(this).attr('x-user') );
     });
-    function get_usercard(user) {
-
-        $.ajax({
-            url: 'user/' + user,
-            success: function (j) {
-                if (j.error) {
-                    alert(j.error, 'Error');
-                    return;
-                }
-                if (!j.prestige_level) j.prestige_level = 0;
-                if (!j.prestige_bonus) j.prestige_bonus = 0;
-                var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
-                var friend = 'Add Friend</div>';
-                var friend_enabled = 'true';
-                if (user_me.friends && user_me.friends.indexOf(j._id) > -1) {
-                    friend = (j.friend)? 'Mutual Friend' : 'Your Friend';
-                    friend_enabled = 'false';
-                } else if (j.friend) {
-                    friend = 'Return Friends';
-                }
-                var online_status = (j.updated_at === '<1 minute')? 'online' : 'offline';
-                var user_cow = '';
-                if (j.cow) {
-                    var rainbow = false;
-
-                    if (j.cow.level < 5) {
-                        j.cow.skin = 'baby';
-                    } else {
-                        if (j.cow.items) {
-                            for (var i = 0; i < j.cow.items.length; i++) {
-                                if (i > 3) break;
-                                var item = j.cow.items[i].split('/')[0].replace(/"/g, '');
-                                if (item == 'wings_rainbow') rainbow = true;
-                                user_cow = user_cow + '<div x-type="' + item + '" class="cow_attachment type_item"></div>';
-                            }
-                        }
-                    }
-                    user_cow = '<div class="user_cow_inner"><div class="cow_body" x-skin="' + j.cow.skin + '" />' + user_cow + '</div>';
-                }
-                var created = (j.created_at)? new Date(j.created_at) : new Date();
-                var created_diff = new Date() - created;
-                var created_days = Math.floor(created_diff / 1000 / 60 / 60 / 24);
-                var defaults = ['http://static.icecreamstand.ca/flavours/vanilla.png',
-                'http://static.icecreamstand.ca/flavours/strawberry.png',
-                'http://static.icecreamstand.ca/flavours/blueberry.png'];
-                var default_img = defaults[0];
-                if (j.quests > 2) default_img = defaults[1];
-                if (j.prestige_level > 1) default_img = defaults[2];
-                var is_new_art = new_art_addons.indexOf(j.last_addon) > -1;
-                var addon_url = is_new_art? image_prepend + '/addons/thumb/' + j.last_addon.replace(/\s+/g, '') + '.png.gz' : image_prepend + '/toppings/' + j.last_addon.replace(/\s+/g, '') + '.png';
-                var cow_cards = '';
-                for (var i = 0; i < j.cows.length; i++) {
-                    cow_cards = cow_cards + '<div class="user_cow_title" x-num="' + i + '" x-id="' + j.cows[i]._id + '">' + j.cows[i].name + '<span class="cow_card_level">lv' + Math.floor(j.cows[i].level) + '</span></div>';
-                }
-                var badges_compiled = '';
-                var badge_avatar = '';
-                if (j.badges && j.badges.length > 0) {
-                    var b_len = j.badges.length;
-                    for (var i = 0; i < b_len; i++) {
-                        badges_compiled = badges_compiled + '<img src="' + image_prepend + '/badges/' + j.badges[i] + '.png" class="user_info_badge" />';
-                    } 
-                    badge_avatar = '<img src="' + image_prepend + '/badges/' + j.badges[0] + '.png" class="user_badge_avatar" />';
-                }
-                alert('<div class="user_info_sash"><div class="badges">' + badges_compiled + '</div></div>' +
-                    '<div class="user_info_inner"><div class="user_info_nav">' +
-                    '<div class="user_info_tab user_info_tab_active" x-section="1">Player</div>' +
-                    '<div class="user_info_tab" x-section="2">Store</div><div class="user_info_tab" x-section="3">Stats</div></div>' +
-                '<div class="playercard_anchor" x-anchor="1" style="display: block;"><table><tr><td style="text-align:center;">' + 
-                '<img src="http://www.gravatar.com/avatar/' + j.gravatar + '?s=200&d=' + default_img + '" class="gravatar" />' +
-                '<div class="button send_message" x-user="' + j.name + '">Message</div>' +
-                '<div class="button add_friend" x-enabled="' + friend_enabled + '" x-user="' + j.name + '">' + friend + '</div></td>' +
-                '<td><div class="user_icecream_holder"><div class="user_icecream" style="background-image: url(' + image_prepend + '/flavours/thumb/' + j.last_flavor.replace(/\s+/g, '') + 
-                '.png.gz), url(' + image_prepend + '/cones/' + j.cone + '.png.gz)"><img src="' + addon_url + '" x-new-art="' + is_new_art + '" class="user_addon" /></div></div>' +
-                '</td></tr></table></div><div class="playercard_anchor" x-anchor="2"><table>' +
-                    '<tr><td><b>Carts</b> ' + j.carts + '</td><td><b>Employees</b> ' + j.employees + '</td></tr>' +
-                    '<tr><td><b>Trucks</b> ' + j.trucks + '</td><td><b>Robots</b> ' + j.robots + '</td></tr>' +
-                    '<tr><td><b>Rockets</b> ' + j.rockets + '</td><td><b>Aliens</b> ' + j.aliens + '</td></tr>' +
-                    '<tr><td><b>Coldhands</b> ' + j.cold_hands + '</td><td><b>Autopilot</b> ' + j.autopilot + '</td></tr>' +
-                '</table></div>' +
-                '<div class="playercard_anchor" x-anchor="3"><table>' +
-                    '<tr><td><b>Flavors</b> ' + j.flavors + '</td>' +
-                    '<td><b>Add-ons</b> ' + j.toppings + '</td></tr>' +
-                    '<td><b>Prestige</b> ' + j.prestige_bonus + '% </td>' +
-                    '<td><b>Quests</b> ' + j.quests + '</td></tr>' +
-                    '<td><b>Combos</b> ' + j.combos + '</td>' +
-                    '<td><b>Player for</b> ' + created_days + ' days</td></tr>' +
-                    '<td><b>Channel</b> ' + j.release_channel + '</td>' +
-                    '<td><b>Ice Cube time</b> ' + Math.floor(j.accumulation_time / 60) + ':' + (j.accumulation_time % 60).toFixed(1) + '</td></tr>' +
-                    '<td><b>Sold</b> ' + numberWithCommas(j.sold) +
-                    ((user_me.is_mod || user_me.is_admin)? '<td><b>ID</b> <small>' + j._id + '</small>': '') +
-                '</td></tr></table></div>' +
-                '<div class="playercard_anchor" x-anchor="4">Achievements</div>' +
-                '<div class="user_bottom_panel">' +
-                    '<time class="' + online_status + '" title="Last seen ' + j.updated_at + ' ago." x-away="' + j.is_away + '"></time>' +
-                '</div>' +
-                '<div class="user_cow" x-user="' + j.name + '" x-night="' + j.is_night + '">' + cow_cards + user_cow + '</div>', badge_avatar + ' ' + j.name.substring(0,1).toUpperCase() + j.name.substring(1) + ', ' + j.title);
-                
-
-            },
-            error: function (j) {
-                alert('failed to load user card', 'Error');
-            }
-        });
-    }
     $('body').on('click', '.icecream', function (e) {
         if (is_cube || $('.cube_infobar').length > 0) return false;
         //console.log('starting ice cubes...');
@@ -1747,7 +1745,13 @@ $(document).ready(function () {
     }
     function cubebar_end() {
         console.log('... ending ice cubes');
-        socket.emit('accumulation', { a: cache_cube_money, t: (new Date() - cache_cube_time) / 1000, is_first_win: cache_first_win_avail });
+        socket.emit('accumulation', { 
+            a: cache_cube_money,
+            t: (new Date() - cache_cube_time) / 1000,
+            is_first_win: cache_first_win_avail,
+            flavour: user_me.last_flavor,
+            addon: user_me.last_addon
+        });
         setTimeout(function() {
             $('.cube_infobar').remove();
             $('#canvas_sales').hide();
@@ -1790,7 +1794,7 @@ $(document).ready(function () {
         else if (user_me.icecream_sold >= 1000) {  achievement_register('5280ee78b61b420000000003'); }
         else if (user_me.icecream_sold >= 100) {  achievement_register('5280ee5fb61b420000000001'); }
 
-        if (user_me.quests.length == 0) Icecream.get_quest('cubes');
+        if (user_me.quests.length === 0) Icecream.get_quest('cubes');
     }
     function cube_collision(x, y) {
         for (var i = 0; i < canvas_cache_sales.length; i++) {
@@ -2061,15 +2065,15 @@ $(document).ready(function () {
          add_friend( $(this).attr('x-add') );
     });
     $('body').on('click', '.friends_add', function () {
-        if ($(this).text() === __('Add')) {
+        if ($(this).text() === __('Search')) {
             if ($('.friends_add_text').val() !== '') {
-                add_friend( $('.friends_add_text').val() );
+                get_usercard( $('.friends_add_text').val() );
             }
-            $(this).text(__('Add friend'));
+            $(this).html('<i class="fa fa-search"></i>');
             $('.friends_add_text').hide();
         } else { 
             $('.friends_add_text').val('').show().focus();
-            $(this).text(__('Add'));
+            $(this).text(__('Search'));
         }
     });
     $('body').on('click', '.add_friend', function () { //good thing this isn't confusing
@@ -2184,7 +2188,12 @@ $(document).ready(function () {
         
     });
     $('body').on('click', '.inventory_clear', function () {
-        var num = $(this).attr('x-num');
+        var num = Number( $(this).attr('x-num') );
+        var max_items = $('.cow_inventory > .inventory_slot').length;
+        for (var i = num; i < max_items; i++) {
+            var clear = $('.inventory_clear[x-num="' + i + '"]');
+            clear.attr('x-num', Number(clear.attr('x-num')) - 1);
+        }
         $(this).parent('.inventory_slot').remove();
         cow.items.splice(num, 1);
 
@@ -2193,7 +2202,7 @@ $(document).ready(function () {
             //load_cow(cow);
         }, true);
     });
-    $('body').on('click', '.user_cow_title', function () {
+    $('body').on('click', '.user_cow_title, .cow_background', function () {
         $.ajax({
             url: 'cow/' + $(this).attr('x-id'),
             dataType: 'json',
@@ -2309,6 +2318,110 @@ $(document).ready(function () {
         return false;
     });
 });
+function get_usercard(user) {
+        history.pushState({}, "Player - " + user, "/#!u/" + user);
+        $.ajax({
+            url: 'user/' + user.toLowerCase(),
+            success: function (j) {
+                if (j.error) {
+                    alert(j.error, 'Error');
+                    return;
+                }
+                if (!j.prestige_level) j.prestige_level = 0;
+                if (!j.prestige_bonus) j.prestige_bonus = 0;
+                var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+                var friend = 'Add Friend</div>';
+                var friend_enabled = 'true';
+                if (user_me.friends && user_me.friends.indexOf(j._id) > -1) {
+                    friend = (j.friend)? 'Mutual Friend' : 'Your Friend';
+                    friend_enabled = 'false';
+                } else if (j.friend) {
+                    friend = 'Return Friends';
+                }
+                var online_status = (j.updated_at === '<1 minute')? 'online' : 'offline';
+                var user_cow = '';
+                if (j.cow) {
+                    var rainbow = false;
+
+                    if (j.cow.level < 5) {
+                        j.cow.skin = 'baby';
+                    } else {
+                        if (j.cow.items) {
+                            for (var i = 0; i < j.cow.items.length; i++) {
+                                if (i > 3) break;
+                                var item = j.cow.items[i].split('/')[0].replace(/"/g, '');
+                                if (item == 'wings_rainbow') rainbow = true;
+                                user_cow = user_cow + '<div x-type="' + item + '" class="cow_attachment type_item"></div>';
+                            }
+                        }
+                    }
+                    user_cow = '<div class="user_cow_inner"><div class="cow_body" x-skin="' + j.cow.skin + '" />' + user_cow + '</div>';
+                }
+                var created = (j.created_at)? new Date(j.created_at) : new Date();
+                var created_diff = new Date() - created;
+                var created_days = Math.floor(created_diff / 1000 / 60 / 60 / 24);
+                var defaults = ['http://static.icecreamstand.ca/flavours/vanilla.png',
+                'http://static.icecreamstand.ca/flavours/strawberry.png',
+                'http://static.icecreamstand.ca/flavours/blueberry.png'];
+                var default_img = defaults[0];
+                if (j.quests > 2) default_img = defaults[1];
+                if (j.prestige_level > 1) default_img = defaults[2];
+                var is_new_art = new_art_addons.indexOf(j.last_addon) > -1;
+                var addon_url = is_new_art? image_prepend + '/addons/thumb/' + j.last_addon.replace(/\s+/g, '') + '.png.gz' : image_prepend + '/toppings/' + j.last_addon.replace(/\s+/g, '') + '.png';
+                var cow_cards = '';
+                for (var i = 0; i < j.cows.length; i++) {
+                    cow_cards = cow_cards + '<div class="user_cow_title" x-num="' + i + '" x-id="' + j.cows[i]._id + '">' + j.cows[i].name + '<span class="cow_card_level">lv' + Math.floor(j.cows[i].level) + '</span></div>';
+                }
+                var badges_compiled = '';
+                var badge_avatar = '';
+                if (j.badges && j.badges.length > 0) {
+                    var b_len = j.badges.length;
+                    for (var i = 0; i < b_len; i++) {
+                        badges_compiled = badges_compiled + '<img src="' + image_prepend + '/badges/' + j.badges[i] + '.png" class="user_info_badge" />';
+                    } 
+                    badge_avatar = '<img src="' + image_prepend + '/badges/' + j.badges[0] + '.png" class="user_badge_avatar" />';
+                }
+                alert('<div class="user_info_sash"><div class="badges">' + badges_compiled + '</div></div>' +
+                    '<div class="user_info_inner"><div class="user_info_nav">' +
+                    '<div class="user_info_tab user_info_tab_active" x-section="1">Player</div>' +
+                    '<div class="user_info_tab" x-section="2">Store</div><div class="user_info_tab" x-section="3">Stats</div></div>' +
+                '<div class="playercard_anchor" x-anchor="1" style="display: block;"><table><tr><td style="text-align:center;">' + 
+                '<img src="http://www.gravatar.com/avatar/' + j.gravatar + '?s=200&d=' + default_img + '" class="gravatar" />' +
+                '<div class="button send_message" x-user="' + j.name + '">Message</div>' +
+                '<div class="button add_friend" x-enabled="' + friend_enabled + '" x-user="' + j.name + '">' + friend + '</div></td>' +
+                '<td><div class="user_icecream_holder"><div class="user_icecream" style="background-image: url(' + image_prepend + '/flavours/thumb/' + j.last_flavor.replace(/\s+/g, '') + 
+                '.png.gz), url(' + image_prepend + '/cones/' + j.cone + '.png.gz)"><img src="' + addon_url + '" x-new-art="' + is_new_art + '" class="user_addon" /></div></div>' +
+                '</td></tr></table></div><div class="playercard_anchor" x-anchor="2"><table>' +
+                    '<tr><td><b>Carts</b> ' + j.carts + '</td><td><b>Employees</b> ' + j.employees + '</td></tr>' +
+                    '<tr><td><b>Trucks</b> ' + j.trucks + '</td><td><b>Robots</b> ' + j.robots + '</td></tr>' +
+                    '<tr><td><b>Rockets</b> ' + j.rockets + '</td><td><b>Aliens</b> ' + j.aliens + '</td></tr>' +
+                    '<tr><td><b>Coldhands</b> ' + j.cold_hands + '</td><td><b>Autopilot</b> ' + j.autopilot + '</td></tr>' +
+                '</table></div>' +
+                '<div class="playercard_anchor" x-anchor="3"><table>' +
+                    '<tr><td><b>Flavors</b> ' + j.flavors + '</td>' +
+                    '<td><b>Add-ons</b> ' + j.toppings + '</td></tr>' +
+                    '<td><b>Prestige</b> ' + j.prestige_bonus + '% </td>' +
+                    '<td><b>Quests</b> ' + j.quests + '</td></tr>' +
+                    '<td><b>Combos</b> ' + j.combos + '</td>' +
+                    '<td><b>Player for</b> ' + created_days + ' days</td></tr>' +
+                    '<td><b>Channel</b> ' + j.release_channel + '</td>' +
+                    '<td><b>Ice Cube time</b> ' + Math.floor(j.accumulation_time / 60) + ':' + (j.accumulation_time % 60).toFixed(1) + '</td></tr>' +
+                    '<td><b>Sold</b> ' + numberWithCommas(j.sold) +
+                    ((user_me.is_mod || user_me.is_admin)? '<td><b>ID</b> <small>' + j._id + '</small>': '') +
+                '</td></tr></table></div>' +
+                '<div class="playercard_anchor" x-anchor="4">Achievements</div>' +
+                '<div class="user_bottom_panel">' +
+                    '<time class="' + online_status + '" title="Last seen ' + j.updated_at + ' ago." x-away="' + j.is_away + '"></time>' +
+                '</div>' +
+                '<div class="user_cow" x-user="' + j.name + '" x-night="' + j.is_night + '">' + cow_cards + user_cow + '</div>', badge_avatar + ' ' + j.name.substring(0,1).toUpperCase() + j.name.substring(1) + ', ' + j.title);
+                
+
+            },
+            error: function (j) {
+                alert('failed to load user card', 'Error');
+            }
+        });
+}
 function precise_round(num,decimals){
     return Math.round(num*Math.pow(10,decimals))/Math.pow(10,decimals);
 }
@@ -2325,7 +2438,7 @@ function populate_cones() {
         }
         $('.cones_inner #unlock_cone_' + user_me.cones[i]).remove();
     }
-    $('#main_cone .option_wrapper:first').click();
+    setTimeout(function () { $('#main_cone .option_wrapper:first').click(); }, 100);
     if ( $('.flavor_tab[x-id="main_cone"]').hasClass('active') ) $('.flavor_tab[x-id="main_cone"]').click(); //turn x-src into srcs
     if ($('.cones_inner .unlockable, .cones_inner h3').length === 0) {
         $('.cones_inner').append('<h3>Every cone is unlocked!</h3>');
@@ -2347,16 +2460,53 @@ function bind_sockets() {
                 Icecream.first_time_party();
             });
         }
+        if (msg.sync && msg.sync == user_me._id) {
+            window.location.reload(true);
+        }
         if (msg.room) {
             console.log('message for room: ' + msg.room);
             if (msg.room && msg.room != user_me.room) {
                 if (!cached_rooms[msg.room]) cached_rooms[msg.room] = 0;
                 cached_rooms[msg.room]++;
                 $('.chat_room_option[x-id="' + msg.room + '"] > .chat_count')[0].textContent = cached_rooms[msg.room];
+                $('.chat_rooms').attr('x-unread', true);
                 return false;
             }
         }
         load_message(msg);
+    });
+    socket.on('cow', function(msg){
+        console.log(msg);
+        if (msg.resync) {
+            cow = null;
+            Icecream.sync_cow();
+        }
+        if (msg.experience) {
+            cow.experience = msg.experience;
+        }
+        if (cow.level < 5 && msg.level > 5) {
+            alert('<center><b>Your cow is growing up!</b><br><br><img src="' + image_prepend + '/skins/default.png" class="cow_evolve" /></center>', cow.name + ' is evolving!');
+            cow = null;
+            $('.cow')[0].textContent = '';
+            Icecream.sync_cow();
+        }
+        cow.level = msg.level;
+        cow.experience = msg.experience;
+        cow.happiness = msg.happiness;
+        if (msg.item_change) cow_item_stats();
+    });
+    socket.on('epic/aoc/log', function(msg){
+        var message = '';
+        if (msg.power) {
+            epic_last_attack = new Date();
+            message = msg.player + ' attacked <i>' + msg.fort + '</i> with <b>' + msg.power + ' power</b><small>' + new Date() + '</small>';
+        }
+        if (msg.health) {
+            message = msg.player + ' repaired <i>' + msg.fort + '</i> for <b>' + msg.health + ' health</b><small>' + new Date() + '</small>';
+        }
+        $('.aoc_log').append('<div class="aoc_log_msg">' + message + '</div>');
+        if ( $('.aoc_log_msg').length > 10 ) $('.aoc_log_msg:first').remove();
+        //epic_interval();
     });
     socket.on('update', function(msg){
         if (msg.gold) {
@@ -2365,33 +2515,66 @@ function bind_sockets() {
         if (msg.ifr) {
             main('flavor');
         }
+        if (msg.chapter) {
+            toast('You have unlocked <b>' + msg.chapter + '</b>', 'Lore Chapter Unlocked!');
+            if (!user_me.chapters_unlocked) user_me.chapters_unlocked = [];
+            user_me.chapters_unlocked.push(msg.chapter);
+            $('.lore').attr('x-chapters', user_me.chapters_unlocked.length);
+        }
+        if (msg.epic) {
+            user_me.epic_collected = msg.epic;
+            $('.user_epic_collected')[0].textContent = user_me.epic_collected;
+        }
+        if (msg.fort) {
+            $('.aoc_dynamic[x-id="' + msg.fort + '"] .fort_options span')[0].textContent = numberWithCommas(msg.fort_health);
+            if (msg.fort_health <= 0) {
+                $('.aoc_dynamic[x-id="' + msg.fort + '"]').remove();
+            }
+        }
+        if (msg.refresh) {
+            game_working = false;
+            $('body').append('<div class="white_overlay"><strong>Already signed in (or the server just went down)<br><br><small>Refreshing in 10 seconds</small></strong>' +
+                '<i class="fa fa-times"></i></div>');
+            $('.white_overlay i').click(function () {
+                $('.white_overlay').fadeOut(250, function() {
+                    $(this).remove();
+                    game_working = true;
+                });
+            });
+            setTimeout(function () {
+                if (!game_working) window.location.reload(true); 
+            }, 10000);
+        }
         if (msg.trend) {
             $('#trend_left')[0].textContent = numberWithCommas(75000 - msg.trend) + ' left';
             $('#trend_sold_inner').css('width', ((msg.trend / 75000.00) * 100) + '%');
         }
-        if (msg.expertise) {
-            var flavour_position = user_me.flavors.indexOf(user_me.last_flavor);
-            user_me.flavors_sold[flavour_position] = msg.expertise;
+        if (msg.expertise && msg.expertise_position) {
+            user_me.flavors_sold[msg.expertise_position] = msg.expertise;
         }
     });
     socket.on('alert', function(msg){
         if (msg.error) {
             $('.inline-message').remove();
-            $('body').append('<h4 class="inline-message" id="animations">Ack Ack!<br /><small>' + msg.error + '</small></h4>'); 
+            var error_messages = ['Ack Ack', 'Oh Noooo', 'Errrrar', 'Uh-oh', 'Bad news doc'];
+            toast(msg.error, error_messages[ Math.floor( Math.random() * error_messages.length ) ] );
             return;
+        }
+        if (msg.error) {
+            toast(msg.error, 'Error');
         }
         alert(msg.message, msg.title);
     });
     socket.on('join', function(msg){
         var friend = Icecream.get_friend(msg._id);
         if (friend) {
-            friend.is_away = false;
             var cur_time = new Date();
             var last_seen = new Date(friend.updated_at);
             console.log('online -' + friend.name + ' (' + (cur_time - last_seen)  + ')');
-            if (user_me.is_friend_notify && cur_time - last_seen > 1000) {
-                load_message({ _id: Math.random() * 999999, user: ':', badge: '1', text: friend.name + ' has come online', is_system: true });
+            if (friend.is_away && user_me.is_friend_notify && cur_time - last_seen > 60000) {
+                load_message({ _id: Math.random() + 'online', user: ':', badge: '1', text: friend.name + ' has come online', is_system: true });
             }
+            friend.is_away = false;
             friend_list_add(friend.name, true, friend.is_away);
             $('.friends_counter span#count').text($('.friends_list_online > user').length + '/' + $('.friends_counter span#count').attr('x-length'));
         }
@@ -2399,8 +2582,13 @@ function bind_sockets() {
     socket.on('sleep', function(msg){
         var friend = Icecream.get_friend(msg._id);
         if (friend) {
+            var cur_time = new Date();
+            var last_seen = new Date(friend.updated_at);
+            if (user_me.is_friend_notify && friend.is_away && !msg.sleep  && cur_time - last_seen > 600000) {
+                load_message({ _id: Math.random() + 'afk', user: ':', badge: '1', text: friend.name + ' is no longer away', is_system: true });
+            }
             friend.is_away = msg.sleep;
-            friend.updated_at = new Date();
+            friend.updated_at = cur_time;
             friend_list_add(friend.name, true, friend.is_away);
         }
     });
@@ -2409,6 +2597,7 @@ function bind_sockets() {
         if (friend) {
             console.log('offline -' + friend.name);
             friend.updated_at = new Date();
+            friend.is_away = true;
             friend_list_add(friend.name, false);
             $('.friends_counter span#count').text($('.friends_list_online > user').length + '/' + $('.friends_counter span#count').attr('x-length'));
         }
@@ -2442,12 +2631,15 @@ function change_room(room) {
 
     $('.current_room')[0].textContent = room;
     $('.chat_rooms .hidden').remove();
-    $('.chat_rooms').append('<div class="hidden"></div>');
+    $('.chat_rooms').attr('x-unread', false).append('<div class="hidden"></div>');
 
     if (cache_rooms_avail.length === 0) {
         if (!user_me.shadow_ban) {
-            cache_rooms_avail.push('bug reports');
             cache_rooms_avail.push('default');
+            cache_rooms_avail.push('bug reports');
+            cache_rooms_avail.push('suggestions');
+            if (user_me.prestige_bonus > 90) cache_rooms_avail.push('Roleplay Closet');
+            if (user_me.is_admin || user_me.is_mod) cache_rooms_avail.push('Mod Only');
         }
         if (user_me.is_admin || user_me.is_mod) {
             cache_rooms_avail.push('swamp');
@@ -2464,6 +2656,7 @@ function change_room(room) {
 }
 function change_room_format(room) {
     if (!cached_rooms[room]) cached_rooms[room] = 0;
+    if (cached_rooms[room] > 0) $('.chat_rooms').attr('x-unread', true);
     return '<div class="chat_room_option" x-id="' + room + '">' + room + ' <span class="chat_count">' + cached_rooms[room] + '</span></div>';
 }
 function cow_hay(is_from_cube) {
@@ -2510,6 +2703,18 @@ function cow_hay(is_from_cube) {
         if (user_me.last_flavor == '525baa7865c3460000000006' && user_me.last_frankenflavour == '523903de9e47060000000002' && user_me.last_addon == '523d5dbf171d3e0000000005') {
             rare_drops.push('mask_cthulhu/2/2/1/rare/Grakmarr');
         }
+
+        //dino grabber
+        var is_top_15expertise = (user_me.flavors_sold.length > 4);
+        for (var i = 0; i < user_me.flavors_sold.length; i++) {
+            var sold = user_me.flavors_sold[i];
+            if (sold < 6076015) is_top_15expertise = false;
+            if (i == 4) break;
+        }
+        if (is_top_15expertise && cow.magic_find >= 0.10) {
+            rare_drops.push('grabber_dino/-1/3.5/0/rare');
+        }
+
         if (is_from_cube) {
             if (user_me.last_addon == '523d5abafbdef6f047000020' && user_me.last_flavor == '524d0d1e1320310000000004') {
                 rare_drops.push('hat_mercow/2/2/-1/rare');
@@ -2525,7 +2730,9 @@ function cow_hay(is_from_cube) {
         if (item_chance > 0.925 && !is_from_cube) drop_table.push.apply(drop_table, uncommon_drops);
         if (item_chance > 0.975) drop_table.push.apply(drop_table, rare_drops);
         type = drop_table[ Math.floor( Math.random() * drop_table.length ) ];
-        console.log('spawning item: ' + type);
+        
+        console.table(rare_drops);
+        //console.log('spawning item: ' + type);
     }
 
     var hay = $('<div />', {
@@ -2965,33 +3172,136 @@ function epic_prompt() {
         });
     });
 }
-function epic_load() {
-    $('.trending_and_events.main_container').after('<div class="epic main_container"><h4>Winter Event</h4>' +
+function epic_load() { //set up the frame of the epic
+    $('.trending_and_events.main_container').after('<div class="epic main_container"><h4>Attack on the Castle</h4>' +
         '<p class="epic_desc"></p>' +
-        '<table x-col="2"><tr><td><p class="epic_goal"><strong>Personal Goals</strong><br>' +
-        '<small>You\'ve collected <span class="user_epic_collected">' + user_me.epic_collected + '</span>.</small>' +
-        '<ul><li>Collect 100 - Unlock Team Skin <small>Current cow only</small></li><li>Collect 200 - <img src="http://static.icecreamstand.ca/badges/10.png" height=20 /> Event Badge</li>' +
-        '<li>Collect 1,000 - Team Coat</li>' +
-        '</ul></p></td><td><p class="epic_goal"><strong>Team Goals</strong><br>' +
-        '<small>Your team has collected <span class="team_epic_collected">-</span>.</small>' +
-        '<ul><li>Collect 5,000 - Team Hat</li>' +
-        '<li>Collect 100,000 - Players permanently unlock team\'s skin</li>' +
-        '<li>Leading team - 10% income boost</li></ul>' +
-        '</p></td></tr></table><p class="epic_goal"><strong>Invite a friend</strong><br>' +
-        '<span class="link_underline" x-link="invite">Invite a friend here</span> and they will automatically join your team. Current bonus: 10X - Winter Event ends at midnight on December 31st (new years).</p><div class="epic_progress_container">' +
-        '<div class="epic_progress_bar_1"></div><div class="epic_progress_bar_2"></div>' +
+        '<strong>Remaining Forts</strong><table x-col="2" class="aoc_forts"></table><div class="aoc_log"></div>' +
+        '<div class="col_2"><strong>Treasure</strong><br><p class="epic_goal">' +
+        '<ul>' +
+        '<li>Destroy 1 fort: <img src="' + image_prepend + '/badges/15.png" /> Badge</li>' +
+        '<li>Destroy 2 forts: <div class="tooltip inline_item" x-type="item" x-name="shield_steel/0/0/3">steel shield</div></li>' +
+        '<li>Destroy 3 forts: <div class="tooltip inline_item" x-type="item" x-name="armor_steel/-1/1/3">suit of steel armor</div></li>' +
+        '<li>Destroy 4 forts: <div class="tooltip inline_item" x-type="item" x-name="sword_steel/-1/4/-1">Steel Sword</div></li>' +
+        '<li>Help destroy the castle: "The Usurper" title</li>' +
+        '</ul></p></div><div class="col_2 aoc_upgrades"></div><p class="epic_goal"><strong>Invite a friend</strong><br>' +
+        'Attack a fort or castle within 2 minutes of another player will make your attack 50% more effective. <span class="link_underline" x-link="invite">Invite a friend here</span>. Players can only join the rebellion if invited, however they will also be able to report you for dissent (making you lose half your strength).' +
+        '<div class="epic_aoc_invite"><input type="text" placeholder="Player"><span>Recruit a player to the attack</span></div></p><div class="epic_progress_container">' +
         '</div></div>');
+    $('body').on('click', '.aoc_attack', function() {
+        if (user_me.epic_collected == 0) return alert('You have no power to attack with.', 'Error');
+        var d = new Date();
+        var delta = (d - new Date(user_me.epic_last_attack)) / 60000;
+        if (user_me.epic_last_attack && delta < 10) {
+            return alert('You can not attack again so soon, please wait ' + (10 - delta).toFixed(1) + ' minutes.', 'Error');
+        }
+        var is_chained = false;
+        if (epic_last_attack) {
+            var d = new Date();
+            var delta = (d - epic_last_attack) / 60000;
+            if (delta < 2) is_chained = true;
+        }
+        var max_attack = parseInt( $('.aoc_max_attack').text() );
+        user_me.epic_last_attack = new Date();
+        user_me.epic_collected -= max_attack;
+        if (user_me.epic_collected < 0) user_me.epic_collected = 0;
+        $('.user_epic_collected')[0].textContent = user_me.epic_collected;
+        socket.emit('epic/aoc/attack', { is_chained: is_chained });
+        epic_attack_buttons();
+    });
+    $('body').on('click', '.epic_aoc_invite span', function() {
+        var user = $('.epic_aoc_invite input').val();
+        if (!user) return alert('No user selected', 'Error');
+
+        var d = new Date();
+        var delta = (d - new Date(user_me.epic_last_recruit)) / 60000;
+        if (user_me.epic_last_recruit && delta < 10) {
+            return alert('You can not recruit again so soon, please wait ' + (10 - delta).toFixed(1) + ' minutes.', 'Error');
+        }
+        
+        user_me.epic_last_recruit = new Date();
+        socket.emit('epic/aoc/invite', { user: user });
+        $('.epic_aoc_invite input').val('');
+        
+        user_me.epic_last_recruit = new Date();
+    });
     epic_update();
 }
-function epic_update() {
+function epic_update() { //load in the details
+    if (user_me.is_mod || user_me.is_admin) {
+        $('.epic_desc').html('<strong>Overview</strong><br>You are on the council in Ice Cream Standopia. <b>The citizens have gone mad and are revolting!</b> Or so the ice that has grown around the forts and castle tells you. Buy knights to protect your forts and castles!');
+    } else {
+       $('.epic_desc').text('Buy weapons to increase the strength of your attacks. Attack up to once every 10 minutes, with up to 200 power. Attack within 2 minutes of another player to get a 50% bonus to your attack.'); 
+    }
+    $('.aoc_upgrades').html('<strong>Upgrades</strong><br>' +
+        '<small>Your power: <span class="user_epic_collected">' + user_me.epic_collected + '</span>. Maximum attack power: <span class="aoc_max_attack"></span></small>' +
+        '<table class="weapon_upgrades" x-col="2">' +
+        '<tr><td>Ice Cream balls</td><td><div class="button button_green aoc_upgrade" x-power="1">+1 power $100,000</div></td></tr>' +
+        '<tr><td>Ice Cream arrows</td><td><div class="button button_green aoc_upgrade" x-power="5">+5 power $450,000</div></td></tr>' +
+        '<tr><td>Ice Cream boulder catapult</td><td><div class="button button_green aoc_upgrade" x-power="10">+10 power $875,000</div></td></tr>' +
+        '</table>');
+
+    $('body').on('click', '.aoc_upgrade', function() {
+        var cost = { 1: 100000, 5: 450000, 10: 875000 };
+        var power = $(this).attr('x-power');
+        if (user_me.gold < cost[power]) return alert('Not enough money to purchase this upgrade', 'error');
+        user_me.gold -= cost[power];
+        gold -= cost[power];
+        socket.emit('epic/aoc/upgrade', { power: power });
+    });
+    $('body').on('click', '.aoc_upgrade_knight', function() {
+        var d = new Date();
+        var delta =  new Date(user_me.epic_last_attack) - d; //last_attack is the future date
+        if (delta > 0) {
+            return alert('You can not Repair again so soon, please wait ' + (delta / 60000).toFixed(1) + ' minutes.', 'Error');
+        }
+        var fort_id = $(this).closest('.aoc_dynamic').attr('x-id');
+        var cost = 100000;
+        if (user_me.gold < cost) return alert('Not enough money to purchase this upgrade', 'error');
+        user_me.gold -= cost;
+        gold -= cost;
+
+        var cooldown  = 1 + (1 / ((0.0002 * cache_civvie_attack) + 1)); //minutes to wait
+        user_me.epic_last_attack = new Date( new Date().getTime() + (cooldown * 60000) ); //that number of minutes in the future
+        console.log('upgrading fort ' + fort_id + ', cooldown: ' + cooldown);
+        console.log(user_me.epic_last_attack);
+        socket.emit('epic/aoc/knight', { fort: fort_id, health: $(this).attr('x-health') });
+        epic_attack_buttons();
+    });
+
+    //dynamic content below
     $.ajax({
-        url: '/epic/find',
+        url: '/epics',
         data: { id: user_me.epic_id },
         dataType: 'json',
-        success: function (epic) {
-            $('.epic.main_container p.epic_desc').html('<img src="' + image_prepend + '/event/' + epic.name.replace(/\W+/g, '').toLowerCase() + 
-                '.png" class="event_img" />' + epic.text + '<br>...<span class="link_underline" x-link="winter">Read More</span>');
-            $('.user_epic_collected, .team_epic_collected').after(' ' + epic.name);
+        success: function (epics) {
+            var civvies = 0;
+            //the forts
+            for (var i = 0; i < epics.length; i++) {
+                var fort = epics[i];
+                if (fort.name != 'Civilians'){
+                    if (fort.total > 0) $('.aoc_forts').prepend('<tr x-id="' + fort._id + '" class="aoc_dynamic" x-health="' + (fort.total > 0) + '"><td><img src="' + image_prepend + '/badges/16.png" />' + fort.name + '</td><td class="fort_options">Health <span>' + fort.total + '</span></td></tr');
+                } else {
+                    civvies = fort.players;
+                    cache_civvie_attack = fort.total;
+                    $('.aoc_max_attack')[0].textContent = 200 + (fort.total / 100);
+                }
+            }
+            if (user_me.is_mod || user_me.is_admin) {
+                var knight_health = 2 + (civvies * 1.5);
+                $('.fort_options').each(function () {
+                    $(this).append('<div class="button button_green aoc_upgrade_knight" x-health="' + knight_health + '">Hire Knight - $10,000,000 +' + knight_health + 'hp</div>');
+                });
+            } else {
+                var is_first_attack = true;
+                $('.fort_options').each(function () {
+                        if (is_first_attack) {
+                            $(this).append('<div class="button button_red aoc_attack">...</div>');
+                            is_first_attack = false;
+                        } else {
+                            $(this).append('<div class="button button_grey">Attack</div>');
+                        }
+                });
+            }
             epic_interval();
             setInterval(function () {
                 epic_interval();
@@ -2999,20 +3309,50 @@ function epic_update() {
         }
     });
 }
-function epic_interval() {
+function epic_interval() { //update each forts power
     if (is_deep_sleep) return;
     console.log('updating epic');
     $.ajax({
         url: '/epic/count',
         dataType: 'json',
         success: function (epics) {
-            var total = epics[0].total + epics[1].total;
-            $('.epic_progress_bar_1').css('width', (100 * (epics[0].total / total)) + '%').attr('title', epics[0].total);
-            $('.epic_progress_bar_2').css('width', (100 * (epics[1].total / total)) + '%').attr('title', epics[1].total);
-
-            $('.team_epic_collected')[0].textContent = (epics[0]._id == user_me.epic_id)? numberWithCommas(epics[0].total) : numberWithCommas(epics[1].total);
+            for (var i = 0; i < epics.length; i++) {
+                var epic = epics[i];
+                if (epic._id != '54c3f61c195ce39c30982562'){
+                    var elem = $('.aoc_dynamic[x-id="' + epic._id + '"] .fort_options span');
+                    if (elem.length > 0 && elem[0]) elem[0].textContent = numberWithCommas(epic.total);
+                } else {
+                    $('.aoc_max_attack')[0].textContent = 200 + (epic.total / 100);
+                }
+            }
         }
     });
+    epic_attack_buttons();
+}
+function epic_attack_buttons() {
+    var d = new Date();
+    var delta = (epic_last_attack)? (d - epic_last_attack) / 60000 : 0;
+    var delta_locked = (user_me.epic_last_attack)? (d - new Date(user_me.epic_last_attack)) / 60000 : 0;
+    console.log('epic/aoc: locked for ' + delta_locked);
+    if (user_me.epic_last_attack && delta_locked < 10) {
+        if ($('.aoc_attack')[0]) $('.aoc_attack')[0].textContent = 'Unlocks in ' + (10 - delta_locked).toFixed(1) + ' minutes';
+    } else if (epic_last_attack && delta < 5) {
+        if ($('.aoc_attack')[0]) $('.aoc_attack')[0].textContent = 'Attack (x1.5)';
+    } else {
+        if ($('.aoc_attack')[0]) $('.aoc_attack')[0].textContent = 'Attack';
+    }
+    if (user_me.is_admin || user_me.is_mod) {
+
+        var delta =  new Date(user_me.epic_last_attack) - d; //last_attack is the future date
+        if (delta > 0) {
+            $('.aoc_upgrade_knight')[0].textContent = 'Please wait ' + (delta / 60000).toFixed(1) + ' minutes.';
+        } else {
+            $('.aoc_upgrade_knight').each(function () {
+                var knight_health = $(this).attr('x-health');
+                $(this)[0].textContent = 'Hire Knight - $10,000,000 +' + knight_health + 'hp'; 
+            });  
+        }
+    }
 }
 function tooltip_winter() {
     alert('<p><h2>Winter is Upon Ice Creamtopia!</h1>' +
@@ -3051,6 +3391,7 @@ function update_worker_tiers() {
     $('#unlock_frankenflavour .sale_level').text(user_me.upgrade_frankenflavour);
     if (user_me.upgrade_machinery > 0) $('.option[x-type="machine"]').show();
     if (user_me.upgrade_machinery === 10) $('#unlock_machine').hide();
+    if (user_me.upgrade_autopilot === 250) $('#unlock_autopilot').hide();
     if (user_me.upgrade_coldhands === 1000) $('#unlock_coldhands').hide();
     if (user_me.upgrade_frankenflavour === 3) $('#unlock_frankenflavour').hide();
     if (user_me.upgrade_heroic > 0) {
@@ -3104,6 +3445,9 @@ function first_time_init() {
         init_canvas();
         tooltip_winter();
     }
+    if (location.hash.substring(0,4) == '#!u/') {
+        get_usercard( location.hash.substring(4) );
+    }
     if (lang !== 'en') {
         var lang_elems = $('.lang').length;
         for (var i = 0; i < lang_elems; i++) {
@@ -3111,16 +3455,44 @@ function first_time_init() {
             l.textContent = __(l.textContent);
         }
     }
-    if (!user_me.chat_off) {
-        var socket_data = { query: "id=" + user_me._id + '&name=' + user_me.name  };
-        socket = io('http://icecreamstand.ca', socket_data);
-        bind_sockets();
-    }
+
+    var socket_data = { query: "id=" + user_me._id + '&name=' + user_me.name  };
+    socket = io('http://icecreamstand.ca', socket_data);
+    bind_sockets();
+
     if (user_me.dunce_until) {
         Icecream.first_time_dunce();
     }
     if (user_me.party_until) {
         Icecream.first_time_party();
+    }
+    if (user_me.is_animation_lore) {
+        $('.lore').addClass('lore_float');
+    }
+
+    if (!user_me.chapters_unlocked) user_me.chapters_unlocked = [];
+    $('.lore').attr('x-chapters', user_me.chapters_unlocked.length);
+
+    if (user_me.is_admin || user_me.is_mod || (user_me.epic_id && user_me.epic_id == 'aoc_civ')) {
+        $('body').attr('x-epic', 'aoc');
+        $('h1').append('<div class="sub_header">Attack on the Castle</div>');
+        epic_load();
+    }
+    if ((user_me.total_gold > 100000 && !user_me.epic_id && !user_me.is_mod && !user_me.is_admin) || (user_me.epic_id && user_me.epic_id.substring(0, 8) == 'aoc_pend')) {
+        setTimeout(function () {
+            var name = (user_me.epic_id)? user_me.epic_id.substring(9, 10).toUpperCase() + user_me.epic_id.substring(10) : 'A citizen';
+            alert('<b>' + name + ' appears from the shadows and pulls you aside in secret.</b>' +
+            '<p>"There is something very wrong with the Council in Ice Cream Standopia. Ice has been forming across our lands, but the Council turns a blind eye.  Something is not right, there are whispers of a large beast made of ice causing this corruption! We need to rise up and attack the castle."' +
+            'Will you join us in our time of need?</p>' +
+            '<div class="aoc_recruit_buttons"><div class="button button_green aoc_join">Yes</div>' +
+            '<div class="button button_red aoc_deny">No</div>' +
+            '<div class="button button_red aoc_deny">Turn in ' + name + ' for dissent</div></div>', 'Attack on the Castle');
+        }, 100);
+
+        $('body').on('click', '.aoc_recruit_buttons .button', function () {
+            socket.emit('epic/aoc/signup', { join: $(this).hasClass('aoc_join') });
+            $('.message_close').click();
+        });
     }
     // if (user_me.quests.length > 1 && !user_me.epic_id) {
     //     epic_prompt();
@@ -3344,7 +3716,7 @@ function main_toppings(update_type, callback) {
                     Icecream.employees_working();
                 }, 5000); //TODO should this be accounting for machinery?
                 cached_machinery = user_me.upgrade_machinery;
-                Icecream.get_quests();
+                Icecream.get_quests('main topping');
                 $('.flavor .option[x-id="' + user_me.last_flavor + '"]').eq(0).click();  
                 $('.flavor .option[x-id="' + user_me.last_addon + '"]').eq(0).click();
                 if (user_me.last_addon == 'undefined') $('#main_addon .option').eq(0).click();
@@ -3398,31 +3770,54 @@ function main(update_type, callback) {
         dataType: 'JSON',
         timeout: 10000,
         success: function (j) {
-            if (!j.badges) j.badges = [];
-            if (!j.cones) j.cones = [];
-            if (!j.ignore) {
-                j.ignore = '';
-            } else {
-                j.ignore_list = j.ignore.split(',');
+            me_callback(j, update_type, callback);
+        },
+        error: function (j) {
+            if (game_working) {
+                game_working = false;
+                connect_fails++;
+                if (connect_fails > 20) {
+                    connect_fails = 20;
+                }
+                var timeout = connect_fails * 10;
+                toast( __('Trying again in') + ' ' + timeout + ' ' + __('seconds'), 'Connectivity Issues');
+                for (var i = 0; i <= timeout; i++) {
+                    setTimeout("Icecream.reconnect(" + (timeout - i) + ")", 1000 * i);
+                }
             }
-            if (!j.upgrade_coldhands) j.upgrade_coldhands = 0;
-            if (!j.badge_off) j.badge_off = false;
-            if (j.is_night) $('body:not(.night)').addClass('night');
-            if (!j.last_icecube_at && j.total_gold < 100) j.last_icecube_at = new Date();
-            buff_remove('firstwin');
-            cache_first_win_avail = false;
-            if (!j.last_icecube_at || new Date() - new Date(j.last_icecube_at) > 1000 * 60 * 60 * 24 ) {
-                cache_first_win_avail = true;
-                buff_add('firstwin', 'Daily x2 Ice Cube Bonus available');
-            }
+        }
+    });
+}
+function me_callback(j, update_type, callback) {
+    if (!j.badges) j.badges = [];
+    if (!j.cones) j.cones = [];
+    if (!j.ignore) {
+        j.ignore = '';
+    } else {
+        j.ignore_list = j.ignore.split(',');
+    }
+    if (!j.upgrade_coldhands) j.upgrade_coldhands = 0;
+    if (!j.badge_off) j.badge_off = false;
+    if (j.is_night) {
+        $('body:not(.night)').addClass('night');
+    } else if (j.is_auto_daynight && new Date().getHours() > 20) {
+        $('body:not(.night)').addClass('night');
+    }
+    if (!j.last_icecube_at && j.total_gold < 100) j.last_icecube_at = new Date();
+    buff_remove('firstwin');
+    cache_first_win_avail = false;
+    if (!j.last_icecube_at || new Date() - new Date(j.last_icecube_at) > 1000 * 60 * 60 * 24 ) {
+            cache_first_win_avail = true;
+            buff_add('firstwin', 'Daily x2 Ice Cube Bonus available');
+    }
+    $('.friend_gold').remove();
+    if (j.friend_gold) {
+        $('.floating_footer').append('<div class="friend_gold"><span class="money_icon is_white">' + numberWithCommas( (j.friend_gold).toFixed(0) ) + '</span><img src="' + image_prepend + '/moneybag.png" id="moneybag" /></div>');
+    }
+    user_me = j;
 
-            $('.friend_gold').remove();
-            if (j.friend_gold) {
-                $('.floating_footer').append('<div class="friend_gold"><span class="money_icon is_white">' + numberWithCommas( (j.friend_gold).toFixed(0) ) + '</span><img src="' + image_prepend + '/moneybag.png" id="moneybag" /></div>');
-            }
-            user_me = j;
-            if (!gold) gold = user_me.gold;
-            if (update_type && (update_type === 'badges')) {
+    if (!gold) gold = user_me.gold;
+    if (update_type && (update_type === 'badges')) {
                 $('.badge_inner .individual_badge').remove();
                 if (user_me.badges) {
                     for (var i = 0; i < user_me.badges.length; i++) {
@@ -3431,17 +3826,17 @@ function main(update_type, callback) {
                     }
                     if (user_me.badges[0]) $('.badge_selector').css('background-image', 'url("' + image_prepend + '/badges/' + user_me.badges[0] + '.png")');
                 }
-            }
+    }
             if (user_me.release_channel > 0) debug_mode = true;
-            if (user_me.is_guest && user_me.total_gold > 100) {
+            if (user_me.is_guest && user_me.total_gold > 1000) {
                 $('body').append('<h4 class="inline-message view_settings" id="guest" style="cursor:pointer;">' + __('Set a name and password!') + '<br />' +
-                '<small>' + __('Click here to secure your account and set a username and password.') + '</small></h4>'); 
+                '<small>' + __('Click here to save your account and set a username.') + '</small></h4>'); 
             }
-            if (!user_me.email && user_me.total_gold > 20000) {
+            if (!user_me.email && user_me.total_gold > 200000) {
                 $('body').append('<h4 class="inline-message view_settings" id="guest" style="cursor:pointer;">' + __('Set an Email') + '<br />' +
                 '<small>' + __('Secure your account and set your email address by clicking here.') + '</small></h4>'); 
             }
-            if (!user_me.email_verified && user_me.email && user_me.total_gold > 20000) {
+            if (!user_me.email_verified && user_me.email && user_me.total_gold > 200000) {
                 $('body').append('<h4 class="inline-message view_settings" id="guest" style="cursor:pointer;">' + __('Verify your email address') + '<br />' +
                 '<small>' + __('If you did not get a verification email go to settings to re-send.') + '</small></h4>'); 
             }
@@ -3486,40 +3881,24 @@ function main(update_type, callback) {
                 $('.trending_and_events.main_container:not(.half_size)').addClass('half_size');
             }
             
-            cached_flavor_length = user_me.flavors.length;
-            get_prestige_bonus(user_me);   
-            if (update_type && (update_type === 'carts' || update_type === 'employees' || update_type === 'trucks' || 
+    cached_flavor_length = user_me.flavors.length;
+    get_prestige_bonus(user_me);  
+
+    if (update_type && (update_type === 'carts' || update_type === 'employees' || update_type === 'trucks' || 
                 update_type === 'robots' || update_type === 'rockets' || update_type === 'aliens' || update_type === 'repaint' )) {
                 Icecream.update_worker_fx('main workers');
                 update_sell_value('bought worker');
                 if (callback && typeof callback === 'function') callback();
                 return;
-            }
-            if (update_type && (update_type === 'quest')) {
-                console.log('getting quests...');
-                Icecream.get_quests();
-                Icecream.get_quest();
-                return;
-            }
-            populate_cones();
-            main_flavours(update_type, callback);
-        },
-        error: function (j) {
-            if (game_working) {
-                game_working = false;
-                connect_fails++;
-                if (connect_fails > 20) {
-                    connect_fails = 20;
-                }
-                var timeout = connect_fails * 10;
-                $('.inline-message').remove();
-                $('body').append('<h4 class="inline-message" id="updated">Connectivity issue<br /><small>' + __('Trying again in') + ' ' + timeout + ' ' + __('seconds') + '</small></h4>'); 
-                for (var i = 0; i <= timeout; i++) {
-                    setTimeout("Icecream.reconnect(" + (timeout - i) + ")", 1000 * i);
-                }
-            }
-        }
-    });
+    }
+    if (update_type && (update_type === 'quest')) {
+        console.log('getting quests...');
+        Icecream.get_quests();
+        //Icecream.get_quest('me_callback');
+        return;
+    }
+    populate_cones();
+    main_flavours(update_type, callback);
 }
 function buff_add(buff, text) {
     if (cache_buffs.indexOf(buff) !== -1) return;
@@ -3542,6 +3921,8 @@ function get_prestige_bonus(user) {
     return ret;
 }
 function sell_icecream(amount, workers) {
+    if (!game_working) return;
+    
     if (workers) {
         //replace sold out ice cream
         var outofstock = -1;
@@ -3636,8 +4017,19 @@ function sell_icecream(amount, workers) {
         });
     }
 }
+function toast(msg, title, is_sticky) {
+    var toast_id = 'toast' + Math.random();
+    if (!title) title = 'Notice';
+    $('.inline-message').remove();
+    $('body').append('<h4 class="inline-message" id="' + toast_id + '">' + title + '<br /><small>' + msg + '</small></h4>'); 
+    if (!is_sticky) {
+        setTimeout(function () {
+            $('.inline-message').slideUp(500, function () { $(this).remove() });
+        }, 5000);
+    }
+}
 function alert(msg, title) {
-    if (is_cube) {
+    if (is_cube || $('#friend_message_textarea').length > 0) {
         alert_queue.unshift( { 'msg': msg, 'title': title } );
         return false;
     }
@@ -3988,6 +4380,7 @@ function __(input) {
     return resp;
 }
 function load_message(msg) {
+    if (user_me.chat_off) return false;
     if (!msg.user) { return console.log('No user attached to this message'); }
     if ($('.chat[x-id="' + msg._id + '"]').length > 0) { return console.log('Message already loaded'); }
     if (user_me.ignore_list && user_me.ignore_list.indexOf(msg.user) > -1) {
@@ -4008,9 +4401,15 @@ function load_message(msg) {
         'x-id': msg._id,
         'title': msg.created_at
     });
-    var construct = $('<span />', { html: msg.text.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
-        return '&#'+i.charCodeAt(0)+';';
-    }).replace( /(https?:\/\/[^\s]*)/g, '<a href="$1" target="_blank">$1</a>'), 'class': 'chat_textbody'});
+    var construct = $('<span />', { 
+        html: msg.text.replace(/[\u00A0-\u9999<>\&]/gim, function(i) {
+            return '&#'+i.charCodeAt(0)+';';
+            })
+            .replace( /(https?:\/\/[^\s]*)/g, '<a href="$1" target="_blank">$1</a>')
+            .replace(/(^| )@([^\W]*)/g, ' <div class="user_card" x-user="$2">@$2</div>'),
+        'class': 'chat_textbody'
+    });
+
     construct.find('a').each(function () {
         var href = $(this).attr('href');
         var href_end = href.substring(href.length - 4);
@@ -4025,7 +4424,7 @@ function load_message(msg) {
     $('#chat_window').append(div);
 
     var msg_len = $('#chat_window > .chat').length;
-    var max_len = $('.chat.main_container .expand').hasClass('active')? 75 : 10;
+    var max_len = $('.chat.main_container .expand').hasClass('active')? 75 : 15;
     while (msg_len > max_len) {
         $('#chat_window > .chat:first').remove();
         msg_len--;
@@ -4153,15 +4552,13 @@ return {
         //add in prev/next
         $('.filter_box').remove();
         if (len < 20) return false;
-        $('.inner_flavor_container:visible').after('<div class="filter_box"><div id="filter_flavour"></div><div class="filter_prev button" onclick="Icecream.paginate(' + (index-1) + ')"><img style="height: 20px;" src="' + image_prepend + '/arrow.svg"></div><div class="filter_next button" onclick="Icecream.paginate(' + (index+1) + ')"><img style="height: 20px;" src="'+image_prepend+'/arrow_right.svg"></div></div>');
+        $('.inner_flavor_container:visible').after('<div class="filter_box"><div id="filter_flavour"></div><div class="filter_prev button" onclick="Icecream.paginate(' + (index-1) + ')"><i class="fa fa-arrow-left"></i></div><div class="filter_next button" onclick="Icecream.paginate(' + (index+1) + ')"><i class="fa fa-arrow-right"></i></div></div>');
         if (index == 0) $('.filter_prev').css('opacity', '0.5');
         if (index == page_len) $('.filter_next').css('opacity', '0.5');
-        for (var i = index - 2; i < index + 3; i++) {
-            if (i >= 0 && i <= page_len) {
+        for (var i = 0; i < 6; i++) {
+            //if (i >= 0 && i <= page_len) {
                 $('.filter_box').append('<span class="filter_page ' + ((i == index)? 'active' : '') + '" onclick="Icecream.paginate(' + i + ')">' + (i+1) + '</span>');
-            } else {
-                $('.filter_box').append('<span class="filter_page" onclick="Icecream.paginate(0)" style="opacity: 0">0</span>');
-            }
+            //}
         }
     },
     shop_paginate: function(index) {
@@ -4248,7 +4645,7 @@ return {
             var x = (speed > 0)? 0-w : canvas_cache_width;
             canvas_drop_clouds.push({
                 x: x,
-                y: Math.floor(Math.random() * (canvas_cache_height - 300)),
+                y: Math.floor(Math.random() * (canvas_cache_height / 2)),
                 width: w,
                 height: w * 0.75,
                 speed: speed,
@@ -4476,6 +4873,7 @@ return {
     },
     sync_cow: function(cb, is_sync_items) {
         if (!game_working) { return; }
+        console.log('syncing cow...');
         if (cow && cow.name) {
             var d = { h: cow.happiness, experience: cow.experience };
             if (is_sync_items) {
@@ -4495,42 +4893,12 @@ return {
                 d.items_check = btoa( JSON.stringify(d.items) );
                 if (all_rares) { achievement_register('545dad806c43abdf66d01473'); }
             }
-            $.ajax({
-                url: '/cow/update',
-                data: d,
-                dataType: 'json',
-                type: 'post',
-                success: function (j) {
-                    if (j.err) {
-                        if (j.resync) {
-                            cow = null;
-                            Icecream.sync_cow();
-                        }
-                        if (j.experience) {
-                            cow.experience = j.experience;
-                        }
-                        if (user_me.release_channel === 2) alert(j.err, 'Cow Sync Error');
-                        return false;
-                    }
-                    if (j && j.name) {
-                        //cow = j;
-                        if (cow.level < 5 && j.level > 5) {
-                            alert('<center><b>Your cow is growing up!</b><br><br><img src="' + image_prepend + '/skins/default.png" class="cow_evolve" /></center>', cow.name + ' is evolving!');
-                            cow = null;
-                            $('.cow')[0].textContent = '';
-                            Icecream.sync_cow();
-                        }
-                        cow.level = j.level;
-                        cow.experience = j.experience;
-                        cow.happiness = j.happiness;
-                        if (is_sync_items) cow_item_stats();
-                        if (cb && typeof cb == 'function') {
-                            cb();
-                        }
-                    }
-                }
-            });
+            socket.emit('cow/update', d);
+            if (cb && typeof cb == 'function') {
+                cb();
+            }
         } else {
+
             $.ajax({
                 url: '/me/cows',
                 dataType: 'json',
@@ -4543,7 +4911,7 @@ return {
                             cow_item_stats();
                             cow_redraw();
                             if (cow.skin == 'Moose' || cow.skin == 'Polar Bear') { $('body:not(.winter)').addClass('winter'); }
-                        } else {
+                        } else if (!user_me.is_display_friendcows) {
                             //draw in background
                             var items = '';
                             
@@ -4554,7 +4922,7 @@ return {
                                 for (var j = 0; j < temp_cow.items.length; j++) {
                                     var item = temp_cow.items[j];
                                     items = items + '<div x-type="' + item.split('/')[0] + '" class="cow_attachment type_item"></div>';
-                                    if (j === 2) break;
+                                    if (j === 3) break;
                                 }
                             }
                             var cow_bg_elem = $('<div />', {
@@ -4564,7 +4932,7 @@ return {
                                 "x-num": i,
                                 "html": '<div x-skin="' + temp_cow.skin + '" class="cow_body"></div>' + items
                             });
-                            $(cow_bg_elem).appendTo('.background_hill');
+                            $(cow_bg_elem).appendTo('.footer_cows');
                             if (temp_cow.memories.length > 0 && Math.random() < 0.25) {
                                 alert_inline(cow_bg_elem, temp_cow.memories[ Math.floor( Math.random() * temp_cow.memories.length) ]);
                             }
@@ -4596,6 +4964,40 @@ return {
                     }
                 }
             });
+
+            if (user_me.friends.length > 0 && user_me.is_display_friendcows) {
+                $.ajax({
+                    url: '/me/cows/friends',
+                    dataType: 'json',
+                    type: 'get',
+                    success: function (cows) {
+
+                        for (var i = 0; i < cows.length; i++) {
+                            var items = '';
+                            var temp_cow = cows[i];
+                            if (temp_cow.level < 5) {
+                                temp_cow.skin = 'baby';
+                            } else {
+                                for (var j = 0; j < temp_cow.items.length; j++) {
+                                    var item = temp_cow.items[j];
+                                    items = items + '<div x-type="' + item.split('/')[0] + '" class="cow_attachment type_item"></div>';
+                                    if (j === 3) break;
+                                }
+                            }
+                            var cow_bg_elem = $('<div />', {
+                                "class": "cow_background",
+                                "x-id": temp_cow._id,
+                                "title": temp_cow.name,
+                                "x-num": i,
+                                "html": '<div x-skin="' + temp_cow.skin + '" class="cow_body"></div>' + items
+                            });
+                            $(cow_bg_elem).appendTo('.footer_cows');
+                        }
+                    }
+                });
+            }
+
+
         }
     },
     sync_chat: function() {
@@ -4616,7 +5018,7 @@ return {
             });
             return;
         }
-        var expanded = $('.chat.main_container .expand').hasClass('active')? 75 : 10;
+        var expanded = $('.chat.main_container .expand').hasClass('active')? 75 : 15;
         $.ajax({
             url: 'chat',
             data: {
@@ -4637,10 +5039,10 @@ return {
     reconnect: function (i) {
         console.log('reconnect attempt ' + i);
         if (i > 0) {
-            $('.inline-message#updated').html('Connectivity issue<br /><small>Trying again in ' + i + ' seconds</small>');
+            toast('Trying again in ' + i + ' seconds', 'Connectivity Issues');
             return;
         }
-        $('.inline-message#updated').html('Connectivity issue<br /><small>Reconnecting...</small>');
+        toast('Trying again in ' + i + ' seconds', 'Reconnecting...');
         game_working = true;
         main('reconnect', function () {
             $('.inline-message').remove();
@@ -4735,18 +5137,23 @@ return {
         if (origin) console.log('get_quest, -> ' + origin);
         $.ajax({
             url : 'new_quest',
+            data: { o: origin}, 
             dataType: 'JSON',
             success: function (j) {
                 if (j.error) {
                     alert(j.error, 'error');
                     return;
                 }
+                if (j.warn) {
+                    toast(j.warn, 'warning');
+                    return;
+                }
                 if (j.time) {
                     user_me.next_quest_at = j.time;
-                    Icecream.quests_timer();
-                    var diff = new Date(j.time) - new Date();
-                    setTimeout(function () { Icecream.get_quest('get_quest') }, diff + 200);
-                    console.log('rechecking new quests in ' + (diff + 200));
+                    clearInterval(quest_interval);
+                    quest_interval = setInterval(function () {
+                        Icecream.quests_timer();
+                    }, 1000);
                     return;
                 }
                 if (j && j.name && $('.quests.main_container:visible').length > 0) {
@@ -4767,25 +5174,45 @@ return {
 },
 quests_timer: function () {
     if (!user_me.next_quest_at) return;
-    var diff = new Date(user_me.next_quest_at) - new Date();
-    var minutes = Math.floor(diff / 60000);
-    $('.quests.main_container h4 > .lang')[0].textContent = 'Quests - Next quest unlocks in ' + minutes + ' ' + ((minutes == 1)? 'minute' : 'minutes');
+    var diff = (new Date(user_me.next_quest_at) - new Date()) / 1000;
+    var suffix;
+    if (diff < 0) { 
+        user_me.next_quest_at = null;
+        clearInterval(quest_interval);
+        $('.quests.main_container h4 > .lang')[0].textContent = 'Quests - Unlocking... ';
+        setTimeout(function () {
+            Icecream.get_quest();
+        }, 1000);
+        return false;
+    }
+    if (diff > 60) {
+        var minutes = (diff / 60).toFixed(1);
+        suffix = minutes + ' ' + ((minutes == 1)? 'minute' : 'minutes');
+    } else {
+        var seconds = Math.floor(diff);
+        suffix = seconds  + ' ' + ((seconds == 1)? 'second' : 'seconds');
+    }
+    $('.quests.main_container h4 > .lang')[0].textContent = 'Quests - Next quest unlocks in ' + suffix;
 },
-get_quests: function() {
+get_quests: function(origin) {
     console.log('getting quests');
     if (user_me.quests.length == 0) {
         $('.quest_default').remove(); 
         $('.quest_list').append('<p class="quest_default">You aren\'t currently on any quests...</p>');
-        if (user_me.gold > 10) Icecream.get_quest();
+        if (user_me.gold > 10) Icecream.get_quest('get_quests');
         return;
     }
     if (user_me.next_quest_at && new Date(user_me.next_quest_at) > new Date()) {
-        var diff = new Date(user_me.next_quest_at) - new Date();
-        Icecream.quests_timer();
-        setTimeout(function () { Icecream.get_quest() }, diff + 200);
-        console.log('rechecking new quests in ' + (diff + 200));
+        clearInterval(quest_interval);
+        quest_interval = setInterval(function () {
+            Icecream.quests_timer();
+        }, 1000);
     } else {
-        Icecream.get_quest();
+        var last_quest = user_me.quests[ user_me.quests.length - 1];
+        var split = last_quest.split('&');
+        if (split[1] == '0') { //last quest complete
+            Icecream.get_quest();
+        }
     }
     $.ajax({
         url : 'quests',
@@ -4853,10 +5280,7 @@ get_quests: function() {
     });
 },
 update_trending: function() {
-    if (!cache_event_trend_enable) {
-        console.log('cache event trend enable is OFF');
-        return;
-    }
+    if (!cache_event_trend_enable) return;
     $.ajax({
         url: '/trending',
         data: 'cache=' + Math.random(),
@@ -4872,8 +5296,8 @@ update_trending: function() {
                 }
             }
             trending_bonus = j.bonus.toFixed(2);
-            $('.trending #trend_bonus').text(trending_bonus);
-            $('.trend_title').text( __(j.flavour_name) );
+            $('.trending #trend_bonus')[0].textContent = trending_bonus;
+            $('.trending h4 > span')[0].textContent = __(j.flavour_name) + ' is trending';
             if (flavour) {
                 update_sell_value('update trending');
                 if ($('.currently_trending[x-id="' + trending_flavor + '"]').length == 0) {
@@ -4942,7 +5366,7 @@ update_worker_fx: function(origin) {
     }
 },
 get_tutorial: function() {
-    $('.tutorial').remove();
+    $('.tutorial, .tutorial_shadow').remove();
 
     if (is_cube) {
         setTimeout(function () {
@@ -4950,25 +5374,39 @@ get_tutorial: function() {
         }, 2000);
         return false;
     }
-    if (user_me.tutorial == 0) {
-        $('body').append('<div class="tutorial tutorial_0"><h2>' + __('Click Ice Cream for money') + '</h2><p class="tutorial_text">' +
-            __('Quickly Click ice cubes as they appear') + '<br><b>' + __('Try it out now!') +
-            '</b></p><div class="tut_ice_cube"></div><div class="triangle-left"></div></div>');
+    if (user_me.tutorial == 0) { //where to click
+        $('body').append('<div class="tutorial tutorial_0"><h2>' + __('Click for money') + '</h2><p class="tutorial_text">' +
+            __('Click the ice cream, then click ice cubes as they appear') + '. <b>' + __('Try it out!') +
+            '</b></p><div class="tut_ice_cube"></div><div class="triangle-left"></div></div><div class="tutorial_shadow"></div>');
     }
-    if (user_me.tutorial == 1) {
-        $('body').append('<div class="tutorial tutorial_2"><h2>' + __('Buy All The Things') + '</h2>' +
-        '<b>' + __('When you are ready') + '</b> ' + __('research new flavours, add-ons, and adopt your first cow under Upgrade') + '<div class="button next_tutorial button_green">' + __("Let's Start") + '</div><div class="triangle-right"></div></div>');
+    if (user_me.total_gold > 10 && user_me.tutorial == 1) {
+        $('body').append('<div class="tutorial tutorial_2"><h2>' + __('Get better with expertise') + '</h2><p class="tutorial_text">' +
+            __('The more Ice Cream you sell, the better you will be at making it. This is called ') + '<b>' + __('Expertise') +
+            '</b></p><div class="button next_tutorial button_green">Got it</div><div class="triangle-left"></div></div><div class="tutorial_shadow"></div>');
     }
-    if (user_me.total_gold > 500 && user_me.tutorial == 2) {
-        $('body').append('<div class="tutorial tutorial_3" style="top: ' + (window.innerHeight / 2) + 'px;"><h2>' + __('Sharing is caring') + '</h2>' +
+    if (user_me.tutorial == 2) {
+        var top = $('.flavor.main_container').offset().top;
+        $('body').append('<div class="tutorial tutorial_3" style="top: ' + top + 'px;"><h2>' + __('Almost done! Customize here') + '</h2><p class="tutorial_text">' +
+            __('Choose your favourite flavours and add-ons as you unlock them. If you want to see more than your top 5 click Expand.') +
+            '</p><div class="button next_tutorial button_green">Ok cool</div><div class="triangle-left"></div></div><div class="tutorial_shadow"></div>');
+    }
+    if (user_me.tutorial == 3) {
+        $('body').append('<div class="tutorial tutorial_4"><h2>' + __('Buy All The Things') + '</h2>' +
+        '<b>' + __('Research more powerful Ice Cream here. Hire workers, or get upgrades.') + '</b><div class="button next_tutorial button_green">' + __("Let's Start") + 
+        '</div><div class="triangle-right"></div></div><div class="tutorial_shadow"></div>');
+    }
+    if (user_me.total_gold > 1000 && user_me.tutorial == 4) {
+        $('body').append('<div class="tutorial tutorial_5"><h2>' + __('Sharing is caring') + '</h2>' +
         __('If you enjoy Ice Cream Stand <b>please tell your friends</b>. Any time someone you invite completes a quest, you earn money!') +
-        '<div class="clearfix"></div><div class="button next_tutorial button_red">' + __('No thanks') + '</div><div id="invite" x-link="invite" class="button next_tutorial button_green">' + __('Sure') + '</div></div>');
+        '<div class="clearfix"></div><div class="button next_tutorial button_red">' + __('No thanks') + 
+        '</div><div id="invite" x-link="invite" class="button next_tutorial button_green">' + __('Sure') + '</div></div><div class="tutorial_shadow"></div>');
     }
-    // if (user_me.total_gold > 500000 && user_me.tutorial == 3) {
-    //     $('body').append('<div class="tutorial tutorial_3" style="top: ' + (window.innerHeight / 2) + 'px;"><h2>' + __('Support Ice Cream Stand') + '</h2>' +
-    //     __('Please help keep Ice Cream Stand free and awesome, <span  class="link_underline">support us by donating</span> and earn rewards.') +
-    //     '<div class="clearfix"></div><div class="button next_tutorial">' + __('No thanks :*(') + '</div><div x-link="donate" class="button next_tutorial">' + __('Sure') + '</div></div>');
-    // }
+     if (user_me.total_gold > 500000 && user_me.tutorial == 5) {
+         $('body').append('<div class="tutorial tutorial_6"><h2>' + __('Support Ice Cream Stand') + '</h2>' +
+         __('Please help keep Ice Cream Stand free and awesome, <b>support us by donating</b> and earn cosmetic rewards.') +
+         '<div class="clearfix"></div><div class="button next_tutorial">' + __('No thanks') + '</div><div x-link="donate" class="button next_tutorial">' +
+          __('Support the game') + '</div></div><div class="tutorial_shadow"></div>');
+    }
 },
 get_flavor: function(id) {
     var f_len = flavors.length;
