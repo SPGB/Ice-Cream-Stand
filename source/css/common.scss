@@ -8,7 +8,7 @@ $grey: #404040;
 $green: #0da673;
 $red: #BC0000;
 $grey: #999;
-$brown: #cdbc9a;
+$brown: #9F7C48;
 
 @mixin drop-shadow() {
     box-shadow: 0px 1px 4px -1px #444;
@@ -24,9 +24,7 @@ html {
 }
 body {
     background-attachment: fixed;
-    background-color: #ACDAFF;
-    background-image: url("http://static.icecreamstand.ca/bg_day.png");
-    background-position: left bottom;
+    background-position: left calc(100% - 50px);
     background-repeat: repeat-x;
     color: #222;
     font-size: 14px;
@@ -37,6 +35,80 @@ body {
     text-align: center;
     -webkit-font-smoothing: antialiased;
     text-shadow: 1px 1px 1px rgba(0,0,0,0.004);
+    background-image: url("http://static.icecreamstand.ca/bg_day.png");
+    background-color: #ACDAFF;
+}
+body[x-epic="aoc"][x-scroll-down="false"] .section-side {
+	opacity: 0 !important;
+}
+.background_hill {
+    background-image: url(http://static.icecreamstand.ca/backgrounds/foreground_aoc_day.png.gz);
+    background-position: left top;
+    background-repeat: no-repeat;
+    background-size: 100% 150px;
+    height: auto;
+    bottom: 0;
+    top: 650px;
+}
+/* backgrounds */
+body[x-background="winter"] {
+    background-image: url(https://s3.amazonaws.com/icecreamstand.com/backgrounds/winter.png.gz);
+    background-color: #acdbff;
+}
+body[x-background="winter"].night {
+    background-image: url(https://s3.amazonaws.com/icecreamstand.com/backgrounds/winter_night.png.gz);
+    background-color: #2252ac;
+}
+body.night {
+    background-image: url(https://s3.amazonaws.com/icecreamstand.com/bg_night.png);
+    background-color: #122C5C;
+}
+body.night[x-background="attack on the castle"] {
+    background-image: url("http://static.icecreamstand.ca/backgrounds/aoc_night_c.png.gz");
+    background-color: #13172b;
+    .aoc_log {
+        background-color: #222;
+    }
+    .background_hill:after {
+        background-color: #13172b;
+    }
+}
+body[x-background="attack on the castle"] {
+	background-image: url("http://static.icecreamstand.ca/backgrounds/aoc_day_c.png.gz");
+    background-position: left top;
+    background-color: #102b28;
+    background-size: auto 768px;
+}
+body[x-background="retro"] .section-main {
+    background-image: url("http://static.icecreamstand.ca/background_kenny8_front.png"), url("http://static.icecreamstand.ca/background_wood.png");
+}
+body[x-background="retro"] .background_hill {
+   background-image: url("background_kenny8_front.png"); 
+}
+body.night[x-background="retro"] .background_hill {
+   background-image: url("background_kenny8_front.png"); 
+}
+body[x-background="retro"] {
+    background-image: url("http://static.icecreamstand.ca/backgrounds/retro.png.gz");
+    background-color: #acdbff;
+}
+body.night[x-background="retro"] {
+    background-image: url("http://static.icecreamstand.ca/backgrounds/retro_night.png.gz");
+    background-color: #251d38;
+}
+body[x-background="fallen"] {
+    background-position: left top;
+    background-image: url("http://static.icecreamstand.ca/backgrounds/fallen.png.gz");
+    background-color: #000001;
+}
+/* end backgorunds */
+canvas {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 textarea {
     font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -56,17 +128,33 @@ img {
     -ms-user-select: none;
     user-select: none;
 }
+body[x-scroll-down="true"] h1 {
+    position: static;
+    .sub_header {
+    	display: none;
+    }
+}
+body:not([x-epic]) h1 {
+	position: absolute;
+	top: 0;
+}
 h1 {
-    color: $grey;
+    color: #222;
     display: block;
-    font-size: 42px;
+    font-size: 24px;
+    left: 25%;
     margin: 0 auto;
     padding: 0;
+    position: absolute;
+    right: 25%;
     text-align: center;
+    top: 0px;
+    line-height: 30px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 h1 img {
     height: 80px;
-    margin-top: -10px;
     max-width: 100%;
 }
 h5 {
@@ -111,9 +199,15 @@ progress[value]#happiness[x-full="true"]::-moz-progress-bar {
     background-color: $green;
 }
 .fb_iframe_widget {
-    left: 100px;
-    position: absolute;
-    top: 8px;
+  left: 0;
+  position: absolute;
+  bottom: -35px; 
+  padding: 5px;
+}
+.new_msg_badge {
+    height: 20px;
+    vertical-align: middle;
+    margin-right: 5px;
 }
 #canvas_main {
     z-index: 1;
@@ -139,35 +233,38 @@ progress[value]#happiness[x-full="true"]::-moz-progress-bar {
     left: 0;
     bottom: auto;
     z-index: 2;
+    transition: opacity 0.25s ease 0s;
+    opacity: 1;
 }
 .shop_leftend {
-    background-image: url("https://s3.amazonaws.com/icecreamstand.com/shop_leftend.png");
-    background-size: contain;
-    height: 80px;
-    left: -26px;
-    position: absolute;
-    top: 2px;
-    width: 27px;
+    background-image: url("http://static.icecreamstand.ca/shop_leftend3.png");
     background-repeat: no-repeat;
+    background-size: contain;
+    height: 136px;
+    left: -54px;
+    position: absolute;
+    top: 0;
+    width: 64px;
 }
 .shop_rightend {
-    background-image: url("https://s3.amazonaws.com/icecreamstand.com/shop_rightend.png");
-    background-size: contain;
-    height: 80px;
-    position: absolute;
-    right: -26px;
-    top: 2px;
-    width: 26px;
+    background-image: url("http://static.icecreamstand.ca/shop_rightend3.png");
     background-repeat: no-repeat;
+    background-size: contain;
+    height: 136px;
+    position: absolute;
+    right: -54px;
+    top: 0;
+    width: 64px;
 }
 .section-main {
     background-color: $brown;
-    background-image: url(http://static.icecreamstand.ca/background_wood.png);
-    background-size: 150px auto;
-    border-radius: 5px 5px 0 0;
+    background-image: url("http://static.icecreamstand.ca/backgrounds/foreground_aoc_day.png.gz"), url("http://static.icecreamstand.ca/background_wood.png");
+	background-position: center bottom, left top;
+	background-repeat: no-repeat, repeat;
+	background-size: 100% auto, 150px auto;
     display: inline-block;
     min-height: calc(100% - 100px);
-    margin-top: 5px;
+    margin-top: 10px;
     padding-bottom: 150px;
     position: relative;
     text-align: left;
@@ -175,7 +272,8 @@ progress[value]#happiness[x-full="true"]::-moz-progress-bar {
     width: 50%;
     min-width: 495px;
     position: relative;
-    z-index: 2;
+    z-index: 4;
+    box-shadow: 0 0 2px #000;
 }
 .section-main-inner {
     padding: 10px 10px 0;
@@ -201,39 +299,52 @@ h4 {
     cursor: pointer;
 }
 .current_value {
-    border-radius: 5px;
-    position: absolute;
-    right: 30px;
+    display: table;
+    font-size: 20px;
+    margin: auto;
+    position: relative;
     text-align: right;
-    top: 25px;
     z-index: 2;
-    font-size: 18px;
 }
 #ice_cream_holder {
     position: absolute;
     width: 100%;
 }
+#name > i.fa {
+    padding-right: 5px;
+}
+.chat_rooms[x-unread="true"]:before {
+    color: #fff;
+    content: "!";
+    margin-right: 10px;
+}
+.chat_room_option {
+    padding: 10px;
+    margin: -5px;
+}
+.chat_room_option.active {
+	text-decoration: underline;
+}
 .icecream {
-    display: none;
     background-image: url("http://static.icecreamstand.ca/cones/default.png.gz");
-    background-position: center bottom;
+    background-position: center 228px;
     background-repeat: no-repeat;
-    background-size: 200px auto;
+    background-size: auto;
+    display: none;
     height: 485px;
-    margin-left: 41px;
-    margin-right: auto;
+    margin: 0 auto;
     padding-top: 60px;
-    position: absolute;
-    transition: width 0.5s ease 0s;
+    position: relative;
     width: 225px;
-    left: 12.5%;
-    text-align: left;
     z-index: 2;
+}
+.icecream[x-cone="default"] {
+    background-position: center 261px;
 }
 .icecream #topping {
     position: absolute;
     height: 180px;
-    position: absolute;
+    z-index: 2;
     top: 100px;
     width: 225px;
     user-drag: none;
@@ -249,8 +360,36 @@ h4 {
     background-position: 5px top;
     background-size: auto 245px;
     height: 229px;
-    top: 98px;
+    top: 95px;
     width: 228px;
+}
+.chat_rooms .hidden {
+  background-color: #5c59b8;
+  position: absolute;
+  width: 100%;
+  padding: 5px; 
+  left: 0;
+  top: 26px;
+  box-sizing: border-box;
+  z-index: 2;
+  text-align: left;
+}
+.chat_rooms:hover .hidden {
+    display: block;
+}
+.chat_room_option:hover {
+    background-color: $purple;
+}
+.chat_rooms i {
+  vertical-align: top; 
+  margin-top: -4px;
+}
+.hidden {
+    display: none;
+}
+#topping[x-addon="bacon"] {
+    margin-left: -2px;
+    margin-top: -11px;
 }
 .unlockable .option_wrapper {
     float: left;
@@ -284,31 +423,31 @@ h4 {
     white-space: pre;
 }
 #icecream_float_text {
-    font-size: 24px;
+    font-size: 32px;
 }
 .cow_float {
     background-color: #fff;
     border-radius: 25px;
-    color: $purple;
+    color: $purple-light;
     display: inline-block;
-    font-size: 24px;
+    font-size: 16px;
     font-weight: bold;
-    height: 16px;
-    line-height: 12px;
+    height: 30px;
+    line-height: 30px;
     margin-left: 75px;
-    padding: 10px;
+    padding: 5px 0;
     right: auto;
     text-align: center;
-    -ms-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    transform: rotate(90deg);
-    width: 16px;
+    width: 40px;
     z-index: 7;
 }
 .cow_float.float_success {
     background-color: $green;
     color: #fff;
+}
+.cow_float.float_hay {
+    background-color: $yellow;
+    color: #111;
 }
 .cow_float.float_failure {
     background-color: $red;
@@ -349,7 +488,7 @@ h4 {
     position: fixed;
     right: 20px;
     top: 5px;
-    z-index: 2; 
+    z-index: 3; 
     text-align: right;
 }
 .money_icon {
@@ -374,7 +513,7 @@ h4 {
 .money_icon.infocube_money:before {
     height: 25px;
     left: -21px;
-    top: 0px;
+    top: 5px;
     width: 25px;
 }
 .gold:before {
@@ -397,7 +536,7 @@ h4 {
 }
 .floating_footer {
     position: fixed;
-    z-index: 3;
+    z-index: 4;
     bottom: 10px;
     left: 0;
     padding-left: 10px;
@@ -409,11 +548,11 @@ h4 {
     display: inline-block;
     font-size: 14px;
     text-transform: capitalize;
-    color: #FFF1C6;
+    color: #fff;
     padding-top: 25px 0 0;
 }
 .friends_counter {
-    background-color: $purple-light;
+    background-color: $purple;
     border-radius: 2px 0 0 2px;
     color: #FEFFED;
     display: inline-block;
@@ -421,13 +560,16 @@ h4 {
     transition: background 0.5s;
     margin-left: 10px;
 }
+.search_form {
+    display: inline-block;
+}
 .friends_add {
     background-color: $purple;
     border-radius: 0 2px 2px 0;
     color: #FEFFED;
     cursor: pointer;
     display: inline-block;
-    padding: 5px;
+    padding: 5px 10px;
 }
 .friends_counter > span {
     cursor: default;
@@ -446,47 +588,91 @@ h4 {
     display: block;
 }
 .friends_counter > div {
-    background-color: $purple;
-    border-radius: 2px;
-    @include drop-shadow();
-    bottom: 13px;
+    background-color: #fff;
+    border-radius: 4px;
+    bottom: 10px;
+    color: #222;
     display: none;
     margin-bottom: 20px;
     margin-left: -65px;
+    padding: 0 10px;
     position: absolute;
     text-align: left;
     width: 200px;
-    padding: 5px;
     z-index: 2;
 }
+.friends_list_title {
+    background-color: #7f7dc7;
+    color: #fff;
+    font-weight: bold;
+    margin: 10px -10px 0;
+    padding: 10px;
+}
+.friends_list_holder .friends_list_title:nth-child(1) {
+    margin-top: 0;
+    border-radius: 4px 4px 0 0;
+}
 .friends_counter .triangle-down {
-    border-top: 15px solid #7f7dc7;
+    border-top: 15px solid darken($purple, 10%);
+    border-width: 15px 30px;
     bottom: -15px;
-    left: 46px;
-    padding-left: 20px;
-    padding-right: 20px;
+    left: 53px;
+    opacity: 0.1;
 }
 .friends_counter user {
-    color: #fff;
+    color: #222;
     display: block;
     position: relative;
     text-transform: capitalize;
-    padding: 2px;
+}
+.mention_suggestion_box {
+    background-color: #fff;
+    left: 40px;
+    padding: 10px;
+    position: absolute;
+    z-index: 2;
+    width: 300px;
+}
+.mention_suggestion {
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+.mention_suggestion_box .mention_suggestion.active {
+    background-color: #f1f1f1;
+}
+.mention_suggestion_box .mention_suggestion.active:after {
+    content: 'Autocomplete with TAB';
+    font-size: 12px;
+    color: #888;
+    float: right;
+    margin-left: 10px;
+}
+.friends_list_title {
+    font-weight: bold;
+    margin-top: 20px;
+}
+.friends_list_title > small {
+    cursor: pointer;
+    float: right;
+}
+.friends_list_offline[x-state="hidden"] {
+    display: none;
 }
 user, .user_card {
     cursor: pointer;
     transition: color 0.25s ease 0s;
+    text-transform: capitalize;
 }
 user:hover, .user_card:hover {
     color: $purple;
-}
-.friends_counter user:hover {
-    background-color: #404040;
 }
 .friend_options {
     position: absolute;
     right: 0;
     top: 0;
+}
+.friends_list_online, .friends_list_away, .friends_list_offline {
+    padding: 10px 0;
 }
 .friend_message, .friend_poke, .friend_delete, .friend_reply {
     background-position: center center;
@@ -529,7 +715,7 @@ user:hover, .user_card:hover {
     padding: 10px;
 }
 .login > span#name {
-    background-color: $purple-light;
+    background-color: $purple;
     border-radius: 2px;
     color: #fff;
     cursor: pointer;
@@ -549,23 +735,25 @@ user:hover, .user_card:hover {
     left: 5px;
     border-width: 20px;
     bottom: 5px;
+    z-index: -1;
 }
 .login div a {
     color: #fff;
     padding: 10px;
-    background-color: $purple-light;
+    background-color: $purple;
+    border-bottom: 1px solid $purple-light;
     font-weight: bold;
 }
 .login div a:first-child {
-    border-radius: 2px 2px 0 0;
-    background-color: $purple;
+    border-radius: 4px 4px 0 0;
+    background-color: darken($purple, 10%);
 }
-.login div a:nth-child(6) {
-    border-radius: 0 0 2px 2px;
+.login div a:nth-child(9) {
+    border-bottom: medium none;
+    border-radius: 0 0 4px 4px;
 }
 .login div a:hover {
-    @include drop-shadow();
-    color: #fff;
+    background-color: darken($purple, 10%);
 }
 .login a {
     display: block;
@@ -582,11 +770,10 @@ user:hover, .user_card:hover {
     font-size: 12px;
 }
 .sell_value {
-    background-color: rgba(255, 255, 255, 0);
     display: none;
     font-weight: bold;
     height: 70px;
-    left: 0;
+    left: 20px;
     line-height: 25px;
     position: absolute;
     right: 20px;
@@ -620,6 +807,9 @@ user:hover, .user_card:hover {
     padding: 10px 5px;
     color: #222;
 }
+.footer a:hover {
+    background-color: #bbb;
+}
 .send_feedback {
     float: right;
 }
@@ -631,6 +821,15 @@ user:hover, .user_card:hover {
     right: 0;
     top: 0;
     z-index: 10;
+}
+.dunce {
+    padding: 5px;
+    background-color: $red;
+    color: #fff;
+    border-radius: 0px 0px 5px 5px;
+}
+.dunce[x-type="party"] {
+	background-color: $purple;
 }
 .banner:not(.small) {
     bottom: 0;
@@ -710,25 +909,30 @@ user:hover, .user_card:hover {
 .achievement_list .locked tr td {
     color: $grey;
 }
+.message_badge {
+    float: left;
+    margin-right: 10px;
+    width: 20px;
+}
 .option_wrapper {
     position: relative;
     z-index: 2;
     height: 100px;
     width: 100px;
     display: inline-block;
-    margin: 6px;
+    margin: 4px;
     background-color: rgba(255,255,255,0.3);
-    background-image: url(http://static.icecreamstand.ca/background_icons.png);
+    background-image: url(http://static.icecreamstand.ca/background_icons2.png);
     cursor: pointer;
     transition: background 0.5s;
-    border-radius: 2px;
     overflow: hidden;
+    background-size: 30px 1px;
 }
 .option_wrapper[x-new="true"] {
-    background-image: url("http://static.icecreamstand.ca/cones/thumb/waffle.png.gz"), url("http://static.icecreamstand.ca/background_icons.png");
+    background-image: url("http://static.icecreamstand.ca/cones/thumb/waffle.png.gz"), url("http://static.icecreamstand.ca/background_icons2.png");
     background-position: center 60px;
     background-repeat: no-repeat, repeat;
-    background-size: 70px auto, contain;
+    background-size: 70px auto, 30px 1px;
 }
 .option_wrapper .icecream_float {
     font-size: 26px;
@@ -745,6 +949,9 @@ user:hover, .user_card:hover {
     animation-iteration-count: infinite; 
     color: #fff;
     text-shadow: -1px 0 rgba(0,0,0,0.5), 0 1px rgba(0,0,0,0.5), 1px 0 rgba(0,0,0,0.5), 0 -1px rgba(0,0,0,0.5);
+}
+.current_flavor.tooltip[x-combo="true"] {
+    text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;
 }
 @-webkit-keyframes worker_float {
     0% {  top: 90px; opacity: 1; }
@@ -783,16 +990,16 @@ user:hover, .user_card:hover {
     width: 100px;
 }
 .inline-message {
-    background-color: #FFFFFF;
+    background-color: #ffffff;
+    border-radius: 4px;
     color: #222;
-    letter-spacing: 0;
-    border-radius: 10px 10px 10px 10px;
-    bottom: 20px;
-    padding: 20px;
-    position: fixed;
-    right: 20px;
-    width: 200px;
     cursor: pointer;
+    left: 20px;
+    letter-spacing: 0;
+    padding: 10px;
+    position: fixed;
+    top: 20px;
+    width: 200px;
     z-index: 100;
 }
 .inline-message#animations {
@@ -825,21 +1032,20 @@ iframe.facebook {
 .message h2 {
     font-size: 20px;
 }
-.message_close {
-    background-color: $purple;
+.message_close, #message_read {
     border-radius: 2px;
+    @include drop-shadow();
     color: #ffffff;
     cursor: pointer;
     font-size: 20px;
     font-weight: bold;
     line-height: 10px;
-    padding: 10px;
+    padding: 5px;
     position: absolute;
     right: 5px;
+    text-align: center;
     top: 5px;
-    width: 10px;
     z-index: 2;
-    @include drop-shadow();
 }
 .message_close:hover, .over {
     @include drop-shadow-more();
@@ -909,24 +1115,25 @@ iframe.facebook {
     opacity: 1;
     z-index: 9;
 }
-.quest_princess {
-    float: left;
-    height: 200px;
-}
 .quest_image_container[x-type="icecream"] {
-    background-image: url("http://static.icecreamstand.ca/cones/default.png");
-    background-position: center bottom;
-    background-repeat: no-repeat;
-    background-size: auto 100px;
+    background-color: #f1f1f1;
+    background-image: url("http://static.icecreamstand.ca/cones/default.png.gz"), url("http://static.icecreamstand.ca/background_icons2.png");
+    background-position: center 75px;
+    background-repeat: no-repeat, repeat;
+    background-size: auto 100px, 30px auto;
     float: left;
     height: 190px;
-    margin-right: 20px;
+    margin: -10px 10px -10px -10px;
+    padding: 10px;
 }
 .quest_image_container[x-type="icecream"] img {
     display: inline-block;
     float: none;
-    height: 110px;
-    width: 100px;
+    height: 100px;
+    width: auto;
+}
+.quest_princess {
+	float: left;
 }
 .button[x-text="Ok"] {
     background-color: $green;
@@ -982,7 +1189,8 @@ iframe.facebook {
 }
 .unlockable img:nth-child(1) {
     background-color: rgba(255,255,255,0.5);
-    background-image: url(http://static.icecreamstand.ca/background_icons.png);
+    background-image: url(http://static.icecreamstand.ca/background_icons2.png);
+    background-size: 30px 1px;
     display: block;
     float: left;
     height: 75px;
@@ -1001,6 +1209,9 @@ iframe.facebook {
 }
 .button_container > #button_right {
     float: right;
+}
+#button_right[x-id="friends"] {
+    margin-right: 20px;
 }
 .button_container > div {
     display: inline-block;
@@ -1064,14 +1275,17 @@ iframe.facebook {
     margin-left: 2px;
     margin-top: 10px;
     text-align: center;
-    background-color: $green;
+    background-color: #999;
+    background-image: url("http://static.icecreamstand.ca/background_tile.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
     width: 21%;
     box-shadow: 0 2px 0 darken($green, 10%);
     border-radius: 2px;
     transition: background 0.25s ease 0s;
 }
 .unlockable button:hover, .unlockable .button:hover {
-    background-color: darken($green, 10%);
+    background-color: #999;
 }
 .money_float {
     width: 30px;
@@ -1177,8 +1391,8 @@ input {
     max-height: 100px;
 }
 .option[x-type="addon"], .unlockable[x-type="addon"] img  {
-    background-image: url("http://static.icecreamstand.ca/toppings/jar.png"), url("http://static.icecreamstand.ca/background_icons.png");
-    background-size: 100% auto, auto auto;
+    background-image: url("http://static.icecreamstand.ca/toppings/jar.png"), url("http://static.icecreamstand.ca/background_icons2.png");
+    background-size: 100% auto, 30px 1px;
 }
 .option.drag, .option_wrapper:hover {
     @include drop-shadow();
@@ -1225,17 +1439,18 @@ input {
 }
 .flavor div#main_base, .flavor div#main_addon, .flavor div#main_combo, .flavor div#main_cone {
     height: 110px;
-    margin: 5px auto;
+    margin: 5px auto 0;
     overflow: hidden;
-    width: 561px;
+    width: 540px;
     position: relative;
     display: none;
     max-width: 100%;
 }
 #main_cone .option {
     display: table;
-    margin: 0 auto;
-    width: auto;
+    margin: 10px auto 0;
+    max-height: 200px;
+    width: 66px;
 }
 .expanded {
     height: auto !important;
@@ -1253,10 +1468,9 @@ input {
 }
 .gravatar {
     background-color: #999;
-    border: 2px solid #f1f1f1;
-    border-radius: 50px;
+    border-radius: 10px;
     display: table;
-    height: 100px;
+    height: 190px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -1417,7 +1631,7 @@ table[x-col="2"] td {
 }
 .user_cow_title {
     background-color: #fff;
-    font-size: 14px;
+    font-size: 12px;
     left: 5px;
     padding: 5px;
     position: absolute;
@@ -1494,13 +1708,12 @@ table[x-col="2"] td {
 .user_icecream_holder {
     background-image: url("http://static.icecreamstand.ca/background_icons2.png");
     border-radius: 4px;
-    margin: 0 20px;
 }
 .user_icecream {
     background-position: center 10px, center 60px;
     background-repeat: no-repeat;
     background-size: auto 100px, 90px auto;
-    height: 132px;
+    height: 190px;
 }
 .user_card_name {
     font-weight: bold;
@@ -1631,10 +1844,7 @@ table[x-col="2"] td {
     text-align: center;
     text-transform: capitalize;
     padding-top: 10px;
-}
-.trend_title:after {
-    content: ' is Trending!';
-
+    display: none;
 }
 .upgrades div, .employees div {
     width: 576px;
@@ -1650,6 +1860,15 @@ table[x-col="2"] td {
     min-height: 50px;
     box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
     position: relative;
+}
+.page_wrap {
+    height: 350px;
+    position: absolute;
+    top: 115px;
+    width: 561px;
+}
+.inner_flavor_container.expanded {
+    height: 461px !important;
 }
 .offline:before {
     background-color: $red;
@@ -1675,29 +1894,33 @@ table[x-col="2"] td {
 }
 .trending_img {
     background-color: #afe4ff;
-    background-image: url("http://static.icecreamstand.ca/cones/thumb/default.png.gz"), url("http://static.icecreamstand.ca/background_icons.png");
+    background-image: url("http://static.icecreamstand.ca/cones/thumb/default.png.gz"), url("http://static.icecreamstand.ca/background_icons2.png");
     background-position: center 48px;
     background-repeat: no-repeat, repeat;
-    background-size: auto 100px, 100% 50%;
+    background-size: auto 100px, 30px 1px;
     height: 50px;
     padding: 0 1px;
     vertical-align: middle;
 }
 .trending_img.active {
     cursor: pointer;
-    height: 75px;
+    height: 82px;
     vertical-align: middle;
-    width: 75px;
+    width: auto;
 }
-#trend_time > #trend_bonus {
-    float: left;
+#trend_bonus {
+    float: right;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-right: 10px;
+}
+#trend_time #trend_bonus {
+    float: left;
 }
 #event_name {
     display: inline-block;
     font-size: 14px;
-    min-width: 150px;
+    color: #666;
+    min-width: 120px;
     text-align: center;
     font-style: italic;
     margin: 0 -10px;
@@ -1713,7 +1936,7 @@ table[x-col="2"] td {
     left: 0;
     right: 0;
     top: 0;
-    bottom: 20px;
+    bottom: 10px;
 }
 .base_active {
     background-color: #ccc;
@@ -1725,7 +1948,11 @@ table[x-col="2"] td {
     position: absolute;
     right: 0;
     text-align: right;
-    top: 3px;
+    top: 2px;
+    display: none;
+}
+.expanded > .base_active {
+	display: block;
 }
 #upgrades .trending_img {
     height: 35px;
@@ -1753,7 +1980,7 @@ table[x-col="2"] td {
     right: 50px;
     text-align: center;
     text-transform: capitalize;
-    top: 2px;
+    top: -2px;
     z-index: 1;
     display: none;
 }
@@ -1763,9 +1990,12 @@ table[x-col="2"] td {
 .trending #trend_time {
     font-size: 14px;
     position: absolute;
-    right: 15px;
+    left: 80px;
     text-align: right;
-    top: 10px;
+    top: 5px;
+}
+.trending > h4 span {
+    text-transform: capitalize;
 }
 .event #trend_time {
     bottom: -30px;
@@ -1794,15 +2024,17 @@ h3#upgrades_text {
     width: 64%;
 }
 #upgrades.section-side {
-    top: 115px;
+    top: 152px;
     left: auto;
     right: 0;
     bottom: auto;
     z-index: 3;
 }
 #upgrades h3 {
-    text-align: center;
+    color: #888;
     display: inline-block;
+    font-size: 14px;
+    text-align: center;
 }
 .hovercard, .tutorial {
     position: fixed;
@@ -1810,17 +2042,20 @@ h3#upgrades_text {
     padding: 15px;
     min-width: 250px;
     max-width: 350px;
-    height: 140px;
+    height: auto;
     margin-top: -150px;
     margin-left: -50px;
     @include drop-shadow();
     border-radius: 2px;
     text-align: left;
-    z-index: 3;
+    z-index: 5;
     font-size: 14px;
 }
 .hovercard {
     pointer-events: none;
+}
+.hovercard.auto_height {
+    height: auto;
 }
 .hovercard[x-new-art="true"] .hover_title, .hovercard[x-new-art="true"] p {
     padding-right: 30px;
@@ -1883,7 +2118,7 @@ h3#upgrades_text {
 .triangle-down {
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
-    border-top: 15px solid $purple-light;
+    border-top: 15px solid $purple;
     position: absolute;
     bottom: -15px;
     left: 60px;
@@ -1892,9 +2127,9 @@ h3#upgrades_text {
    border-top: 15px solid #fff; 
 }
 .hovercard > .triangle-up {
-   border-bottom: 15px solid #fff; 
+   border-bottom: 15px solid darken($blue, 10%); 
 }
-.expand {
+.expand, .chat_rooms {
     color: #fff;
     cursor: pointer;
     display: inline-block;
@@ -1902,8 +2137,13 @@ h3#upgrades_text {
     height: calc(100% - 16px);
     line-height: 12px;
     padding: 8px;
+    position: relative;
 }
-
+.chat_rooms {
+	width: 125px;
+	text-align: right;
+	text-transform: capitalize;
+}
 .tab {
     -moz-user-select: none;
     background-color: $purple;
@@ -1919,11 +2159,10 @@ h3#upgrades_text {
     letter-spacing: 1px;
     margin-top: 0px;
     vertical-align: top;
-    transition: all 0.25s ease-in 0s;
+    transition: background 0.25s ease-in 0s;
 }
-.tab:hover, .flavor_tab:hover, .expand:hover, .friend_gold:hover {
-    @include drop-shadow();
-    z-index: 2;
+.tab:hover, .flavor_tab:hover, .expand:hover, .chat_rooms:hover {
+    background-color: darken($purple, 10%);
 }
 .tab.active:hover, .flavor_tab.active:hover {
     cursor: default;
@@ -1943,6 +2182,7 @@ h3#upgrades_text {
     top: -24px;
     width: 100%;
     z-index: -1;
+    overflow: hidden;
 }
 .icecream_particle {
     background-position: center top, 5px 37px;
@@ -1990,7 +2230,7 @@ h3#upgrades_text {
     0% { top: -100px; opacity: 1; }
     100%  { top: 80%; opacity: 0; }
 }
-.icecream #topping[x-addon="moon"] {
+.icecream #topping[x-addon="moon"], .icecream #topping[x-addon="calculator"] {
     -webkit-animation-name: addon_moon; 
     -webkit-animation-duration: 4s; 
     -webkit-animation-iteration-count: infinite;
@@ -2074,7 +2314,6 @@ h3#upgrades_text {
     text-align: left;
 }
 .login_pitch > img {
-    background-color: #fff;
     display: inline-block;
     float: right;
     height: 100px;
@@ -2151,9 +2390,19 @@ h3#upgrades_text {
 }
 .tutorial {
     position: fixed;
+    box-shadow: 0 0 10px #222;
+}
+.tutorial_shadow {
+	position: fixed;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	z-index: 4;
+	background-color: rgba(0,0,0,0.25);
 }
 .tutorial_0 {
-    left: 18%;
+    left: 21%;
     top: 316px;
 }
 .tut_ice_cube {
@@ -2167,16 +2416,27 @@ h3#upgrades_text {
     left: 40%;
     top: 360px;
 }
-.tutorial_2{
+.tutorial_2 {
+    left: 28%;
+    top: 400px;
+    height: 160px;
+}
+.tutorial_4{
     right: 25%;
     top: 275px;
     padding-bottom: 40px;
 }
-.tutorial_3{
+.tutorial_3, .tutorial_5, .tutorial_6 {
+    height: 200px;
     left: 50%;
-    height: 150px;
-    position: absolute;
     margin-left: -187px;
+    margin-top: 50px;
+    position: absolute;
+}
+.tutorial_5, .tutorial_6 {
+	position: fixed;
+	margin-top: -100px;
+	top: 50%;
 }
 .tutorial > h2 {
     background-color: $purple;
@@ -2185,13 +2445,11 @@ h3#upgrades_text {
     padding: 15px;
 }
 .button.next_tutorial {
-    background-color: $green;
-    box-shadow: 0 2px 0 darken($green, 10%);
     margin: 20px auto;
     padding: 10px;
     text-align: center;
 }
-.tutorial_3 .button.next_tutorial{
+.tutorial_5 .button.next_tutorial, .tutorial_6 .button.next_tutorial{
     display: inline-block;
     margin: 10px;
     vertical-align: middle;
@@ -2251,7 +2509,7 @@ h3#upgrades_text {
     height: 20px;
     left: 0;
     padding: 5px 0;
-    position: absolute;
+    position: relative;
     right: 0;
     text-align: center;
     transition: background 0.25s ease 0s;
@@ -2573,6 +2831,9 @@ h3#upgrades_text {
     cursor: pointer;
     display: inline-block;
 }
+.filter_page:hover {
+	background-color: $purple;
+}
 .filter_box {
     max-width: 530px;
     margin: 0 auto;
@@ -2586,8 +2847,8 @@ h3#upgrades_text {
 }
 .expertise_level {
     position: absolute;
-    bottom: 0px;
-    left: 5px;
+    top: 0px;
+    left: 0px;
     padding: 2px 5px;
     font-weight: bold;
 }
@@ -2624,7 +2885,7 @@ h3#upgrades_text {
     margin-bottom: 10px;
     border-radius: 5px;
     margin: 0 -10px;
-    max-height: 600px;
+    max-height: 900px;
 }
 #chat_window .chat {
     font-size: 12px;
@@ -2639,12 +2900,31 @@ h3#upgrades_text {
     width: 72px;
     background-color: #fff;
 } 
-.chat_container_main input[type="submit"] {
+.chat_container_main input[type="submit"], .button_green {
     background-color: $green;
     box-shadow: 0 2px 0 darken($green, 10%);
 } 
+.button_green:hover {
+	background-color: darken($green, 10%);
+}
+.button_red {
+	background-color: $red;
+	box-shadow: 0 2px 0 darken($red, 10%);
+}
+.button_red:hover {
+	background-color: darken($red, 10%);
+}
+.button_grey {
+	cursor: default;
+	background-color: #666;
+	box-shadow: 0 2px 0 darken(#666, 10%);
+}
+.button_grey:hover {
+	background-color: darken(#666, 10%);
+}
 .chat_container_main { 
     width: 100%; 
+    min-height: 400px;
     display: inline-block;
 }
 .chat_container_list {
@@ -2685,18 +2965,23 @@ h3#upgrades_text {
 .chat input[type="text"] {
     width: calc(100% - 116px);
 }
-#chat_window .user_card {
+.chat > .user_card {
     display: inline-block;
     font-weight: bold;
-    width: 18%;
+    width: 120px;
     text-transform: capitalize;
 }
 .chat_textbody {
     display: inline-block;
     text-align: left;
     vertical-align: top;
-    width: 82%;
     word-wrap: break-word;
+    padding-top: 4px;
+    width: calc(100% - 120px);
+}
+.chat_textbody > .user_card {
+  text-decoration: underline;
+  display: inline-block;
 }
 #chat_window  time {
     display: none;
@@ -2712,6 +2997,10 @@ h3#upgrades_text {
     color: darken($purple, 10%);
     font-weight: bold;
 }
+.chat.chat_mod {
+    color: darken($green, 10%);
+    font-weight: bold;
+}
 .main_container.half_size {
     display: inline-block;
     min-height: 200px;
@@ -2720,6 +3009,9 @@ h3#upgrades_text {
 }
 .quests.main_container.half_size, .trending.main_container.half_size {
     margin-right: 10px;
+}
+.flavor.main_container {
+    overflow: hidden;
 }
 .container_controls {
     position: absolute;
@@ -2733,7 +3025,7 @@ h3#upgrades_text {
     border-radius: 2px;
     bottom: 50px;
     left: 10px;
-    min-width: 100px;
+    right: 20px;
     padding: 10px;
     position: absolute;
     text-align: left;
@@ -2744,18 +3036,18 @@ h3#upgrades_text {
     font-weight: bold;
     margin: -10px -10px 10px;
     padding: 10px;
+    height: 20px;
+    font-size: 16px;
+    line-height: 20px;
 }
 .new_message_respond {
     color: #404040;
+    background-color: #f1f1f1;
+    margin-top: 10px;
     font-style: italic;
     padding: 5px 0;
     text-align: center;
     cursor: pointer;
-}
-.new_message #message_read {
-    float: right;
-    cursor: pointer;
-    padding-right: 10px;
 }
 .new_message .triangle-down {
     left: 50%;
@@ -2834,18 +3126,19 @@ h3#upgrades_text {
     right: 10px;
 }
 #canvas_sales {
-    width: 100%;
+    width: 400px;
     margin-top: 50px;
-    height: 175px;
+    height: 400px;
     position: absolute;
-    z-index: 2;
+    z-index: 1000;
+    left: 50%;
+    margin-left: -200px;
 }
 #canvas_main {
     left: 0;
 }
 .alert {
-    background-color: $purple-light;
-    border-radius: 5px;
+    background-color: $red;
     color: #FFFFFF;
     display: inline-block;
     font-size: 16px;
@@ -2908,6 +3201,17 @@ h3#upgrades_text {
 .last_prestige {
     font-size: 12px !important;
 }
+.cow_card_stat {
+    width: 96px;
+    display: inline-block;
+}
+.cow_readopt {
+    width: calc(100% - 120px);
+    margin-top: 0 !important;
+}
+.p_adopt { 
+    margin-top: 0;
+}
 .trending_and_events.main_container {
     background-color: transparent !important;
     box-shadow: none;
@@ -2924,8 +3228,8 @@ h3#upgrades_text {
 }
 #trend_sold_outer {
     background-color: #aaa;
-    bottom: -20px;
-    height: 17px;
+    bottom: -10px;
+    height: 10px;
     left: 0;
     overflow: hidden;
     position: absolute;
@@ -2945,7 +3249,7 @@ h3#upgrades_text {
     background-position: right 0;
     background-repeat: repeat-y;
     background-size: 50px auto;
-    height: 17px;
+    height: 10px;
     position: absolute;
     transition: width 1s ease 0s;
 }
@@ -2966,16 +3270,20 @@ h3#upgrades_text {
     vertical-align: middle;
     transition: background 0.5s ease 0s;
 }
-.friends_button_container:hover .friends_button {
-    background-color: $purple-light;
+.friends_button_container:hover, .friends_add:hover, .friends_counter:hover {
+    background-color: darken($purple, 10%);
+	color: $purple-light;
 }
 .friends_button_container {
     background-color: $purple;
+    color: #fff;
     display: inline-block;
-    padding: 5px;
+    padding: 5px 10px;
     cursor: pointer;
+    border-left: 1px solid $purple-light;
+    border-right: 1px solid $purple-light;
 }
-.friends_list_offline, .friends_list_online {
+.friends_list_offline {
     max-height: 250px;
     overflow-y: scroll;
     padding-bottom: 5px;
@@ -2994,10 +3302,7 @@ h3#upgrades_text {
     word-wrap: break-word;
 }
 #message_list tr {
-    background-color: #FFFFFF;
-}
-#message_list tr:nth-child(2n) {
-    background-color: #f1f1f1;
+    border-bottom: 1px solid #f1f1f1;
 }
 #compose_send {
     display: inline-block;
@@ -3041,7 +3346,7 @@ h3#upgrades_text {
     background-position: left 5px;
     background-repeat: no-repeat;
     background-size: 75px auto;
-    min-height: 174px;
+    min-height: 144px;
     padding-left: 85px;
     font-size: 14px;
 }
@@ -3059,10 +3364,9 @@ message-next {
     float: right;
 }
 .vote_box > img {
-    height: 50px;
+    height: 80px;
     left: 0;
     position: absolute;
-    width: 50px;
     z-index: 1;
 }
 .vote_box > b {
@@ -3075,45 +3379,47 @@ message-next {
     position: absolute;
     right: 15px;
     text-align: center;
-    top: 7px;
+    bottom: 15px;
     z-index: 2;
 }
 .vote_container {
-    bottom: -3px;
-    height: 50px;
-    overflow: hidden;
-    position: absolute;
+    bottom: 0;
+    top: 0;
     right: 0;
+    background-color: #ddd;
+    position: absolute;
     text-align: right;
     width: calc(100% - 75px);
+    overflow: hidden;
 }
 .vote_box {
     display: inline-block;
-    height: 50px;
+    height: 82px;
     position: relative;
-    width: 50px;
+    width: 75px;
     text-align: center;
-    margin-right: 5px;
     cursor: pointer;
-    bottom: -15px;
+    bottom: 0px;
     transition: bottom 0.2s ease 0s;
+    background-image: url("http://static.icecreamstand.ca/cones/thumb/default.png.gz");
+    background-position: 0 43px;
+    background-repeat: no-repeat;
 }
 .vote_box:hover {
-    bottom: -5px;
+    bottom: -10px;
 }
 .user_card_friend {
     float: right;
     font-size: 12px;
 }
 .cow, .cow_background, .cow_card_cow {
-    background-image: url("http://static.icecreamstand.ca/cow.png");
     background-size: 248px 150px;
     background-repeat: no-repeat;
     bottom: 20px;
     height: 150px;
     position: absolute;
     z-index: 2;
-    right: 10%;
+    left: 76%;
     width: 248px;
     cursor: pointer;
 }
@@ -3121,19 +3427,31 @@ message-next {
     background-image: none;
 }
 .cow_card_cow {
+    left: auto;
     right: 120px !important;
     bottom: 0;
 }
 .cow_background {
-    bottom: 60px !important;
-    right: 10px !important;
+    bottom: -20px !important;
+    right: auto !important;
+    left: 0;
     transform: scale(0.5);
     -webkit-transform: scale(0.5);
     -ie-transform: scale(0.5);
     -moz-transform: scale(0.5);
+    z-index: 1;
 }
 .cow_background[x-num="1"] {
-    right: -50px !important;
+    margin-left: 100px;
+}
+.cow_background[x-num="2"] {
+    margin-left: 200px;
+}
+.cow_background[x-num="3"] {
+    margin-left: 300px;
+}
+.cow_background[x-num="4"] {
+    margin-left: 400px;
 }
 .cow_inventory {
     background-color: #fff;
@@ -3171,6 +3489,11 @@ message-next {
     top: 0;
     width: 80px;
     z-index: -1;
+}
+.inline_item {
+    border-bottom: 1px solid $purple;
+    display: inline-block;
+    font-weight: bold;
 }
 .cow_stats {
     background-color: #acdaff;
@@ -3213,30 +3536,108 @@ message-next {
 }
 .button.decline_friendship {
     background-color: $red;
+    box-shadow: 0 2px 0 $red;
 }
 .button.accept_friendship {
     background-color: $green;
+    box-shadow: 0 2px 0 $green;
 }
 .button.decline_friendship, .button.accept_friendship {
     font-size: 14px;
     margin-right: 10px;
+    margin-bottom: 10px;
     padding: 10px;
 }
+.chapter_badge {
+    bottom: 20px;
+    height: 30px;
+    left: 50%;
+    margin-left: -15px;
+    position: absolute;
+    width: 30px;
+    z-index: 3;
+}
 body.night {
-    background-image: url(http://static.icecreamstand.ca/bg_night.png);
-    background-color: #2252AC;
-    color: #fff;
+    color: #ddd;
+    .quest_default {
+        opacity: 0.5;
+    }
+    .mention_suggestion_box {
+        background-color: #111;
+    }
+    .mention_suggestion_box .mention_suggestion.active {
+        background-color: #333;
+    }
+    .thread_msg, .thread_user {
+        background-color: #333;
+    }
+    .thread_msg[x-align="left"]:before {
+        border-right: 10px solid #333;
+    }
+    .thread_msg[x-align="right"]:before {
+        border-left: 10px solid #333;
+    }
+    .expertise_bar_inner, .expertise_ball {
+    	background-color: darken($pink, 10%);
+    }
+    .lore_view_chapter {
+    	background-color: #222;
+    }
+    .lore_bubble, .thread_reply > textarea, .new_message_respond {
+    	background-color: #222;
+    }
+    .new_message .triangle-down {
+        border-top: 15px solid #222;
+    }
+    .lore_view_chapter:hover .lore_bubble {
+		background-color: darken($purple, 10%);
+    }
+    .cow_stats {
+    	background-image: url("http://static.icecreamstand.ca/backgrounds/aoc_night_c.png.gz");
+    }
+    .cow_inventory:before {
+    	background-color: #222;
+    }
+    .cow_inventory {
+    	background-color: #404040;
+    }
+    .background_hill {
+    	background-image: url(http://static.icecreamstand.ca/backgrounds/foreground_aoc_night.png.gz);
+    }
+    .sub_header {
+    	color: #fff;
+    }
+    .login div .triangle-down {
+    	display: none;
+    }
+    .chat_container_main input {
+    	background-color: #111;
+    	color: #fff;
+    }
+    h4, .tab, .login > span#name, .friends_counter, .friends_button_container, .friends_add, .login div a {
+    	background-color: darken($purple, 20%);
+    }
+    .inline-message {
+    	background-color: #404040;
+    	color: #fff;
+    }
+    .shop_top {
+    	background-image: url("http://static.icecreamstand.ca/shap_background5f_night.png");
+    }
+    .shop_leftend {
+    	background-image: url("https://s3.amazonaws.com/icecreamstand.com/shop_leftend5_night.png");
+    }
+    .shop_rightend {
+    	background-image: url("https://s3.amazonaws.com/icecreamstand.com/shop_rightend5_night.png");
+    }
     .epic_desc, .user_info_tab {
         color: #f1f1f1;
     }
     .user_cow_title {
-        color: #404040;
+        color: #333;
     }
-    .user_info_tab:hover {
-        background-color: #404040;
-    }
-    .sell_value {
-        background-color: rgba(0, 0, 0, 0.2) !important;
+    .user_info_tab:hover, .button_container {
+        background-color: #333;
     }
     .achievement_bubble {
         background-color: #111;
@@ -3245,56 +3646,56 @@ body.night {
         color: #fff;
     }
     .expertise_hover {
-        background-color: #444;
+        background-color: #333;
     }
     .flavor_tab.active, .expand.active {
-        background-color: #444 !important;
+        background-color: #333 !important;
     }
-    .background_hill {
-        background-image: url("http://static.icecreamstand.ca/foreground_night.png");
+    .section-main {
+        background-image: url("http://static.icecreamstand.ca/backgrounds/foreground_aoc_night.png.gz"), url("http://static.icecreamstand.ca/background_wood_night.png");
     }
     .chat.admin {
         color: #aaa8f2;
     }
     .new_message {
-        background-color: #222;
+        background-color: #333;
     }
     .base_active, inner_flavor_container {
     background-color: $grey;
     }
     .section-main, .hovercard, .tutorial {
-        background-color: #222;
+        background-color: #333;
     }
     .main_container {
-        background-color: #444;
+        background-color: #222;
     }
     .event, .trending {
-        background-color: #404040;
+        background-color: #333;
     }
     #trend_sold_outer {
         background-color: darken($grey, 20%);
     }
     .upgrades_inner, .flavors_inner, .employees_inner, .toppings_inner, .cones_inner {
-        background-color: #404040;
+        background-color: #333;
     }
     .tab.active {
-        background-color: #404040;
+        background-color: #333;
     }
-    .message {
+    .message, .settings_tab[x-active="true"] {
         background-color: #444;
     }
     #message_list tr {
         background-color: #444 !important;
     }
     .expertise_bar_outer {
-        background-color: $grey;
-        border-color: $grey;
+        background-color: #333;
+        border-color: #333;
     }
     .expertise_ball {
         border-color: $grey;
     }
     .expertise_number {
-        color: #404040;
+        color: #333;
     }
     .chat_disclaimer {
         background: none;
@@ -3306,10 +3707,16 @@ body.night {
         background-image: url(http://static.icecreamstand.ca/coins_night.svg);
     }
     .footer, #new_message {
-        background-color: #333;
+        background-color: #222;
     }
     #chat_window .chat {
-        border-color: #222;
+        border-color: #333;
+    }
+    .sell_value {
+    	color: #000;
+    }
+    .fb_iframe_widget {
+        background-color: #666;
     }
 }
 .cow_level_bar {
@@ -3360,20 +3767,50 @@ body.night {
 .cow_card_experience > span {
     background-color: $blue;
 }
-.inventory_thumb {
+.inventory_slot {
     background-image: url("http://static.icecreamstand.ca/background_icons2.png");
-    background-size: 30px auto;
-    height: 50px;
+    background-size: 30px 1px;
     width: 50px;
+    height: 50px;
+    overflow: hidden;
+}
+.inventory_thumb {
+    display: table;
+    max-height: 50px;
+    margin: 0 auto;
     vertical-align: middle;
+    width: auto;
 }
 .inventory_thumb.thumb_wide {
     background-image: url("http://static.icecreamstand.ca/bg_day.png");
     background-position: right bottom;
     background-size: auto 400px;
     height: 100px;
+    max-height: 100px;
     width: auto;
+    max-width: 175px !important;
     padding: 10px;
+}
+.inventory_thumb.thumb_wide {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0) !important;
+    display: block;
+    height: auto;
+    margin: 10px auto;
+    width: 175px;
+}
+.shop_table .inventory_thumb {
+    background-color: #ddd;
+    background-image: url("http://static.icecreamstand.ca/background_icons2.png");
+    max-width: 100px;
+}
+.skin_td {
+    background-image: url("http://static.icecreamstand.ca/bg_day.png");
+    background-position: right bottom;
+    background-size: auto 400px;
+    width: 40% !important;
+}
+.skin_td[x-background="winter"] {
+    background-image: url("http://static.icecreamstand.ca/bg_snow_day.png");
 }
 .cow_attachment {
     height: 50px;
@@ -3389,7 +3826,10 @@ body.night {
 .rarity {
     color: #777;
     font-weight: bold;
-    float: right;
+    position: absolute;
+    right: 20px;
+    top: 50px;
+    text-transform: capitalize;
 }
 .rarity[x-rarity="uncommon"] {
     color: $purple;
@@ -3466,11 +3906,11 @@ body.night {
     width: 250px;
 }
 .cow_attachment[x-type="coat_canada"] {
-    background-size: 100px 125px;
-    height: 125px;
-    left: 74px;
+    background-size: 103px 130px;
+    height: 130px;
+    left: 69px;
     top: 9px;
-    width: 100px;
+    width: 103px;
 }
 .type_item[x-type="rock"] {
     background-image: url('https://s3.amazonaws.com/icecreamstand.com/rock.png');
@@ -3483,13 +3923,13 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     cursor: pointer;
 }
 .type_item[x-type="hay"] {
-    background-image: url('https://s3.amazonaws.com/icecreamstand.com/hay.png');
+    background-image: url('https://s3.amazonaws.com/icecreamstand.com/items/hay_0.png');
 }
 .type_item[x-type="hay"][x-variance="2"] {
-    background-image: url("https://s3.amazonaws.com/icecreamstand.com/hay2.png");
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hay_1.png");
 }
 .type_item[x-type="hay"][x-variance="3"] {
-    background-image: url("https://s3.amazonaws.com/icecreamstand.com/hay3.png");
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hay_2.png");
 }
 .type_item[x-type="amulet_basic"] {
     background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/amulet_basic.png");
@@ -3530,8 +3970,14 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
 .type_item[x-type="hat_deerstalker"] {
     background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hat_deerstalker.png");
 }
+.type_item[x-type="hat_birthday"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hat_birthday.png");
+}
 .type_item[x-type="hat_afro"] {
     background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hat_afro.png");
+}
+.type_item[x-type="hat_golden afro"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hat_goldenafro.png");
 }
 .type_item[x-type="hat_rainbow afro"] {
     background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hat_rainbowafro.png");
@@ -3623,6 +4069,138 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
 .type_item[x-type="accessory_winter"] {
     background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/accessory_winter.png");
 }
+.type_item[x-type="pet_blair"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/pet_blair.png");
+}
+.type_item[x-type="pet_shiba"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/pet_shiba.png");
+}
+.type_item[x-type="coat_fauxfur"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/coat_fauxfur.png");
+}
+.type_item[x-type="boots_fauxfur"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/boots_fauxfur.png");
+}
+.type_item[x-type="mask_cthulhu"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/mask_cthulhu.png");
+}
+.type_item[x-type="sword_steel"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/sword_steel.png");
+}
+.type_item[x-type="shield_steel"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/shield_steel.png");
+}
+.type_item[x-type="armor_steel"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/armor_steel.png");
+}
+.type_item[x-type="grabber_dino"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/grabber_dino.png");
+}
+.type_item[x-type="hat_wolf"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hat_wolf.png");
+}
+.type_item[x-type="dress_lace"] {
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/dress_lace.png");
+}
+
+.cow_attachment[x-type="dress_lace"] {
+    background-size: auto 100px;
+    height: 111px;
+    left: 69px;
+    top: 18px;
+    width: 124px;
+}
+body[x-rand="true"] .cow_attachment[x-type="dress_lace"] {
+    background-position: right top;
+}
+body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
+    float: right;
+}
+.cow_attachment[x-type="boots_fauxfur"] {
+    background-size: auto 25px;
+    height: 24px;
+    left: 69px;
+    top: 123px;
+    width: 147px;
+    z-index: 100;
+}
+.cow_attachment[x-type="coat_fauxfur"] {
+    background-size: 176px 119px;
+    height: 119px;
+    left: 51px;
+    top: -24px;
+    width: 176px;
+}
+.cow_attachment[x-type="pet_shiba"] {
+    background-size: auto 80px;
+    height: 100px;
+    left: 120px;
+    top: -27px;
+    width: 92px;
+    z-index: 100;
+}
+.cow_attachment[x-type="hat_wolf"] {
+    background-size: auto 100px;
+    height: 100px;
+    left: 3px;
+    top: -24px;
+    width: 92px;
+    z-index: 5;
+}
+.cow_attachment[x-type="grabber_dino"] {
+    background-size: 73px 50px;
+    height: 50px;
+    left: -7px;
+    top: 29px;
+    width: 73px;
+    z-index: 5;
+}
+.cow_attachment[x-type="sword_steel"] {
+    background-size: 64px 33px;
+    height: 33px;
+    left: 13px;
+    top: 32px;
+    width: 64px;
+    z-index: 5;
+}
+.cow_attachment[x-type="armor_steel"] {
+    background-size: 212px 107px;
+    height: 107px;
+    left: 6px;
+    top: -1px;
+    width: 212px;
+}
+.cow_attachment[x-type="shield_steel"] {
+    background-size: 55px 60px;
+    height: 60px;
+    left: 134px;
+    top: 15px;
+    width: 55px;
+    z-index: 5;
+}
+.cow_attachment[x-type="mask_cthulhu"] {
+    background-size: auto 100px;
+    height: 99px;
+    left: 6px;
+    top: -15px;
+    width: 61px;
+    z-index: 5;
+}
+.cow_attachment[x-type="pet_blair"] {
+    background-size: 61px 100px;
+    height: 100px;
+    left: 128px;
+    top: -35px;
+    width: 61px;
+    z-index: 5;
+}
+.cow_attachment[x-type="hat_birthday"] {
+    background-size: 33px 55px;
+    height: 100px;
+    left: 24px;
+    top: -38px;
+    width: 33px;
+}
 .cow_attachment[x-type="hat_mercow"] {
     background-size: 57px 100px;
     height: 100px;
@@ -3643,6 +4221,7 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     left: 131px;
     top: -22px;
     width: 130px;
+    z-index: 2;
 }
 .cow_attachment[x-type="glasses_basic"] {
     top: -6px;
@@ -3668,15 +4247,18 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     width: 240px;
 }
 .cow_attachment[x-type="accessory_marotte"] {
-    left: -9px;
-    top: 38px;
-    width: 100px;
+    background-size: 82px 50px;
+    left: -22px;
+    top: 25px;
+    width: 82px;
+    z-index: -1;
 }
 .cow_attachment[x-type="hat_jester"] {
-    background-size: auto 60px;
-    height: 60px;
-    top: -21px;
-    width: 64px;
+    background-size: 75px 50px;
+    height: 50px;
+    left: -16px;
+    top: -24px;
+    width: 75px;
 }
 .cow_attachment[x-type="skirt_grass"] {
     background-size: 98px 150px;
@@ -3714,7 +4296,7 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     width: 90px;
     z-index: 3;
 }
-.cow_attachment[x-type="hat_afro"], .cow_attachment[x-type="hat_rainbow afro"] {
+.cow_attachment[x-type="hat_afro"], .cow_attachment[x-type="hat_rainbow afro"], .cow_attachment[x-type="hat_golden afro"] {
     background-size: auto 60px;
     height: 60px;
     width: 60px;
@@ -3796,8 +4378,8 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     background-repeat: no-repeat;
     background-position: center bottom;
     background-size: contain;
-    height: 75px;
-    width: 50px;
+    height: 100px;
+    width: 60px;
 }
 .item:after {
     background-color: rgba(0, 0, 0, 0.25);
@@ -3863,6 +4445,9 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     position: absolute;
     width: 300px;
     z-index: 3;
+}
+.franken_selector[x-franken="franken_right"] {
+    right: 0;
 }
 .franken_close {
     margin: 0 -10px -10px;
@@ -3994,7 +4579,9 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     font-size: 10px;
     margin-top: -20px;
     position: absolute;
-    
+}
+.chat_count {
+    float: right;
 }
 .is_typing {
     display: inline-block;
@@ -4012,14 +4599,14 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     width: 96%;
 }
 .shop {
-    background-image: url("http://static.icecreamstand.ca/cart_shop.png");
+    background-image: url("https://s3.amazonaws.com/icecreamstand.com/cart_shop.png");
     background-size: 100% auto;
     bottom: 35px;
-    height: 100px;
-    left: 10%;
+    height: 141px;
+    left: 15%;
     position: absolute;
     z-index: 2;
-    width: 100px;
+    width: 150px;
     cursor: pointer;
 }
 .shop_table {
@@ -4034,31 +4621,44 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     width: 100%;
 }
 .shop_table[x-area="shop_tab_skins"] td {
-    width: auto;
+    width: 30%;
     text-transform: capitalize;
 }
 .item_req {
     color: #888;
     font-size: 12px;
 }
+.img_inline {
+    background-color: #f1f1f1;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 10px;
+    margin: 0 10px;
+    padding: 0 5px;
+    color: $purple;
+}
+.img_inline_after {
+    background: none repeat scroll 0 0 #f1f1f1;
+    display: block;
+    max-width: 200px;
+    max-height: 200px;
+    padding: 10px;
+}
 .shop_top {
-    background-image: url("http://static.icecreamstand.ca/shop_background3.png");
-    background-size: auto 80px;
-    background-repeat: no-repeat;
-    border-radius: 4px;
+    background-image: url("http://static.icecreamstand.ca/shap_background5f.png");
+    background-repeat: repeat-x;
+    background-size: 15.41% 100px;
     height: 100px;
-    width: 100%;
+    margin: 0 10px;
 }
 .background_hill {
-    background-image: url("http://static.icecreamstand.ca/foreground.png");
-    background-size: 100% 152px;
-    background-position: left top;
-    height: 152px;
-    left: 0;
-    position: absolute;
+    height: 150px;
+    top: auto;
+    bottom: 0;
+	position: fixed;
     right: 0;
-    top: 920px;
-    z-index: 2;
+    left: 0;
+    z-index: 1;
 }
 .shop_button.button {
     background-color: $green;
@@ -4104,11 +4704,12 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     cursor: pointer;
 }
 .time_left {
-    float: left;
+    float: right;
+    font-size: 12px;
 }
 .cow_skin {
     background-color: #7f7dc7;   
-    background-size: 175px auto, 30px auto;
+    background-size: 175px auto, 30px 1px;
     height: 75px;
     width: 75px;
     display: inline-block;
@@ -4124,27 +4725,73 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
 .cow_skin[x-id="toy"] { 
     background-image: url("http://static.icecreamstand.ca/skins/toy.png"), url("http://static.icecreamstand.ca/background_icons2.png");
 }
+.cow_skin[x-id="cyber"] { 
+    background-image: url("http://static.icecreamstand.ca/skins/cyber.png"), url("http://static.icecreamstand.ca/background_icons2.png");
+}
+.cow_skin[x-id="cheetah"] { 
+    background-image: url("http://static.icecreamstand.ca/skins/cheetah.png"), url("http://static.icecreamstand.ca/background_icons2.png");
+}
 .cow_skin[x-id="digital"] { 
     background-image: url("http://static.icecreamstand.ca/skins/digital.png"), url("http://static.icecreamstand.ca/background_icons2.png");
 }
+.cow_skin[x-id="chocolate"] { 
+    background-image: url("http://static.icecreamstand.ca/skins/chocolate.png"), url("http://static.icecreamstand.ca/background_icons2.png");
+}
+.cow_skin[x-id="cowasaurus"] { 
+    background-image: url("http://static.icecreamstand.ca/skins/cowasaurus.png"), url("http://static.icecreamstand.ca/background_icons2.png");
+}
+.cow_skin[x-id="dalek"] { 
+    background-image: url("http://static.icecreamstand.ca/skins/dalek.png"), url("http://static.icecreamstand.ca/background_icons2.png");
+}
+.cow_skin[x-id="chocolatebunny"] { 
+    background-image: url("http://static.icecreamstand.ca/skins/chocolatebunny.png"), url("http://static.icecreamstand.ca/background_icons2.png");
+}
 .cow_skin[x-id="default"] { 
-    background-image: url("http://static.icecreamstand.ca/cow.png"), url("http://static.icecreamstand.ca/background_icons2.png");
+    background-image: url("http://static.icecreamstand.ca/skins/default.png"), url("http://static.icecreamstand.ca/background_icons2.png");
 }
 .cow_body {
-    background-image: url("http://static.icecreamstand.ca/cow.png");
+    background-image: url("http://static.icecreamstand.ca/skins/default.png");
+}
+.cow_body[x-skin="baby"] {
+    background-image: url("http://static.icecreamstand.ca/skins/baby.png");
+    background-position: center bottom;
+    background-size: auto 125px;
 }
 .cow_body[x-skin="toy"] {
     background-image: url("http://static.icecreamstand.ca/skins/toy.png");
 }
+.cow_body[x-skin="cheetah"] {
+    background-image: url("http://static.icecreamstand.ca/skins/cheetah.png");
+}
+.cow_body[x-skin="Chocolate bunny"] {
+    background-image: url("http://static.icecreamstand.ca/skins/chocolatebunny.png");
+    background-size: auto 175px;
+    height: 175px;
+    margin-left: 18px;
+    margin-top: -31px;
+}
+.cow_body[x-skin="cyber"] {
+    background-image: url("http://static.icecreamstand.ca/skins/cyber.png");
+}
 .cow_body[x-skin="digital"] {
     background-image: url("http://static.icecreamstand.ca/skins/digital.png");
 }
+.cow_body[x-skin="Cowasaurus"] {
+    background-image: url("http://static.icecreamstand.ca/skins/cowasaurus.png");
+}
+.cow_body[x-skin="dalek"] { 
+    background-image: url("http://static.icecreamstand.ca/skins/dalek.png");
+    margin-left: 11px;
+}
+.cow_body[x-skin="chocolate"] {
+    background-image: url("http://static.icecreamstand.ca/skins/chocolate.png");
+}
 .cow_body[x-skin="Polar Bear"] {
     background-image: url("http://static.icecreamstand.ca/skins/polarbear.png");
-    background-size: auto 155px;
+    background-size: auto 150px;
     height: 160px;
-    margin-left: 2px;
-    margin-top: -2px;
+    margin-left: 12px;
+    margin-top: -1px;
 }
 .cow_body[x-skin="Moose"] {
     background-image: url("http://static.icecreamstand.ca/skins/moose.png");
@@ -4161,37 +4808,211 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     position: absolute;
     width: 250px;
 }
+.lore > .lore_glow {
+    background-image: url("http://static.icecreamstand.ca/lore_glow.png");
+    background-repeat: no-repeat;
+    background-size: 150px 162px;
+    height: 162px;
+    left: -20px;
+    position: absolute;
+    top: -40px;
+    transform-origin: 75px 79px 0;
+    width: 150px;
+    z-index: -1;
+}
+.lore {
+    bottom: 0;
+    cursor: pointer;
+    left: 3%;
+    margin-bottom: 100px;
+    position: absolute;
+    z-index: 3;
+}
+.lore > .lore_book {
+    background-image: url("http://static.icecreamstand.ca/lore_noglow.png");
+    background-repeat: no-repeat;
+    background-size: 100% auto;
+    content: " ";
+    height: 100px;
+    left: 2px;
+    position: absolute;
+    top: -10px;
+    width: 100px;
+}
+.lore[x-chapters="0"] {
+	display: none;
+}
+.lore:hover > .lore_glow {
+    -moz-animation: 12s linear 0s normal none infinite running lore_rotate;
+    -webkit-animation: 12s linear 0s normal none infinite running lore_rotate;
+    animation: 12s linear 0s normal none infinite running lore_rotate;
+}
+.lore_float {
+    -moz-animation: 6s ease 0s normal none infinite running lore_float;
+    -webkit-animation: 6s ease 0s normal none infinite running lore_float;
+    animation: 6s ease 0s normal none infinite running lore_float;
+}
+@-webkit-keyframes lore_rotate {
+	0% {  transform: rotate(0deg); }
+	100% {  transform: rotate(360deg); }
+}
+@-moz-keyframes lore_rotate {
+	0% {  transform: rotate(0deg); }
+	100% {  transform: rotate(360deg); }
+}
+@keyframes lore_rotate {
+	0% {  transform: rotate(0deg); }
+	100% {  transform: rotate(360deg); }
+}
+@-webkit-keyframes lore_float {
+	0% {  bottom: 40px; }
+	50% { bottom: 80px; }
+	100%  { bottom: 40px; }
+}
+@-moz-keyframes lore_float {
+	0% {  bottom: 40px; }
+	50% { bottom: 80px; }
+	100%  { bottom: 40px; }
+}
+@keyframes lore_float {
+	0% {  bottom: 40px; }
+	50% { bottom: 80px; }
+	100%  { bottom: 40px; }
+}
+.lore_view_chapter {
+    background-color: #f1f1f1;
+    box-sizing: border-box;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 16px;
+    height: 200px;
+    margin-bottom: 10px;
+    margin-right: 3%;
+    padding: 20px;
+    vertical-align: top;
+    width: 30%;
+    position: relative;
+    overflow: hidden;
+}
+.lore_view_chapter b {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+.lore_bubble {
+    background-color: #f1f1f1;
+    border-radius: 20px;
+    height: 20px;
+    left: 50%;
+    position: absolute;
+    transition: all 0.25s ease 0s;
+    width: 20px;
+    z-index: 1;
+}
+.lore_chap_pback.button {
+    float: left;
+}
+.lore_chap_pnext.button {
+    float: right;
+}
+.lore_chap_pnext[x-is-max="true"], .lore_chap_pback[x-page="-6"] {
+	display: none;
+}
+.lore_chapter_controls {
+    margin-top: 20px;
+    text-align: center;
+}
+.lore_inner {
+    position: relative;
+    z-index: 2;
+}
+.lore_view_chapter:hover .lore_bubble {
+    background-color: $purple-light;
+    border-radius: 200px;
+    height: 300px;
+    left: -50px;
+    top: -65px;
+    width: 300px;
+}
+.lore_in_title {
+    left: -115px;
+    position: absolute;
+    top: -71px;
+    z-index: 2;
+}
+.lore_pback.button {
+    float: left;
+}
+.lore_pnext.button {
+    float: right;
+}
+.lore_pback[x-page="-1"], .lore_pnext[x-is-max="true"] {
+	display: none;
+}
+.lore_pback.button, .lore_pnext.button {
+	padding: 10px 20px;
+}
+.lore_page_controls {
+    bottom: 0;
+    display: table;
+    margin: 20px auto;
+    max-width: 960px;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
+.fullscreen.message {
+    bottom: 20px;
+    box-sizing: border-box;
+    left: 20px;
+    margin-left: 0;
+    margin-top: 0;
+    right: 20px;
+    top: 20px !important;
+    width: auto;
+}
+.message.fullscreen > #description {
+    margin: 10px auto;
+    max-width: 960px;
+}
+.white_overlay {
+	background-color: rgba(255,255,255,0.75);
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	position: fixed;
+	z-index: 100;
+}
+.white_overlay strong {
+	position: fixed;
+	left: 0;
+	right: 0;
+	text-align: center;
+	top: 50%;
+	transform: translateY(-50%);
+	color: $purple;
+	font-size: 42px;
+}
+.white_overlay i {
+	position: fixed;
+	right: 20px;
+	top: 20px;
+	font-size: 60px;
+	color: #404040;
+	cursor: pointer;
+}
 .winter {
     background-image: url("http://static.icecreamstand.ca/bg_snow_day.png");
-    .background_hill {
-        background-image: url("http://static.icecreamstand.ca/foreground_snow_day.png");
+    .section-main {
+        background-image: url("http://static.icecreamstand.ca/foreground_snow_day.png"), url("http://static.icecreamstand.ca/background_wood.png");
     }
+
     .shop {
         background-image: url("http://static.icecreamstand.ca/shop_winter.png");
         height: 200px;
         width: 140px;
-    }
-
-    .shop_leftend {
-        background-image: url("https://s3.amazonaws.com/icecreamstand.com/event/roof_snow_left.png"), url("https://s3.amazonaws.com/icecreamstand.com/shop_leftend.png");
-        background-position: left top, center 4px;
-        background-size: auto 93px, auto 100px;
-        height: 100px;
-        left: -40px;
-        width: 46px;
-    }
-    .shop_top {
-        background-image: url("https://s3.amazonaws.com/icecreamstand.com/event/roof_snow_middle.png"), url("http://static.icecreamstand.ca/shop_background3.png");
-        background-size: 100% 100%, auto 95px;
-        background-repeat: repeat-x;
-    }
-    .shop_rightend {
-        background-image: url("https://s3.amazonaws.com/icecreamstand.com/event/roof_snow_right.png"), url("https://s3.amazonaws.com/icecreamstand.com/shop_rightend.png");
-        background-position: right top, center 4px;
-        background-size: auto 93px, auto 100px;
-        height: 100px;
-        right: -38px;
-        width: 46px;
     }
     .winter_alert {
         h2 {
@@ -4214,9 +5035,87 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
 }
 .winter.night {
     background-image: url("http://static.icecreamstand.ca/bg_snow_night.png");
-    .background_hill {
-        background-image: url("http://static.icecreamstand.ca/foreground_snow_night.png");
+    .section-main {
+        background-image: url("http://static.icecreamstand.ca/foreground_snow_night.png"), url("http://static.icecreamstand.ca/background_wood_night.png");
     }
+}
+.aoc_recruit_buttons .button {
+    box-sizing: border-box;
+    display: inline-block;
+    font-size: 12px;
+    margin-left: 1.5%;
+    margin-right: 1.5%;
+    text-align: center;
+    width: 30%;
+}
+.aoc_recruit_buttons {
+    margin-top: 40px;
+}
+body[x-epic="aoc"] {
+	
+	.background_hill:after {
+	    background-color: #102b28;
+	    bottom: 0;
+	    content: " ";
+	    left: 0;
+	    position: absolute;
+	    right: 0;
+	    top: 150px;
+	}
+
+	.aoc_log {
+	    background-color: #f1f1f1;
+	    margin-bottom: 20px;
+	    padding: 10px;
+	}
+	.fort_options .button {
+	    display: inline-block;
+	    margin-bottom: 10px;
+	    margin-left: 10px;
+	    margin-top: -5px;
+	    float: right;
+	}
+
+	.epic_aoc_invite {
+	    background-color: #aaa;
+	    color: #fff;
+	    display: block;
+	    margin: 10px -10px -30px;
+	    padding: 10px;
+	    text-align: center;
+	}
+
+	
+	.aoc_dynamic td img {
+	    height: 25px;
+	    margin-right: 10px;
+	    vertical-align: sub;
+	}
+	.epic_aoc_invite input {
+	    background-color: #fff;
+	    margin: 0;
+	}
+	.epic_aoc_invite span {
+	    background-color: $green;
+	    font-weight: bold;
+	    padding: 5px 10px;
+	    cursor: pointer
+	}
+	.epic_aoc_invite span:hover {
+		background-color: darken($green, 10%);
+	}
+
+	.aoc_forts {
+	    border-bottom: 1px solid #f1f1f1;
+	    margin-bottom: 20px;
+	}
+	.aoc_log_msg > small {
+	    float: right;
+	}
+	.aoc_log {
+	    height: 170px;
+        overflow-y: scroll;
+	}
 }
 .event_img {
     position: absolute;
@@ -4287,8 +5186,25 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
         animation-timing-function: linear;
     }
 }
+.buff {
+    background-color: $purple;
+    display: inline-block;
+    height: 30px;
+    top: 10px;
+    width: 30px;
+    background-size: 30px 30px;
+    margin-left: 10px;
+    border: 1px solid #888;
+    border-radius: 2px;
+}
+.buff[x-id="firstwin"] { background-image: url("http://static.icecreamstand.ca/buff/daily.png"); }
+.buff[x-id="event"] { background-image: url("http://static.icecreamstand.ca/buff/event.png"); }
+.buff[x-id="combo"] { background-image: url("http://static.icecreamstand.ca/buff/combo.png"); }
+.buff[x-id="trend"] { background-image: url("http://static.icecreamstand.ca/buff/trend.png"); }
+.buff[x-id="deep sleep"] { background-image: url("http://static.icecreamstand.ca/buff/deepsleep.png"); }
+
 .cube_infobar {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
     left: -20px;
     position: absolute;
@@ -4297,16 +5213,21 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     text-align: center;
 }
 .infocube_time {
-    color: $purple;
     float: left;
 }
+.infocube_money {
+    color: $purple;
+    text-shadow: 1px 1px 1px #fff;
+    font-size: 32px;
+    display: inline-block;
+    margin-top: -10px;
+}
 .infocube_multiplier {
-    font-weight: normal;
     float: right;
 }
 #main_addon .option_wrapper[x-new-art="true"], .unlockable[x-type="addon"][x-new-art="true"] .unlock_art_wrapper {
-    background-image: url("http://static.icecreamstand.ca/toppings/jar.png"), url("http://static.icecreamstand.ca/background_icons.png");
-    background-size: 100% auto, auto;
+    background-image: url("http://static.icecreamstand.ca/toppings/jar.png"), url("http://static.icecreamstand.ca/background_icons2.png");
+    background-size: 100% auto, 30px 1px;
 }
 #main_addon .option_wrapper[x-new-art="true"] .option, .unlockable[x-type="addon"][x-new-art="true"] img {
     height: 100px;
@@ -4332,20 +5253,238 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
     float: left;
     height: 75px;
     width: 75px;
+    overflow: hidden;
 }
-
+.credits_entry {
+    margin: 10px 0;
+}
+.cow_evolve {
+    background-image: url("http://static.icecreamstand.ca/background_icons2.png");
+    background-size: 60px auto;
+    height: 150px;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+.mobile_menu {
+    display: none;
+    color: #fff;
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 37px;
+    transition: color 0.25s ease 0s;
+}
+.mobile_menu.active {
+	color: $purple;
+}
+.mailbox_list {
+    display: inline-block;
+    width: 200px;
+}
+.mailbox_thread {
+    display: inline-block;
+    width: calc(100% - 200px);
+    vertical-align: top;
+    padding-left: 20px;
+    padding-right: 20px;
+    box-sizing: border-box;
+    position: relative;
+}
+.message.extended {
+    margin-left: -480px;
+    width: 960px;
+}
+.thread_user {
+    background-color: #f1f1f1;
+    margin-bottom: 5px;
+    padding: 5px;
+    cursor: pointer;
+    position: relative;
+}
+.thread_user.thread_active {
+    background-color: $purple;
+    color: #fff;
+}
+.thread_msg {
+    background-color: #f1f1f1;
+    display: table;
+    margin-bottom: 10px;
+    max-width: 75%;
+    padding: 10px;
+    position: relative;
+    clear: both;
+}
+.thread_reply > input {
+    display: block;
+    width: 100%;
+}
+.thread_reply > textarea {
+    background-color: #ddd;
+    display: block;
+    min-width: 400px;
+    padding: 10px;
+}
+.thread_user > img {
+    height: 20px;
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    width: 20px;
+}
+.thread_msg[x-align="right"] {
+    float: right;
+}
+.thread_msg[x-align="left"]:before {
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #f1f1f1;
+    border-top: 10px solid transparent;
+    content: "";
+    position: absolute;
+    left: -10px;
+}
+.thread_msg[x-align="right"]:before {
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid #f1f1f1;
+    border-top: 10px solid transparent;
+    content: "";
+    position: absolute;
+    right: -10px;
+}
+.thread_controls {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    z-index: 2;
+}
+.thread_controls_down {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    top: 75px;
+    display: none;
+}
+.thread_controls > i, .thread_controls_down > i {
+    margin-left: 10px;
+}
+.thread_user[x-read="false"], .thread_msg[x-read="false"] {
+    font-weight: bold;
+}
+.mailbox_thread[x-docked="true"] {
+    height: 400px;
+    overflow-y: scroll;
+}
+.mailbox_thread[x-docked="true"] .thread_msg {
+    display: block !important;
+}
+.chat_popout {
+    color: #fff;
+    font-size: 12px;
+    padding: 0 5px;
+}
+.chat_popout i {
+    margin-right: 5px;
+}
+.silo {
+    background-image: url("http://static.icecreamstand.ca/silo_back.png");
+    height: 200px;
+    width: 106px;
+    display: block;
+    position: absolute;
+    height: 200px;
+    z-index: 2;
+    right: 10px;
+    bottom: 40px;
+    cursor: pointer;
+}
+.silo_bar {
+    background-image: url("http://static.icecreamstand.ca/silo_bar.png");
+    background-repeat: no-repeat;
+    background-position: left bottom;
+    position: absolute;
+    bottom: 39px;
+    right: 24px;
+    width: 20px;
+    padding-bottom: 4px;
+}
+.button.button_facebook {
+    background-color: #3b5998;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+.background_option {
+    background-color: #f1f1f1;
+    display: inline-block;
+    height: 50px;
+    margin-right: 5px;
+    width: 50px;
+    background-size: auto 100%;
+    cursor: pointer;
+}
+.background_option.active {
+    box-shadow: 0 0 0 2px $purple inset;
+}
+.background_option[x-value="default"] { background-image: url("http://static.icecreamstand.ca/backgrounds/default.png.gz"); }
+.background_option[x-value="retro"] { background-image: url("http://static.icecreamstand.ca/backgrounds/retro.png.gz"); }
+.background_option[x-value="fallen"] { background-image: url("http://static.icecreamstand.ca/backgrounds/fallen.png.gz"); }
+.background_option[x-value="winter"] { background-image: url("http://static.icecreamstand.ca/backgrounds/winter.png.gz"); }
+.background_option[x-value="attack on the castle"] { background-image: url("http://static.icecreamstand.ca/backgrounds/aoc_day_c.png.gz"); }
+.party_icon {
+    height: 20px;
+    width: auto;
+}
+.easter_hunt {
+    cursor: pointer;
+    vertical-align: middle;
+    -webkit-animation:spin 4s ease infinite;
+    -moz-animation:spin 4s ease infinite;
+    animation:spin 4s ease infinite;
+    display: inline-block;
+}
+.easter_hunt > img {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0) !important;
+    height: 25px !important;
+    width: 20px !important;
+}
+@-moz-keyframes spin { 
+    0% { -moz-transform: rotate(-20deg); }
+    50% { -moz-transform: rotate(20deg); }
+    100% { -moz-transform: rotate(-20deg); }
+}
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(-20deg); }
+    50% { -webkit-transform: rotate(20deg); }
+    100% { -webkit-transform: rotate(-20deg); }
+}
+@keyframes spin {
+    0% { transform: rotate(-20deg); }
+    50% { transform: rotate(20deg); }
+    100% { transform: rotate(-20deg); }
+}
 /* RESPONSIVE */
 
 @media all and (min-width : 1921px) {
-    .background_hill {
-        background-image: url("http://static.icecreamstand.ca/foreground_wide.png");
-        background-size: auto 152px;
-    }
     body {
         background-image: url("http://static.icecreamstand.ca/bg_day_wide.png");
     }
     body.night {
         background-image: url("http://static.icecreamstand.ca/bg_night_wide.png");
+    }
+    body[x-epic="aoc"] {
+    	background-size: 100% 768px;
+    }
+}
+@media all and (max-width : 1370px) {
+	#upgrades.section-side {
+		top: 100px;
+	}
+	body[x-epic="aoc"] .background_hill {
+    	top: auto;
+    	bottom: 0px;
+    	height: 100px;
+    	background-size: 100% 100px;
+    }
+    body[x-epic="aoc"] {
+    	background-size: 100% auto;
     }
 }
 @media all and (max-width : 1240px) {
@@ -4353,15 +5492,36 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
         width: 75px;
         height: 75px;
     }
-    h1 {
-        font-size: 40px;
-    }
     .tab {
         font-size: 10px;
     }
+    body[x-epic="aoc"] {
+    	background-size: auto;
+    }
 }
 @media all and (max-width : 768px) {
-    body {
+	.mobile_menu {
+		display: block;
+	}
+	.icecream_flavour[x-new="true"] {
+		margin-top: -60px;
+	}
+	.icecream {
+		padding-top: 0;
+	}
+	.sell_value {
+		top: 290px;
+	}
+	#upgrades.section-side {
+		top: 0;
+		background-color: #fff;
+		z-index: 10;
+	}
+    #upgrades.section-side:not(.active) {
+    	display: none;
+    }
+    .shop_top {
+    	margin: 0;
     }
     .section-side {
         position: relative;
@@ -4373,11 +5533,15 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
         min-width: 100%;
     }
     .flavor div#main_base, .flavor div#main_addon, .flavor div#main_combo {
-        width: 435px;
+        width: 100%;
         height: 90px;
     }
+    .option_wrapper {
+    	height: 90px;
+    	width: 90px;
+    }
     .base_active {
-        height: 22px;
+        height: 35px;
     }
     .shop_rightend, .shop_leftend {
         display: none;

@@ -7,6 +7,8 @@ var imagemin = require('gulp-imagemin');
 var pngcrush = require('imagemin-pngcrush');
 var rename = require("gulp-rename");
 var imageResize = require('gulp-image-resize');
+var cache = require('gulp-cache');
+
 
 var config = require('./config.js');
 var paths = {
@@ -14,6 +16,7 @@ var paths = {
   css: ['source/css/*.scss'],
   scripts_public: ['public/js/*.js'],
   flavours: ['source/img/flavours/*.png'],
+  backgrounds: ['source/img/backgrounds/*.png'],
   addons: ['source/img/addons/*.png'],
   cones: ['source/img/cones/*.png'],
   css_public: ['public/css/*.css'],
@@ -30,6 +33,14 @@ gulp.task('js', function() {
     .pipe(jsValidate())
     .pipe(uglify())
     .pipe(gulp.dest('public/js'));
+});
+gulp.task('clear', function() {
+  // Still pass the files to clear cache for
+  gulp.src(paths.addons)
+    .pipe(cache.clear());
+
+  // Or, just call this for everything
+  cache.clearAll();
 });
 gulp.task('css', function () {
     return gulp.src(paths.css)
@@ -62,6 +73,35 @@ gulp.task('publish_js', ['js'], function() {
      // print upload updates to console
     .pipe(awspublish.reporter());
 });
+gulp.task('backgrounds', function() {
+  // create a new publisher
+  var publisher = awspublish.create(config.aws);
+
+  // define custom headers
+  
+
+  return gulp.src(paths.backgrounds)
+
+    .pipe(cache(imagemin({
+            optimizationLevel: 2,
+            use: [pngcrush()]
+    })))
+    .pipe(rename(function (path) {
+      path.dirname += '/backgrounds';
+    }))
+     // gzip, Set Content-Encoding headers and add .gz extension
+    .pipe(awspublish.gzip({ ext: '.gz' }))
+
+    // publisher will add Content-Length, Content-Type and  headers specified above
+    // If not specified it will set x-amz-acl to public-read by default
+    .pipe(publisher.publish(headers_image))
+
+    // create a cache file to speed up consecutive uploads
+    .pipe(publisher.cache())
+
+     // print upload updates to console
+    .pipe(awspublish.reporter());
+});
 gulp.task('flavours', ['publish_js', 'flavours_thumb'], function() {
   // create a new publisher
   var publisher = awspublish.create(config.aws);
@@ -71,10 +111,10 @@ gulp.task('flavours', ['publish_js', 'flavours_thumb'], function() {
 
   return gulp.src(paths.flavours)
 
-    .pipe(imagemin({
+    .pipe(cache(imagemin({
             optimizationLevel: 2,
             use: [pngcrush()]
-    }))
+    })))
     .pipe(rename(function (path) {
       path.dirname += '/flavours';
     }))
@@ -100,10 +140,10 @@ gulp.task('addons', ['publish_js', 'addons_thumb'], function() {
 
   return gulp.src(paths.addons)
 
-    .pipe(imagemin({
+    .pipe(cache(imagemin({
             optimizationLevel: 2,
             use: [pngcrush()]
-    }))
+    })))
     .pipe(rename(function (path) {
       path.dirname += '/addons';
     }))
@@ -133,10 +173,10 @@ gulp.task('addons_thumb', function() {
       gravity: 'South',
       imageMagick: true
     }))
-    .pipe(imagemin({
+    .pipe(cache(imagemin({
             optimizationLevel: 2,
             use: [pngcrush()]
-    }))
+    })))
     .pipe(rename(function (path) {
       path.dirname += '/addons/thumb';
     }))

@@ -1,0 +1,198 @@
+<% layout('layout') -%>
+		<style>
+			table {
+				margin: 10px 0;
+				width: 100%;
+			}
+			thead td {
+				font-weight: bold;
+			}
+			tbody tr:nth-child(2n+1) td {
+			    background-color: #F1F1F1;
+			}
+			td {
+			    padding: 5px;
+			    width: 220px;
+			}
+			input[type="submit"] {
+			    background-color: #7f7dc7;
+			    color: #fff;
+			}
+			form {
+				padding: 20px;
+				background-color: #f1f1f1;
+			}
+			input, textarea {
+				background-color: #fff;
+				display: inline-block;
+			}
+		</style>
+			<%= (locals.alert)? alert : '' %>
+			<h2>With great power comes great responsibility.</h2>
+
+		<h3>Give Money</h3>
+		<form action="http://icecreamstand.ca/reward" method="get">
+			user: <input name="n"><br>
+			amount: <input type="number" name="a"><br>
+			SAVE: <input type="submit"><br>
+		</form>
+
+		<h3>Give Item</h3>
+		<form action="http://icecreamstand.ca/reward" method="get">
+			user: <input name="n"><br>
+			item: <input type="text" name="item"><br>
+			SAVE: <input type="submit"><br>
+		</form>
+
+		<h3>Give Cone</h3>
+		<form action="http://icecreamstand.ca/reward" method="get">
+			user: <input name="n"><br>
+			cone: <input type="text" name="cone"><br>
+			SAVE: <input type="submit"><br>
+		</form>
+
+		<h3>Cow Age</h3>
+		<form action="http://icecreamstand.ca/reward" method="get">
+			user: <input name="n"><br>
+			new date: <input name="cow_age"><br>
+			SAVE: <input type="submit"><br>
+		</form>
+
+		<h3>Remove Skin</h3>
+		<form action="http://icecreamstand.ca/reward" method="get">
+			user: <input name="n"><br>
+			skin: <input name="remove_skin"><br>
+			SAVE: <input type="submit"><br>
+		</form>
+
+		<h3>Clear Cows</h3>
+		<form action="http://icecreamstand.ca/reward" method="get">
+			user: <input name="n"><br>
+			confirm by typing "yes": <input name="cow_clear"><br>
+			SAVE: <input type="submit"><br>
+		</form>
+
+		<h3>Remove cow</h3>
+		<form action="http://icecreamstand.ca/reward" method="get">
+			user: <input name="n"><br>
+			cow id: <input name="cow_remove"><br>
+			SAVE: <input type="submit"><br>
+		</form>
+
+		<h3>Add Badge</h3>
+		<form action="http://icecreamstand.ca/reward" method="get">
+			user: <input name="n"><br>
+			badge: <input type="number" name="badge"><br>
+			SAVE: <input type="submit"><br>
+		</form>
+
+		<h3>Add Flavour</h3>
+		<form action="flavors" method="POST">
+			optional id: <input name="_id" type="text" value="">
+			Name: <input name="name" placeholder="name" value=""><br/>
+			Description: <input name="description" placeholder="desc" value=""><br/>
+			Cost: <input name="cost" placeholder="cost" value=''><br/>
+			Value: <input name="base_value" placeholder="base value" value=""><br />
+			<input type="submit">
+		</form>
+
+		<h3>Add Add-on</h3>
+		<form action="toppings" method="POST">
+			<input name="_id" type="hidden" value="">
+			Name: <input name="name" placeholder="name" value=""><br/>
+			Event text: <input name="event" placeholder="event text" value=""><br/>
+			Cost: <input name="cost" placeholder="cost" value=""><br/>
+			Value: <input name="base_value" placeholder="base value" value=""><br/>
+			Delete: <input type="checkbox" name="remove"><br/>
+			<input type="submit">
+		</form>
+
+		<h3>Add Achievement</h3>
+		<form action="/add_achievement" method="POST">
+		id: <input name="id" placeholder="optional id"><br />
+		name: <input name="name" placeholder="name"><br />
+		badge: <input name="badge_id" type="number" placeholder="badge id"><br />
+		description: <textarea name="description" required="required" placeholder="description"></textarea><br />
+		SAVE: <input type="submit">
+		</form>
+		
+		<h3>Assign Achievement</h3>
+		<form action="/achievement/assign" method="POST">
+		user id: <input name="user_id"><br />
+		achievement id: <input name="id"><br />
+		SAVE: <input type="submit">
+		</form>
+
+		<h3>Add Skin</h3>
+		<form action="http://icecreamstand.ca/reward" method="get">
+			user: <input name="n"><br>
+			skin: <input type="text" name="skin"><br>
+			SAVE: <input type="submit"><br>
+		</form>
+		<h3>Add Cow</h3>
+		<form action="http://icecreamstand.ca/admin/cow" method="post">
+			user: <input name="cow[user_id]"><br>
+			name: <input name="cow[name]"><br>
+			experience: <input name="cow[experience]"><br>
+			strength: <input name="cow[strength]"><br>
+			intelligence: <input name="cow[intelligence]"><br>
+			constitution: <input name="cow[constitution]"><br>
+			active?: <input name="cow[is_active]" value="true"><br>
+			SAVE: <input type="submit"><br>
+		</form>
+
+<h3>Epics</h3>
+<table>
+			<tr>
+				<td>Name</td>
+				<td>Players</td>
+				<td>Total</td>
+				<td>Event</td>
+				<td>Actions</td>
+			</tr>
+			<% for (i in epics) { %>
+				<tr>
+					<td><%= epics[i].name %></td>
+					<td><%= epics[i].players %></td>
+					<td><%= epics[i].total %></td>
+					<td><%= epics[i].event %></td>
+					<td><a href="/admin/epic/<%= epics[i]._id %>/edit">edit</a> | <a href="/admin/epic/<%= epics[i]._id %>/remove">remove</a></td>
+				</tr>
+			<% } %>
+</table>
+<form action="http://icecreamstand.ca/admin/epic" method="post">
+		name: <input name="epic[name]"><br>
+		event: <input name="epic[event]"><br>
+		text: <textarea name="epic[text]"></textarea><br>
+		SAVE: <input type="submit"><br>
+</form>
+
+<h3>Chapters</h3>
+<table>
+	<tr>
+		<td>Title</td>
+		<td>Text</td>
+		<td>Chapter #</td>
+		<td>Badge</td>
+		<td>Saga</td>
+		<td>Actions</td>
+	</tr>
+	<% for (i in chapters) { %>
+		<tr>
+			<td><%= chapters[i].title %></td>
+			<td><%= chapters[i].text.substring(0, 140) %></td>
+			<td><%= chapters[i].chapter_number %></td>
+			<td><%= chapters[i].badge_id %></td>
+			<td><%= chapters[i].saga %></td>
+			<td><a href="/admin/chapter/<%= chapters[i]._id %>/edit">edit</a> | <a href="/admin/chapter/<%= chapters[i]._id %>/remove">remove</a></td>
+		</tr>
+	<% } %>
+</table>
+<form action="http://icecreamstand.ca/admin/chapter" method="post">
+	Title: <input name="chapter[title]"><br>
+	Text: <textarea name="chapter[text]"></textarea><br>
+	Chapter Number: <input name="chapter[chapter_number]" type="number"><br>
+	Saga: <input name="chapter[saga]"><br>
+	Badge: <input name="chapter[badge_id]" type="number"><br>
+	SAVE: <input type="submit"><br>
+</form>

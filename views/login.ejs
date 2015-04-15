@@ -14,12 +14,18 @@
 		<title>Sign Up - Ice Cream Stand</title> 
 		<style>
 			.new_user { position: relative; }
-			.back_button {
-				bottom: 10px;
+			i.back_button {
+				top: 50px;
 				cursor: pointer;
 				position: absolute;
-				right: 10px;
-				width: 50px;  
+				left: 10px;
+				width: 50px;
+				font-size: 40px;
+				color: #5C59B8;
+			}
+			.icecream.active > img {
+			    margin-top: 62px;
+			    width: 200px;
 			}
 		</style>
 	</head>
@@ -27,31 +33,43 @@
 		<link rel="stylesheet" href="https://s3.amazonaws.com/icecreamstand.com/common.css.gz" />
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script>
-			var word_pool = ['vanilla.svg', 'chocolate.svg', 'strawberry.svg', 'mint.png', 'zombie.png', 'ghost.png', 'squidink.png', 'mocha.png', 'glass.png', 'uranium.png', 'bacon.png', 'mint.png'];
-			var word_pointer = 0;
-			var sign_up = <%= ( typeof sign_up == 'undefined')? false : true %>;
-			var trends = [];
+			var flavours = ['vanilla', 'chocolate', 'strawberry', 
+			'grape', 'orange', 'banana', 'pistachio', 'almond', 
+			'raspberry', 'blueberry', 'cherry', 'hazelnut', 'mocha', 'coffee',
+			'pumpkin', 'caramel', 'maple', 'mango', 'peach', 'cottoncandy', 'candycane', 'avocado', 'bubblegum',
+			'cakebatter', 'bread', 'mint',
+			'zombie', 'ghost', 'lemon', 'mocha', 'glass', 'uranium', 'bacon',
+			'anti-matter', 'rainbow', 'ham'];
+			var addons = ['cherries', 'sprinkles', 'jelly beans', 'peanuts', 'gummy worms', 'peanut butter', 'onions', 'honey', 'berry jelly',
+			'gummy sodas', 'blackberries', 'raspberries', 'chopped strawberries', 'marshmallow cream', 'vanilla frosting', 'chocolate frosting', 'crumbled candy bars', 'sugar cookies',
+			'crumbled brownies', 'crumbled fudge', 'red velvet cake', 'cookie dough', 'm&m\'s', 'oreo',
+			'chocolate chips', 'white chocolate chips', 'dark chocolate chips', 'pecans', 'acorns', 'almonds', 'gumballs', 'mini marshmallows', 'candied lemon rinds',
+			'rice', 'chili peppers', 'gravy', 'coconut', 'peas', 'fudge ripple', 'chopped peaches', 'chopped pineapple',
+			'croutons', 'fries', 'olives', 'candied bacon', 'bacon', 'shrimp', 'blueberries', 'raisins', 'waffles', 'cheese',
+			 'eyeballs', 'bat wings', 'nuts and bolts', 'warts', 'oil', 'sausage', 'pepperoni', 'ram', 'egg'];
+			var cones = ['default', 'sprinkle', 'chocolate', 'whitechocolate', 'sugarcone'];
+
+			var sign_up = <%= (typeof sign_up != 'undefined') %>;
 			var refer = atob(getURLParameter('refer'));
 			$(document).ready(function () {
-				$('body').append('<img src="img/' + word_pool[word_pointer + 1] + '" style="display:none;" />');
-				setInterval(function () {
-					word_pointer++;
-					if (word_pointer > word_pool.length - 1) word_pointer = 0;
-					$(this).attr('style', 'display: block; background-image: url("img/' + word_pool[word_pointer] + '"), url("img/cone.svg");');
-					$('body').append('<img src="img/' + word_pool[word_pointer + 1] + '" style="display:none;" />');
-				}, 5000);
-
+				update_bg();
+				setInterval( function () { update_bg(); }, 60000);
 				$('#new_game_button').click(function () {	
 					$('.screen_1').slideUp(100);
 					$('.new_game').slideDown(100);
+					$('.alert').slideUp(500);
 				});
 				$('#continue_button').click(function () {	
 					$('.screen_1').slideUp(100);
 					$('.continue').slideDown(100);
+					$('.alert').slideUp(500);
 				});
 				$('#forgot').click(function () {	
 					$('.screen_1, .new_game, .continue').slideUp(100);
 					$('.forgot_container').slideDown(100);
+				});
+				$('.icecream').click(function () {
+					update_bg();
 				});
 				$('.back_button').click(function () {
 					$('.screen_1').slideDown(100);
@@ -60,6 +78,7 @@
 				if (window.location.search.substring(1) == 'signed_succes=0') {
 					$('h2').text('Can\'t start a new game :( That name might be taken');
 				}
+
 				if (sign_up) {
 					$('#new_game_button').click();
 					if (getURLParameter('refer') != 'null') {
@@ -68,11 +87,13 @@
 					}
 				}
 			});
-			function icecream_fx(cash) {
-				$('.icecream').after('<div class="icecream_float" style="color: #' + color_pool[Math.floor(Math.random()*10)] + '">' + cash + '</div>');
-				$('.icecream_float:first').animate({ 'margin-top': '0', 'margin-left' : (Math.floor(Math.random()*200)-100) + 'px'}, 1000, function () { $(this).remove() });
-				$('.icecream').after('<div class="icecream_particle" style=\'' + $('.icecream').attr('style') + '\'></div>');
-				$('.icecream_particle:first').css('left', Math.floor(Math.random()*400) + 'px').css('top', '-' + (Math.floor(Math.random()*200)+100) + 'px').animate({top:($(document).height() - 100 - Math.floor(Math.random()*100)) + 'px', opacity:'0'}, 4000, function () { $(this).remove() });
+
+			function update_bg() {
+				var flavour = flavours[ Math.floor( Math.random() * flavours.length ) ];
+				var cone = cones[ Math.floor( Math.random() * cones.length ) ];
+				var addon = addons[ Math.floor( Math.random() * addons.length ) ];
+				$('.icecream.active').css('background-image', 'url("http://static.icecreamstand.ca/flavours/' + flavour + '.png.gz"), url("http://static.icecreamstand.ca/cones/' + cone + '.png.gz")');
+				$('#addon').attr('src', 'http://static.icecreamstand.ca/addons/' + addon.replace(/\W/g, '') + '.png.gz');
 			}
 			function getURLParameter(name) {
 				return decodeURI(
@@ -83,37 +104,40 @@
 		<div class="section-side">
 			<div id="ice_cream_holder">
 				<div style="height: 350px;">
-					<div class="icecream active" style='display: block; background-image: url("img/vanilla.svg"), url("img/cone.svg");'><div id="glow"></div></div>
+					<div class="icecream active" style='display: block; background-position: center 115px, center bottom;'><img src="" id="addon" /></div>
 				</div>
 			</div>
 		</div><div class="section-main">
-			<div class="shop_leftend"></div>
-			<div class="shop_rightend"></div>
-			<div class="section-main-inner">
-				<h1><img src="/img/icslogo.png" alt="logo"></h1>
-				
-				<%- (locals.alert)? '<div class="alert">' + alert + '</div>': '' %>
+			<div class="shop_top">
+				<h1><img src="http://static.icecreamstand.ca/icslogo_small.png" srcset="http://static.icecreamstand.ca/icslogo.png 2x" /></h1>
+				<div class="shop_leftend"></div>
+				<div class="shop_rightend"></div>
+			</div>
+			<div class="section-main-inner">			
+				<% if (typeof alert != 'undefined')	{ %> <div class="alert"><%= alert %></div> <% } %>
+
 				<div class="new_user main_container">
-					<h2>Sign Up!</h2>		
+					<h2>Start Playing</h2>		
 					<div class="screen_1" style="margin: 50px auto;">
 						<div class="button signup_input" id="new_game_button" style="text-align: center;">New Game</div>
 						<div class="button signup_input" id="continue_button" style="text-align: center;">Continue</div>
+						<a href="/auth/facebook" class="button button_facebook signup_input" id="continue_button" style="box-shadow: 0 2px 0 #102e6d; text-align: center; display: table;"><i class="fa fa-facebook"></i> Log in with Facebook</a>
 					</div>
 					<div class="new_game" style="display: none;">
-						<img src="img/back-icon.png" class="back_button" />
+						<i class="back_button fa fa-arrow-left"></i>
 						<form action="signup" method="POST">
 							<input class="signup_input" type="text" name="name" placeholder="Username" autocomplete="off">
 							<input class="signup_input" type="password" name="password" placeholder="Password (OPTIONAL)" autocomplete="off">
 							<input class="signup_input" type="text" name="email" placeholder="Email (OPTIONAL)" autocomplete="off">
-							<input class="signup_input button" type="submit" value="START" class="button">
+							<input class="signup_input button button_green" type="submit" value="START" class="button">
 						</form>
 					</div>
 					<div class="continue" style="display: none;">
-						<img src="img/back-icon.png" class="back_button" />
+						<i class="back_button fa fa-arrow-left"></i>
 						<form action="login" method="POST">
 							<input class="signup_input" type="text" name="user" placeholder="Username">
 							<input class="signup_input" type="password" name="password" placeholder="Password">
-							<input class="signup_input button" type="submit" value="Log In">
+							<input class="signup_input button button_green" type="submit" value="Log In">
 						</form>
 						<a href="#" id="forgot">Forgot your password?</a>
 					</div>
@@ -128,9 +152,9 @@
 				</div>
 				<div class="login_pitch">
 					<p>
-						Open an Ice Cream Stand and <b>sell exciting and weird flavours</b>. Hire workers, research flavours and add-ons.
+						Open an Ice Cream Stand and <b>sell exciting and weird flavours</b> in the global economy. Hire workers, research flavours and add-ons.
 					</p>
-					<img src="http://static.icecreamstand.ca/employee_thumb.png" />
+					<img src="http://static.icecreamstand.ca/flavours/thumb/vanilla.png.gz" />
 				</div>
 				<div class="login_pitch">
 					<img src="http://static.icecreamstand.ca/questicon.png" />
@@ -140,11 +164,16 @@
 				</div>
 				<div class="login_pitch">
 					<p>
-						Raise a cow.
+						Raise a cow. Give him loot, and use him to grow your Ice Cream empire.
 					</p>
-					<img src="http://static.icecreamstand.ca/cow.svg" class="no_background" />
+					<img src="http://static.icecreamstand.ca/skins/default.png" class="no_background" />
 				</div>
 		</div></div><div class="section-side" id="upgrades">
 		</div>
+		<div class="background_hill">
+			<div class="cow" x-type="cow"></div>
+			<div class="shop tooltip" x-type="shop"></div>
+		</div>
+		<link rel="stylesheet" href="http://static.icecreamstand.ca/font-awesome-4.2.0/css/font-awesome.min.css" />
 	</body>
 </html>

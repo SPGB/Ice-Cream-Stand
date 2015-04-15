@@ -1,17 +1,343 @@
 <!doctype html>
-<html lang="en">
+<html lang="<%= (typeof lang == 'undefined')? 'en' : lang %>">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
 		<meta property="fb:app_id" content="1421033384776672" />
 		<meta property="og:url" content="http://icecreamstand.ca" />
-		<meta property="og:image" content="http://icecreamstand.ca/img/thumb.png" />
+		<meta property="og:image" content="http://static.icecreamstand.ca/flogo.png" />
 		<meta property="og:title" content="Ice Cream Stand">
-		<meta property="og:description" content="Free Browser game where you sell delicious delicious ice cream. Open up a stand, buy workers, unlock flavors.">
+		<meta property="og:description" content="Incremental multiplayer clicker game, create an ice cream stand and combine flavours and add-ons. Build an army of workers and raise cows.">
 		<meta property="og:type" content="website" />
-		<meta name="description" content="Incremental browser game where you open an ice cream stand and sell ice cream. Unlock flavors, add-ons, workers, and raise a cow!" />
+		<meta name="description" content="Incremental multiplayer clicker game, create an ice cream stand and combine flavours and add-ons. Build an army of workers and raise cows." />
 		<link rel="icon" type="image/png" href="http://static.icecreamstand.ca/favicon.png" />
-		<title>Ice Cream Stand</title>
+		<title>Ice Cream Stand - Clicker Game</title>
+	</head>
+	<body x-scroll-down="false">
+	<div id="fb-root"></div>
+	<script>
+		(function(d, s, id) {
+		  var js, fjs = d.getElementsByTagName(s)[0];
+		  if (d.getElementById(id)) return;
+		  js = d.createElement(s); js.id = id;
+		  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=1421033384776672&version=v2.0";
+		  fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));
+	</script>
+	<link rel="stylesheet" href="https://s3.amazonaws.com/icecreamstand.com/common.css.gz?patch=146" />
+	<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script type="text/javascript" src="http://static.icecreamstand.ca/jquery.easing.1.3.js"></script>
+	<script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main<%= (typeof release_channel != 'undefined')? release_channel : 0 %>.js.gz?patch=146"></script>
+	<script src="http://icecreamstand.ca/socket.io/socket.io.js"></script>
+	<script type="text/javascript">
+		var user_start = <%- (typeof user != 'undefined')? JSON.stringify(user) : 'null' %>;
+	</script>
+	<canvas id="canvas_main" x-resize="true" style="width: 100%; position: fixed; height: 100%;"></canvas>
+	<div class="section-side">
+		<canvas id="canvas_sales" width="400" height="400"></canvas>
+		<div class="icecream">
+			<div id="topping"></div>
+		</div>
+		<div class="sell_value">
+			<div class="current_flavor tooltip" x-type="value"></div><span class="current_value"></span>
+		</div>
+
+	</div>
+	<div class="section-main">
+		<div class="shop_top">
+			<h1><img src="http://static.icecreamstand.ca/icslogo_small.png" srcset="http://static.icecreamstand.ca/icslogo.png 2x" /><div class="mobile_menu"><i class="fa fa-bars"></i>
+</div></h1>
+			<div class="shop_leftend"></div>
+			<div class="shop_rightend"></div>
+		</div>
+		<div class="section-main-inner">
+			
+			<div class="highscores main_container">
+					<h4><span class="lang">Highscores</span>
+						<span class="container_controls">
+							<div class="refresh_highscores flavor_tab lang">Refresh</div>
+							<div class="flavor_tab" id="hide">X</div>
+						</span>		
+					</h4>
+					<div class="button_container highscore_button_container">
+						<div>
+							<div class="flavor_tab active tab_round_left tooltip lang" x-type="highscore" id="this_day">Today</div>
+							<div class="flavor_tab tooltip lang" id="this_week" x-type="highscore">Weekly</div>
+							<div class="flavor_tab tooltip lang" id="all_time" x-type="highscore">All Time</div>
+							<div class="flavor_tab tooltip lang" id="up_and_coming" x-type="highscore">Upcoming</div>
+							<div class="flavor_tab tooltip lang" id="prestige" x-type="highscore">Prestige</div>
+							<div class="flavor_tab tooltip lang" id="trend_today" x-type="highscore">Trend sold today</div>
+							<div class="flavor_tab tab_round_right tooltip lang" id="cowlv" x-type="highscore">Cow</div>
+						</div>
+						<div id="button_right">
+							<div class="flavor_tab active tab_round_left" id="top_10">10</div>
+							<div class="flavor_tab tab_round_right" id="top_100">100</div>
+						</div>
+						<div id="button_right" x-id="friends">
+							<div class="flavor_tab active tab_round_left" id="show_all">All</div>
+							<div class="flavor_tab tab_round_right" id="show_friends">Friends</div>
+						</div>
+					</div>
+					<ol></ol>
+			</div>
+			<div class="flavor main_container">  
+				<h4><span class="lang">Ice Cream</span>
+						<span class="container_controls">
+							<div class="flavor_tab" x-id="main_franken" id="frankenflavour_tab" style="display:none;"><span class="lang">Frankenflavour</span></div>
+							<div class="flavor_tab active" x-id="main_base"><span class="lang">Flavour</span></div>
+							<div class="flavor_tab" x-id="main_addon"><span class="lang">Add-on</span></div>
+							<div class="flavor_tab" x-id="main_cone"><span class="lang">Cone</span></div>
+							<div class="flavor_tab" x-id="main_combo"><span class="lang">Combo</span></div>
+							<a class="expand"><span class="lang">Expand</span></a>
+						</span>
+				</h4>
+					<div id="main_base" class="inner_flavor_container"></div>
+					<div id="main_addon" class="inner_flavor_container"></div> 
+					<div id="main_combo" class="inner_flavor_container"></div> 
+					<div id="main_cone" class="inner_flavor_container"></div> 
+			</div><div class="quests main_container half_size">
+					<h4><span class="lang">Quests</span>
+					<span class="container_controls">
+						<a class="expand"><span class="lang">Expand</span></a>
+					</span></h4>
+					<div class="quest_list"></div>
+				</div><div class="trending_and_events main_container half_size hidden">
+					<div class="event">
+						<h4><span class="lang">Events</span></h4>
+						<div class="event_container">
+							<span id="event_name"></span>
+							<span id="trend_time"></span>
+						</div>
+					</div>
+
+					<div class="trending">
+						<h4><span class="lang">Trends</span><span id="trend_bonus" class="money_icon is_white"></span></h4>
+						<div class="trending_container">
+							<div class="trending_info">
+								<span class="currently_trending_container"></span>
+								<div class="vote_container" x-type="vote"></div>
+								<div id="trend_sold_outer"><div id="trend_left"></div><div id="trend_sold_inner"></div></div>
+							</div>
+							<div class="trend_title tooltip" x-type="trending"></div>
+							<span id="trend_time"></span>
+						</div>
+					</div>
+
+			</div><div class="chat main_container">
+					<h4><span class="lang">Chat</span>
+					<span class="container_controls">
+						<div class="chat_rooms"><span class="current_room">...</span> <i class="fa fa-sort-desc"></i></div>
+						<a href="chat" class="chat_popout"><i class="fa fa-expand"></i><span class="lang">Popout</span></a>
+						<a class="expand"><span class="lang">Expand</span></a>
+					</span></h4>
+					<div class="chat_container_main">
+						<div id="chat_window">
+						</div>
+						<form id="new_message" method="POST" action="chat">
+							<div id="typing"></div>
+							<div class="badge_selector"><div class="badge_inner"><b class="lang">Badges</b> <span class="triangle-down"></span></div></div><input type="text" name="text" maxlength="240" placeholder="What would you like to say" autocomplete="off">
+							<input type="submit" class="button button_green" value="Send">
+						</form>
+					</div>
+				</div>
+				<span class="footer">
+					<p>
+						<a class="lang" href="http://icecreamstand.wikia.com" target="_blank">Wiki</a>
+						<a class="lang" href="http://www.reddit.com/r/icecreamstand/" target="_blank">Reddit</a>
+						<a class="lang" href="https://facebook.com/icecreamstand" target="_blank">Facebook</a>
+						<a class="lang" href="http://icecreamstand.ca/privacy-policy" target="_blank">Privacy Policy</a>
+						<div class="fb-like" data-href="https://facebook.com/icecreamstand" data-layout="standard" data-action="like" data-show-faces="false" data-share="true"></div>
+					</p>
+					<span id="version_info"></span>
+				</span>
+				<div class="footer_cows">
+				</div>
+		</div>
+	</div>
+	<div class="section-side" id="upgrades">
+			<div class="section_inner">
+				<div id="upgrades_tabs">
+				<div class="tab active lang" id="flavors">Flavour</div><div class="tab lang" id="toppings">Add-on</div><div class="tab locked lang" id="employees">Worker</div><div class="tab lang" id="cones">Cone</div><div class="tab lang" id="upgrades">Upgrade</div>
+				</div>
+				<div class="employees_inner" style="display: none;">
+					<div class="unlockable" id="unlock_cart" x-worker="cart" x-type="sales_cart">
+						<img x-src="http://static.icecreamstand.ca/cart_thumb.png" x-type="sales_cart" class="tooltip" />
+						<div class="unlock_text"><span class="lang">Cart</span><span class="cost">25</span ></div>
+						<div class="sale_level"></div>
+						<button x-amount="1" class="worker_increment">+1</button>
+						<button x-amount="10" class="worker_increment">+10</button>
+						<button x-amount="1000" class="worker_increment lang">Max</button>
+					</div>
+					<div class="unlockable" id="unlock_employee" x-worker="employee" x-type="sales_employee">
+						<img x-src="http://static.icecreamstand.ca/employee_thumb.png" x-type="sales_employee" class="tooltip" />
+						<div class="unlock_text"><span class="lang">Employee</span><span class="cost">200</span></div>
+						<div class="sale_level"></div>
+						<button x-amount="1" class="worker_increment">+1</button>
+						<button x-amount="10" class="worker_increment">+10</button>
+						<button x-amount="1000" class="worker_increment lang">Max</button>
+					</div>
+					<div class="unlockable" id="unlock_truck" x-worker="truck" x-type="sales_truck">
+						<img x-src="http://static.icecreamstand.ca/truck_thumb.png" class="tooltip" />
+						<div class="unlock_text"><span class="lang">Truck</span><span class="cost">1,000</span></div>
+						<div class="sale_level"></div>
+						<button x-amount="1" class="worker_increment">+1</button>
+						<button x-amount="10" class="worker_increment">+10</button>
+						<button x-amount="1000" class="worker_increment lang">Max</button>
+					</div>
+					<div class="unlockable" id="unlock_robot" x-type="sales_robot" x-worker="robot" class="tooltip" />
+						<img x-src="http://static.icecreamstand.ca/robot_thumb.png" x-type="sales_robot" class="tooltip" />
+						<div class="unlock_text"><span class="lang">Robot</span><span class="cost">5,000</span></div>
+						<div class="sale_level"></div>
+						<button x-amount="1" class="worker_increment">+1</button>
+						<button x-amount="10" class="worker_increment">+10</button>
+						<button x-amount="1000" class="worker_increment lang">Max</button>
+					</div>
+					<div class="unlockable" id="unlock_rocket" x-worker="rocket" x-type="sales_rocket">
+						<img x-src="http://static.icecreamstand.ca/rocket_thumb.png" x-type="sales_rocket" class="tooltip" />
+						<div class="unlock_text"><span class="lang">Rocket</span><span class="cost">50,000</span></div>
+						<div class="sale_level"></div>
+						<button x-amount="1" class="worker_increment">+1</button>
+						<button x-amount="10" class="worker_increment">+10</button>
+						<button x-amount="1000" class="worker_increment lang">Max</button></div>
+					<div class="unlockable" id="unlock_alien" x-worker="alien" x-type="sales_alien">
+						<img x-src="http://static.icecreamstand.ca/alien_thumb.png" x-type="sales_alien" class="tooltip" />
+						<div class="unlock_text"><span class="lang">Alien</span><span class="cost">500,000</span></div>
+						<div class="sale_level"></div>
+						<button x-amount="1" class="worker_increment">+1</button>
+						<button x-amount="10" class="worker_increment">+10</button>
+						<button x-amount="1000" class="worker_increment lang">Max</button>
+					</div>
+				</div>
+				<div class="upgrades_inner" style="display: none;">
+					<div x-type="machine" id="unlock_machine" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/machine_thumb.png" class="tooltip" /><div class="unlock_text"><span class="lang">Machinery</span><span class="cost">50,000</span></div>
+						<div class="sale_level"></div><button class="lang">Upgrade</button>
+					</div>
+					<div x-type="autopilot" id="unlock_autopilot" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/autopilot.png" class="tooltip" />
+						<div class="unlock_text"><span class="lang">Autopilot</span><span class="cost">250</span></div>
+						<div class="sale_level"></div><button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button>
+					</div>
+					<div x-type="coldhands" id="unlock_coldhands" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/coldhands.png" class="tooltip"  />
+						<div class="unlock_text"><span class="lang">Cold Hands</span><span class="cost">250</span></div>
+						<div class="sale_level"></div><button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button>
+					</div>
+					<div x-type="frankenflavour" id="unlock_frankenflavour" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/frankenflavour.png" class="tooltip" /><div class="unlock_text"><span class="lang">Frankenflavour</span><span class="cost" id="frankenflavour_amount">1x Lab Parts</span></div><div class="sale_level">0</div><button class="lang">Unlock</button>
+					</div>
+					<div x-type="prestige" id="unlock_prestige" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/prestige_thumb.png" class="tooltip" /><div class="unlock_text"><span class="lang">Prestige</span><span class="cost" id="prestige_amount">*</span></div><div class="sale_level">0</div><div class="button prestige_button lang">Unlock</div>
+					</div>
+					<div x-type="heroic" id="unlock_heroic" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/heroic_thumb.png" class="tooltip" /><div class="unlock_text"><span class="lang">Heroic Tier</span><span class="cost">2,000,000</span>
+						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					</div>
+					<div x-type="legendary" id="unlock_legendary" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/legendary_thumb.png" class="tooltip" /><div class="unlock_text"><span class="lang">Legendary Tier</span><span class="cost">50,000,000</span>
+						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					</div>
+					<div x-type="research" id="unlock_research" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/research_thumb.png" class="tooltip" />
+						<div class="unlock_text"><span class="lang">Flavor Research</span><span class="cost">500</span></div>
+						<button class="lang">Unlock</button>
+					</div>
+					<div x-type="research_addon" id="unlock_addon" class="unlockable">
+						<img x-src="http://static.icecreamstand.ca/addon_thumb.png" class="tooltip" />
+						<div class="unlock_text"><span class="lang">Add-on Research</span><span class="cost">50</span></div>
+						<button class="lang">Unlock</button>
+					</div>
+				</div>
+				<div class="flavors_inner"></div>
+				<div class="toppings_inner" style="display: none;"></div>
+				<div class="cones_inner" style="display: none;">
+					<div x-type="cone" x-id="baby" class="unlockable" x-cost="1000">
+						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="baby"><img x-src="http://static.icecreamstand.ca/cones/thumb/baby.png.gz" /></div><div class="unlock_text"><span class="lang">Baby</span>
+						<span class="cost">1,000</span>
+						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					</div>
+					<div x-type="cone" x-id="waffle" class="unlockable" x-cost="100000">
+						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="waffle"><img x-src="http://static.icecreamstand.ca/cones/thumb/waffle.png.gz" /></div><div class="unlock_text"><span class="lang">Waffle</span>
+						<span class="cost">100,000</span>
+						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					</div>
+					<div x-type="cone" x-id="chocolate" class="unlockable" x-cost="50000000">
+						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="chocolate"><img x-src="http://static.icecreamstand.ca/cones/thumb/chocolate.png.gz" /></div><div class="unlock_text"><span class="lang">Chocolate Dipped</span>
+						<span class="cost">50,000,000</span>
+						<span class="requirement">Requires 25%P</span>
+						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					</div>
+					<div x-type="cone" x-id="whitechocolate" class="unlockable" x-cost="1000000000">
+						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="whitechocolate"><img x-src="http://static.icecreamstand.ca/cones/thumb/whitechocolate.png.gz" /></div><div class="unlock_text"><span class="lang">White Chocolate</span>
+						<span class="cost">1,000,000,000</span>
+						<span class="requirement">Requires 75%P</span>
+						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					</div>
+					<div x-type="cone" x-id="sugar" class="unlockable"  x-cost="5000000000">
+						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="sugar"><img x-src="http://static.icecreamstand.ca/cones/thumb/sugar.png.gz" /></div><div class="unlock_text"><span class="lang">Sugar</span>
+						<span class="cost">5,000,000,000</span>
+						<span class="requirement">Requires 150%P</span>
+						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					</div>
+					<div x-type="cone" x-id="sprinkle" class="unlockable"  x-cost="20000000000">
+						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="sprinkle"><img x-src="http://static.icecreamstand.ca/cones/thumb/sprinkle.png.gz" /></div><div class="unlock_text"><span class="lang">Sprinkle</span>
+						<span class="cost">20,000,000,000</span>
+						<span class="requirement">Requires 200%P</span>
+						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					</div>
+					<div x-type="cone" x-id="mintycat" class="unlockable" x-cost="200000000000">
+						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="mintycat"><img x-src="http://static.icecreamstand.ca/cones/thumb/mintycat.png.gz" /></div><div class="unlock_text"><span class="lang">Minty Cat</span>
+						<span class="cost">200,000,000,000</span>
+						<span class="requirement">Requires 300%P</span>
+						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					</div>
+					<div x-type="cone" x-id="doublechocolate" class="unlockable" x-cost="500000000000">
+						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="doublechocolate"><img x-src="http://static.icecreamstand.ca/cones/thumb/doublechocolate.png.gz" /></div><div class="unlock_text"><span class="lang">Double Chocolate</span>
+						<span class="cost">500,000,000,000</span>
+						<span class="requirement">Requires 399%P</span>
+						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="gold">0</div>
+		<div class="gold_sales tooltip lang" x-type="ipm">Income per Minute <span class="money_icon"></span><div class="buff_container"></div></div>
+		<div class="floating_footer">
+		<div class="login">
+			<span id="name" class="user_card"></span>
+			<div>
+				<a href='' class='view_settings lang'><i class="fa fa-cog"></i> Settings</a>
+				<a href='stats' class='view_stats lang'><i class="fa fa-pie-chart"></i> Stats</a>
+				<a href='highscores' class='view_highscores lang'><i class="fa fa-trophy"></i> Highscores</a>
+				<a href='#!achievements' class='view_achievements lang'><i class="fa fa-star"></i> Achievements</a>
+				<a href='#' id="invite" class="lang"><i class="fa fa-share-alt"></i> Share</a>
+				<a href='#' id="feedback" class="lang"><i class="fa fa-bug"></i>  Bug Report</a>
+				<a href='#' id="donate" class="lang"><i class="fa fa-usd"></i> Donate</a>
+				<a href='#' class="view_credits lang"><i class="fa fa-asterisk"></i> Credits</a>
+				<a href='logout' class="lang"><i class="fa fa-arrow-left"></i> Logout</a>
+				<span class="triangle-down"></span>
+			</div>
+		</div>
+		<div class="friends_counter">
+			<span id="count">0</span>
+			<div class="friends_list_holder">
+			<div class="friends_list_title">Online</div>
+				<div class="friends_list_online"></div>
+				<div class="friends_list_title">Away</div>
+				<div class="friends_list_away"></div>
+				<div class="friends_list_title">Offline <small>Show</small></div>
+				<div class="friends_list_offline" x-state="hidden"></div>
+				<span class="triangle-down"></span>
+			</div>
+		</div><div class="friends_button_container"><i class="fa fa-envelope-o"></i></div><form class="search_form"><input class="friends_add_text" autocomplete="off" placeholder="Player" style="display:none;"></form><div class="friends_add tooltip" x-type="search"><i class="fa fa-search"></i></div>
+		</div>
+		<div class="background_hill">
+			<div class="lore" x-link="lore"><div class="lore_book"></div><div class="lore_glow"></div></div>
+			<div class="shop tooltip" x-type="shop"></div>
+			<div class="silo tooltip" x-type="silo"><b class="silo_bar"></b></div>
+			<div class="cow" x-type="cow"></div>
+		</div>
+		<link rel="stylesheet" href="http://static.icecreamstand.ca/font-awesome-4.2.0/css/font-awesome.min.css" />
 		<script type="text/javascript">
 		  var _gaq = _gaq || [];
 		  _gaq.push(['_setAccount', 'UA-44957881-1']);
@@ -23,276 +349,5 @@
 		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 		  })();
 		</script>
-	</head>
-	<body>
-	<link rel="stylesheet" href="<%= (!locals.release_channel || release_channel > 0)? 'https://s3.amazonaws.com/icecreamstand.com/common.css.gz?patch=136' : 'http://static.icecreamstand.ca/common.css.gz' %>" />
-	<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script type="text/javascript" src="http://static.icecreamstand.ca/jquery.easing.1.3.js"></script>
-	<script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main<%= (locals.release_channel)? release_channel : 0 %>.js.gz?patch=136"></script>
-	<script src="https://cdn.socket.io/socket.io-1.1.0.js"></script>
-	<canvas id="canvas_main" style="width: 100%; position: fixed; height: 100%;"></canvas>
-	<div class="section-side">
-				<div class="icecream">
-					<div id="glow"></div>
-					<div id="topping"></div>	
-					<canvas id="canvas_sales"></canvas>
-				</div>
-			<div class="sell_value">
-				<div class="current_flavor tooltip" x-type="value"></div><span class="current_value"></span>
-			</div>
-
-	</div>
-	<div class="section-main">
-		<div class="shop_leftend"></div>
-		<div class="shop_rightend"></div>
-		<div class="section-main-inner">
-			<h1><img src="http://static.icecreamstand.ca/icslogo_small.png" srcset="http://static.icecreamstand.ca/icslogo.png 2x" /></h1>
-			<div class="highscores main_container">
-					<h4>Highscores
-						<span class="container_controls">
-							<div class="refresh_highscores flavor_tab">Refresh</div>
-							<div class="flavor_tab" id="hide">X</div>
-						</span>		
-					</h4>
-					<div class="button_container highscore_button_container">
-						<div>
-							<div class="flavor_tab active tab_round_left tooltip" x-type="highscore" id="this_day">Today</div>
-							<div class="flavor_tab tooltip" id="this_week" x-type="highscore">Weekly</div>
-							<div class="flavor_tab tooltip" id="all_time" x-type="highscore">All Time</div>
-							<div class="flavor_tab tooltip" id="up_and_coming" x-type="highscore">Up and Coming</div>
-							<div class="flavor_tab tooltip" id="prestige" x-type="highscore">Prestige</div>
-							<div class="flavor_tab tooltip" id="accumulation" x-type="highscore">Accumulation</div>
-							<div class="flavor_tab tab_round_right tooltip" id="cowlv" x-type="cow">Cow Lv</div>
-						</div>
-						<div id="button_right">
-							<div class="flavor_tab active tab_round_left" id="top_10">10</div>
-							<div class="flavor_tab tab_round_right" id="top_100">100</div>
-						</div>
-					</div>
-					<ol></ol>
-			</div>
-			<div class="flavor main_container">  
-				<h4>Ice Cream
-						<span class="container_controls">
-							<div class="flavor_tab" x-id="main_franken" id="frankenflavour_tab" style="display:none;">Frankenflavour</div>
-							<div class="flavor_tab active" x-id="main_base">Flavour</div>
-							<div class="flavor_tab" x-id="main_addon">Add-on</div>
-							<div class="flavor_tab" x-id="main_cone">Cone</div>
-							<div class="flavor_tab" x-id="main_combo">Combo</div>
-							<a class="expand">Expand</a>
-						</span>
-				</h4>
-					<div id="main_base" class="inner_flavor_container"></div>
-					<div id="main_addon" class="inner_flavor_container"></div> 
-					<div id="main_combo" class="inner_flavor_container"></div> 
-					<div id="main_cone" class="inner_flavor_container"></div> 
-			</div><div class="quests main_container half_size">
-					<h4>Quests
-					<span class="container_controls">
-						<a class="expand">Expand</a>
-					</span></h4>
-					<div class="quest_list"></div>
-				</div><div class="trending_and_events main_container half_size hidden">
-					<h4>Events and Trends</h4>
-
-					<div class="event">
-						<div class="event_container">
-							<span id="event_name"></span>
-							<span id="trend_time"></span>
-						</div>
-					</div>
-
-					<div class="trending">
-						<div class="trending_container">
-							<div class="trending_info">
-								<span class="currently_trending_container"></span>
-								<div class="vote_container" x-type="vote"></div>
-								<div id="trend_sold_outer"><div id="trend_left"></div><div id="trend_sold_inner"></div></div>
-							</div>
-							<div class="trend_title tooltip" x-type="trending"></div>
-							<span id="trend_time">
-								<span id="trend_bonus" class="money_icon"></span>
-							</span>
-						</div>
-					</div>
-
-			</div><div class="achievements main_container half_size" style="display: none;">
-					<h4>Achievements
-					<span class="container_controls">
-						<a class="expand">Expand</a>
-					</span></h4>
-					<div>
-						<div class="achievement_list">
-							<table class="unlocked"></table>
-							<table class="locked"></table>
-						</div>
-					</div>
-				</div>
-				<div class="chat main_container">
-					<h4>Chat
-					<span class="container_controls">
-						<a class="expand">Expand</a>
-					</span></h4>
-					<div class="chat_container_main">
-						<div id="chat_window">
-						</div>
-						<form id="new_message" method="POST" action="chat">
-							<div id="typing"></div>
-							<div class="badge_selector"><div class="badge_inner"><b>Badges</b> <span class="triangle-down"></span></div></div><input type="text" name="text" maxlength="240" placeholder="What would you like to say" autocomplete="off">
-							<input type="submit" class="button" value="Send">
-						</form>
-					</div>
-				</div>
-				<span class="footer">
-					<p>
-						<a href="http://icecreamstand.wikia.com" target="_blank">Wiki</a>
-						<a href="http://blog.samgb.com" target="_blank">Blog</a>
-						<a href="http://www.reddit.com/r/icecreamstand/" target="_blank">Reddit</a>
-					</p>
-					<span id="version_info"></span>
-				</span>
-		</div>
-	</div>
-	<div class="section-side" id="upgrades">
-			<div class="section_inner">
-				<div class="tab active" id="flavors">Flavour</div><div class="tab" id="toppings">Add-on</div><div class="tab locked" id="employees">Workers</div><div class="tab" id="cones">Cones</div><div class="tab" id="upgrades">Upgrade</div>
-				<div class="employees_inner" style="display: none;">
-					<div class="unlockable" id="unlock_cart" x-type="sales_cart">
-						<img x-src="http://static.icecreamstand.ca/cart_thumb.png" x-type="sales_cart" class="tooltip" /><div class="unlock_text">Cart<span class="cost">25</span ></div><div class="sale_level"></div>
-						<button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button></div>
-					<div class="unlockable" id="unlock_employee" x-type="sales_employee">
-						<img x-src="http://static.icecreamstand.ca/employee_thumb.png" x-type="sales_employee" class="tooltip" /><div class="unlock_text">Employee<span class="cost">200</span></div><div class="sale_level"></div>
-						<button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button></div>
-					<div class="unlockable" id="unlock_truck" x-type="sales_truck">
-						<img x-src="http://static.icecreamstand.ca/truck_thumb.png" class="tooltip" /><div class="unlock_text">Truck<span class="cost">1,000</span></div><div class="sale_level"></div>
-						<button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button></div>
-					<div class="unlockable" id="unlock_robot" x-type="sales_robot" x-type="sales_cart" class="tooltip" />
-						<img x-src="http://static.icecreamstand.ca/robot_thumb.png" x-type="sales_robot" class="tooltip" /><div class="unlock_text">Robot<span class="cost">5,000</span></div><div class="sale_level"></div>
-						<button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button></div>
-					<div class="unlockable" id="unlock_rocket" x-type="sales_rocket">
-						<img x-src="http://static.icecreamstand.ca/rocket_thumb.png" x-type="sales_rocket" class="tooltip" /><div class="unlock_text">Rocket<span class="cost">50,000</span></div><div class="sale_level"></div>
-						<button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button></div>
-					<div class="unlockable" id="unlock_alien" x-type="sales_alien">
-						<img x-src="http://static.icecreamstand.ca/alien_thumb.png" x-type="sales_alien" class="tooltip" /><div class="unlock_text">Alien<span class="cost">500,000</span></div><div class="sale_level"></div>
-						<button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button></div>
-				</div>
-				<div class="upgrades_inner" style="display: none;">
-					<div x-type="machine" id="unlock_machine" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/machine_thumb.png" class="tooltip" /><div class="unlock_text">Machinery<span class="cost">50,000</span></div>
-						<div class="sale_level"></div><button>Unlock</button>
-					</div>
-					<div x-type="autopilot" id="unlock_autopilot" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/autopilot.png" class="tooltip" />
-						<div class="unlock_text">Autopilot<span class="cost">250</span></div>
-						<div class="sale_level"></div><button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button>
-					</div>
-					<div x-type="coldhands" id="unlock_coldhands" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/coldhands.png" class="tooltip"  />
-						<div class="unlock_text">Cold Hands<span class="cost">250</span></div>
-						<div class="sale_level"></div><button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button>
-					</div>
-					<div x-type="frankenflavour" id="unlock_frankenflavour" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/frankenflavour.png" class="tooltip" /><div class="unlock_text">Frankenflavour<span class="cost" id="frankenflavour_amount">1x Lab Parts</span></div><div class="sale_level">0</div><button>Unlock</button>
-					</div>
-					<div x-type="adopt_cow" id="unlock_cow" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/icon_breed.png" class="tooltip" /><div class="unlock_text">Adopt a Cow<span class="cost">1,000</span></div><div class="sale_level"></div><button>Unlock</button>
-					</div>
-					<div x-type="prestige" id="unlock_prestige" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/prestige_thumb.png" class="tooltip" /><div class="unlock_text">Prestige<span class="cost" id="prestige_amount">*</span></div><div class="sale_level">0</div><div class="button prestige_button">Confirm</div>
-					</div>
-					<div x-type="heroic" id="unlock_heroic" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/heroic_thumb.png" class="tooltip" /><div class="unlock_text">Heroic Tier<span class="cost">2,000,000</span>
-						</div><div class="sale_level"></div><button>Unlock</button>
-					</div>
-					<div x-type="legendary" id="unlock_legendary" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/legendary_thumb.png" class="tooltip" /><div class="unlock_text">Legendary Tier<span class="cost">50,000,000</span>
-						</div><div class="sale_level"></div><button>Unlock</button>
-					</div>
-					<div x-type="research" id="unlock_research" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/research_thumb.png" class="tooltip" />
-						<div class="unlock_text">Flavor Research <span class="cost">500</span></div>
-						<button>Unlock</button>
-					</div>
-					<div x-type="research_addon" id="unlock_addon" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/addon_thumb.png" class="tooltip" />
-						<div class="unlock_text">Add-on Research <span class="cost">50</span></div>
-						<button>Unlock</button>
-					</div>
-				</div>
-				<div class="flavors_inner"></div>
-				<div class="toppings_inner" style="display: none;"></div>
-				<div class="cones_inner" style="display: none;">
-					<div x-type="cone" x-id="babycone" id="unlock_cone_babycone" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/cones/baby_thumb.png" class="tooltip" /><div class="unlock_text">Baby Cone
-						<span class="cost">1,000,000</span>
-						<span class="requirement">Requires 25%P</span>
-						</div><div class="sale_level"></div><button>Unlock</button>
-					</div>
-					<div x-type="cone" x-id="chocolate"  id="unlock_cone_chocolate" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/cones/chocolate_thumb.png" class="tooltip" /><div class="unlock_text">Chocolate Dipped Cone
-						<span class="cost">10,000,000</span>
-						<span class="requirement">Requires 75%P</span>
-						</div><div class="sale_level"></div><button>Unlock</button>
-					</div>
-					<div x-type="cone" x-id="sprinkle" id="unlock_cone_sprinkle" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/cones/sprinkle_thumb.png" class="tooltip" /><div class="unlock_text">Sprinkle Cone
-						<span class="cost">500,000,000</span>
-						<span class="requirement">Requires 150%P</span>
-						</div><div class="sale_level"></div><button>Unlock</button>
-					</div>
-					<div x-type="cone" x-id="sugarcone" id="unlock_cone_sugarcone" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/cones/sugar_thumb.png" class="tooltip" /><div class="unlock_text">Sugar Cone
-						<span class="cost">1,000,000,000</span>
-						<span class="requirement">Requires 200%P</span>
-						</div><div class="sale_level"></div><button>Unlock</button>
-					</div>
-					<div x-type="cone" x-id="waffle" id="unlock_cone_waffle" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/cones/waffle_thumb.png" class="tooltip" /><div class="unlock_text">Waffle Cone
-						<span class="cost">5,000,000,000</span>
-						<span class="requirement">Requires 300%P</span>
-						</div><div class="sale_level"></div><button>Unlock</button>
-					</div>
-					<div x-type="cone" x-id="whitechocolate" id="unlock_cone_whitechocolate" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/cones/whitechocolate_thumb.png" class="tooltip" /><div class="unlock_text">White Chocolate Cone
-						<span class="cost">20,000,000,000</span>
-						<span class="requirement">Requires 399%P</span>
-						</div><div class="sale_level"></div><button>Unlock</button>
-					</div>
-
-				</div>
-				<div class="controls_back">BACK</div>
-				<div class="controls_show">ALL</div>
-				<div class="controls_forward">NEXT</div>
-			</div>
-		</div>
-		<div class="gold">0</div>
-		<div class="gold_sales tooltip" x-type="ipm">Income per Minute <span class="money_icon"></span></div>
-		<div class="floating_footer">
-		<div class="login">
-			<span id="name" class="user_card"></span>
-			<div>
-				<a href='' class='view_settings'>Settings</a>
-				<a href='stats' class='view_stats'>Stats</a>
-				<a href='highscores' class='view_highscores'>Highscores</a>
-				<a href='#!achievements' class='view_achievements'>Achievements</a>
-				<a href='#' id="invite">Invite</a>
-				<a href='#' id="feedback">Feedback</a>
-				<a href='#' id="donate">Donate</a>
-				<a href='logout'>Logout</a>
-				<span class="triangle-down"></span>
-			</div>
-		</div>
-		<div class="friends_counter">
-			<span id="count">0</span>
-			<div class="friends_list_holder">
-				<h4>Friends</h4>
-				<div class="friends_list_online"></div>
-				<div class="friends_list_offline"></div>
-				<span class="triangle-down"></span>
-			</div>
-		</div><div class="friends_button_container"><div class="friend_message friends_button"></div></div><input class="friends_add_text" autocomplete="off" placeholder="Friend's name" style="display:none;"><div class="friends_add tooltip" x-type="friend"><img src="http://static.icecreamstand.ca/addfriend.svg" height=24 width=24 alt="Add Friend" /></div>
-		</div>
-		<div class="cow tooltip" x-type="cow"></div>
-		<div class="cow_alt"></div>
 	</body>
 </html>

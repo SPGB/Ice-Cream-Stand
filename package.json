@@ -1,24 +1,28 @@
 {
   "name": "Ice-Cream-Stand",
+  "description": "Incremental Game",
   "version": "1.3.2",
-  "private": true,
   "scripts": {
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "~4.0.0",
+    "after": "*",
+    "bcrypt": "*",
     "body-parser": "~1.0.0",
-    "cookie-parser": "~1.0.0",
-    "morgan": "~1.0.0",
-    "express-session": "~1.0.0",
-    "bcrypt": "*", 
-    "extjs": "*",
     "connect-mongo": "*",
+    "cookie-parser": "*",
+    "ejs-locals": "^1.0.2",
+    "express": "^4.12.3",
+    "express-session": "*",
+    "extjs": "*",
     "mongoose": "*",
-    "gulp": "*",
-    "gulp-jsvalidate": "*",
-    "gulp-uglify": "*",
-    "gulp-awspublish": "*",
-    "gulp-sass": "*"
+    "morgan": "~1.0.0",
+    "ms": "^0.7.0",
+    "passport": "^0.2.1",
+    "passport-facebook": "^1.0.3",
+    "request": "*",
+    "socket.io": "*",
+    "utf8": "*",
+    "websocket": "^1.0.18"
   }
 }

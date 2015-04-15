@@ -4,6 +4,9 @@
 	* | |\     }| {__    \     }| .-. \| {__ /  /\  \| |\ /| |   .-._} } | | /  /\  \| |\  ||     /
 	* `-' `---' `----'    `---' `-' `-'`----'`-'  `-'`-' ` `-'   `----'  `-' `-'  `-'`-' `-'`----'
 	* Made with love - @SPGB
+	* Routes -> controllers are in routes/
+	* Views are in views/
+	* sockets are over socket.io in io.js
  */
  
 var express = require('express.io'),
@@ -30,7 +33,8 @@ var schedule = require('node-schedule');
 var mongoose = require('mongoose');
 var server = http.createServer(app);
 var db = mongoose.connection;
-var io = require('socket.io').listen(server);
+// var io = require('socket.io');
+// io.listen(server);
 var config = require('./config.js');
 var facebook = require('./facebook');
 var cookieParser = require('cookie-parser')(config.cookie);
@@ -47,7 +51,9 @@ var sessionStore = session( {
 	store: new MongoStore(config.db),
 	secret: config.secret,
 	cookie: { maxAge: 86400000 },
-	rolling: true
+	rolling: true,
+	resave: false,
+	saveUninitialized: false
 });
 var cache_trend_id;
 var motivationals = [
@@ -67,7 +73,7 @@ var motivationals = [
 	'Never give up, for that is just the place and time that the tide will turn.',
 	'There is no justice in following unjust laws.'
 ];
-var is_default_locked = false;
+
 mongoose.connect('mongodb://localhost:' + config.db.port + '/admin', { auto_reconnect: true, user: config.db.username, pass: config.db.password });
 
 
@@ -108,7 +114,7 @@ passport.use(new FacebookStrategy({
       if (!user) {
       	//CREATE A USER HERE...
       	console.log(profile);
-      	return done('no user with your email (' + profile.emails[0].value + ') or token (' + accessToken + ') found');
+      	return done('no user with your email (' + profile.emails[0].value + ') found');
       }
       if (user.facebook_token != accessToken) {
       	user.facebook_token = accessToken;
@@ -207,7 +213,7 @@ var userSchema = new mongoose.Schema({
 	referal_code: { type: String },
 	display_settings: { type: [Number]},
 	animations_off: { type: Boolean },
-	chat_off: { type: Boolean },
+	chat_off: { type: Boolean, default: true },
 	badge_off: { type: Boolean },
 	chat_squelch: { type: Boolean },
 	release_channel: { type: Number, default: 0 }, 
@@ -233,7 +239,7 @@ var userSchema = new mongoose.Schema({
 	is_email_holiday: { type: Boolean, default: true }, 
 	is_email_password: { type: Boolean, default: true }, 
 	is_email_messages: { type: Boolean, default: true }, 
-	is_auto_daynight: { type: Boolean, default: true }, 
+	is_auto_daynight: { type: Boolean, default: false }, 
 	is_winter: { type: Boolean }, 
 	is_display_friendcows: { type: Boolean, default: true }, 
 	is_away: { type: Boolean, default: false }, 
@@ -259,7 +265,11 @@ var userSchema = new mongoose.Schema({
 	chapters_unlocked: { type: [String] },
 	facebook_token: { type: String},
 	facebook_refresh_token: { type: String},
-	facebook_id: { type: String }
+	facebook_id: { type: String },
+	titles: { type: [String] },
+	backgrounds: { type: [String] },
+	easter2: { type: [Number] },
+	active_background: { type: String },
 });
 userSchema.methods.getPublicFields = function () {
     var returnObject = { //holy giant return statement batman
@@ -318,7 +328,7 @@ userSchema.methods.getPublicFields = function () {
 };
 userSchema.pre('save', function(next) {
     var user = this;
-	if (!user.isModified('friend_gold')) user.updated_at = new Date;
+
 	// only hash the password if it has been modified (or is new)
 	if (!user.isModified('password')) return next();
 
@@ -525,1002 +535,25 @@ function checkAdmin(req, res, next) {
   }
 }
 
-/* CHAT */
-//cookieParser is out cookie parser
-io.set('authorization', function (handshake, callback) {
-	//var ip = handshake.client;
-	handshake.foo = 'bar';
-	if (!handshake._query.id) {
-		console.log('Missing ID: ' + handshake._query);
-		return callback('Missing ID.', false);
-	}
-	if (!handshake._query.name) {
-		console.log('Missing name');
-		return callback('Missing Name.', false);
-	}
-	User.findOne({ _id: handshake._query.id }).lean(true).select('name ip').exec(function (err, user) {
-		if (!handshake.client._peername || !user) {
-			return callback('could not complete handshake', false);
-		}
-		if (user.ip != handshake.client._peername.address) {
-			console.log(handshake.client._peername.address + ' vs ' + user.ip);
-			//console.log(handshake.address + ' vs ' + user.ip);
-			return callback('Incorrect IP', false);
-		}
-		if (user.name != handshake._query.name) {
-			console.log('Incorrect name: ' + handshake._query.name);
-			//console.log(handshake.address + ' vs ' + user.ip);
-			return callback('Incorrect name', false);
-		}
-		callback(null, true);
-	});
-});
-
-//var tgives = [];
 var donor_welcome_queue = [];
-
-io.on('connection', function ( socket ) {	
-  	
-  	socket.broadcast.emit('join', { _id: socket.handshake.query.id, name: socket.handshake.query.name });
-  	User.findOne({ _id: socket.handshake.query.id }).select('socket_id').exec(function (err, user) {
-	  	user.socket_id = socket.id;
-	  	console.log('socket: ' + socket.handshake.query.name + ' LOG IN');
-	  	user.save(function (err) { if (err) console.log(err); });
-  	});
-
-  	socket.on('disconnect', function() {
-  		socket.broadcast.emit('leave', { _id: socket.handshake.query.id, name: socket.handshake.query.name });
-  		User.findOne({ _id: socket.handshake.query.id }).select('socket_id').exec(function (err, user) {
-  			user.socket_id = null;
-  			console.log('socket: ' + socket.handshake.query.name + ' LOG OUT');
-  			user.save(function (err) { if (err) console.log(err); });
-  		});
-  	});
-  	socket.on('typing', function(msg){
-  		if (!msg.room) msg.room = 'default';
-  		io.sockets.in(msg.room).emit('typing', { _id: socket.handshake.query.id, name: socket.handshake.query.name });
-  	});
-  	socket.on('sleep', function(msg){
-  		User.findOne({ _id: socket.handshake.query.id }).select('is_away room').exec(function (err, user) {
-  			var changes = false;
-  			if (msg.room) {
-				
-				if (user.room != msg.room) {
-					io.sockets.connected[ socket.id ].emit("chat message", {
-						_id: Math.random() + 'update',
-						text: 'Welcome to the ' + msg.room + ' room.',
-						badge: 1,
-						user: ':',
-						is_admin: true,
-						created_at: new Date()
-					});
-					socket.leave(user.room);
-					user.room = msg.room;
-					changes = true;
-				}
-				socket.join( msg.room );
-			}
-  			if (!user.is_away || user.is_away != msg.sleep) {
-  				user.is_away = msg.sleep;
-  				changes = true;
-  			}
-  			if (changes) {
-  				user.save(function (err) {
-  					if (err) return console.log(err);
-  					io.emit('sleep', {
-  						_id: user._id,
-  						sleep: user.is_away
-  					});
-  				});
-  			}
-  		});
-
-  		if ( donor_welcome_queue.length > 0 && donor_welcome_queue[0].text ) {
-		  	var donor = donor_welcome_queue[0];
-		  	donor_welcome_queue = [];
-		  	if (!donor.room) donor.room = 'default';
-		  	console.log( 'New welcome_queue message: ' + donor.text );
-		  	io.emit("chat message", {
-				_id: Math.random() * 9999999 + 'donor',
-				text: donor.text,
-				badge: 1,
-				user: ':',
-				room: donor.room,
-				created_at: new Date(),
-				cow_sync: donor.cow_sync
-			});	
-			var newchat = new Chat({
-				text: donor.text,
-				badge: 1,
-				user: ':',
-				user_id: ':',
-				room: donor.room,
-				created_at: new Date()
-			});
-			newchat.save(function (err, m) { if (err) return console.log('socket msg error: ' + err); });
-		}
-  	});
-  	socket.on('cow/update', function(msg){
-  		User.findOne({ _id: socket.handshake.query.id }).select('chapters_unlocked silo_hay').exec(function (err, user) {
-
-		Cow.findOne({ user_id: socket.handshake.query.id, is_active: true }).exec(function (err, cow) {
-		if (!cow) return io.sockets.connected[ socket.id ].emit("alert", { error: '40C - Cow not found' });
-
-		if (msg.h) cow.happiness = Math.floor( Number(msg.h) );
-		if (msg.name && msg.name.length <= 20) cow.name = msg.name;
-		if (msg.skin) cow.skin = msg.skin;
-		if (!cow.experience) cow.experience = 0;
-
-
-		if (msg.silo) {
-			var s = Number(msg.silo);
-			user.silo_hay = (isNaN(s))? 0 : s;
-			user.save(function (err) { if(err) console.log(err); });
-		}
-
-		if (msg.experience) {
-			// if (cow.experience < msg.experience - 10 || cow.experience > msg.experience) {
-			// 	return io.sockets.connected[ socket.id ].emit("alert", { error: 'Your cow is out of sync' });
-			// }
-			cow.experience = msg.experience;
-			var new_level = 100 * ( cow.experience / ( cow.experience + 1000 ) );
-			if (new_level > 10 && cow.level != new_level) {
-
-				//new chapter unlock
-				
-					if (!user.chapters_unlocked.length) user.chapters_unlocked = [];
-					var chance_to_unlock = 0.5 - (0.1 * user.chapters_unlocked.length);
-					if (chance_to_unlock < 0.025) chance_to_unlock = 0.025;
-					if (Math.random() < chance_to_unlock) {
-						Chapter.find({ _id: { $nin: user.chapters_unlocked }, saga: 'Side Stories' }).sort('chapter_number').limit(1).exec(function (err, chap) {
-		  					if (chap.length > 0) {
-		  						user.chapters_unlocked.push(chap[0]._id);
-		  						user.markModified('chapters_unlocked');
-		  						io.sockets.connected[ socket.id ].emit("update", { chapter: chap[0].title });
-		  					}
-		  					user.save();
-		  				});
-					}
-			}
-			cow.level = new_level;
-		}
-		if (msg.memory) {
-			if (!cow.memories) cow.memories = [];
-			cow.memories.push(msg.memory);
-			cow.markModified('memories');
-		}
-		if (msg.items) {
-			// if (msg.items_check) {
-			// 	var b = new Buffer(msg.items_check, 'base64');
-			// 	var s = b.toString();
-			// 	if (JSON.stringify(msg.items) != s) {
-			// 		return io.sockets.connected[ socket.id ].emit("aler", { error: 'Item check failed' }); //res.json({ err: 'Item check failed'});
-			// 	}
-			// }
-
-			// for (var i = 0; i < msg.items.length; i++) {
-			// 	if (msg.items[i]) {
-			// 		var item = msg.items[i].split('/');
-			// 		if (item[1] > 10 || item[2] > 10 || item[3] > 10) {
-			// 			msg.items.splice(i, 1);
-			// 			i--;
-			// 		}
-			// 	}
-			// }
-			
-			cow.items = msg.items;
-			if (cow.items.length > 12) {
-				cow.items = cow.items.slice(0, 12);
-			}
-			cow.markModified('items');
-		}
-		io.sockets.connected[ socket.id ].emit("cow", { level: cow.level, experience: cow.experience, happiness: cow.happiness, item_change: Boolean(msg.items) });
-
-		cow.save(function (err) { if (err) console.log(err); });
-  	});
-	});
-});
-  	socket.on('epic', function(msg){
-  		User.findOne({ _id: socket.handshake.query.id }).select('name epic_id epic_collected badges').exec(function (err, user) {
-  			user.epic_collected += 10;
-  			if (user.epic_collected > 200 && user.badges.indexOf(10) === -1) {
-  				user.badges.push(10);
-  				user.markModified('badges');
-  				io.sockets.connected[ socket.id ].emit("chat message", {
-			  		_id: Math.random() * 9999999 + 'TGives',
-			  		text: '(Winter badge) @' + socket.handshake.query.name + ', Congratulations on earning the team badge. Now bring your team to victory.',
-			  		badge: 10,
-			  		user: ':',
-			  		is_admin: true,
-			  		created_at: new Date()
-			  	});
-  			}
-  			user.save(function () { 
-  			  	if (user.epic_collected >= 100 && user.epic_collected < 500) {
-	  				Cow.findOne({ user_id: user._id, is_active: true}, function (err, cow) {
-
-	  					var skin = (user.epic_id === '5481119c19e7a1c726d1b3f7')? 'Polar Bear' : 'Moose';
-	  					if (!cow.skins_unlocked || cow.skins_unlocked.indexOf(skin) === -1) {
-	  						if (!cow.skins_unlocked) cow.skins_unlocked = [];
-	  						cow.skins_unlocked.push(skin);
-	  						cow.markModified('skins_unlocked');
-	  						cow.save(function (err) {
-	  							if (err) return console.log(err);
-	  							console.log('winter event unlocked for ' + cow.name);
-	  						});
-	  					} else {
-	  						console.log('skin already unlocked for '+ user.name);
-	  					}
-	  				});
-  				} else {
-  					console.log('epic collected: ' + user.epic_collected);
-  				}
-  			});
-  			Epic.findOne({ _id: user.epic_id }).select('total').exec(function (err, epic) {
-  				epic.total += 10;
-  				epic.save(function () { });
-  			});
-  		});
-  	});
-
-  	socket.on('epic/aoc/invite', function(msg){
-  		User.findOne({ _id: socket.handshake.query.id}).select('epic_last_recruit').exec(function (err, user2) {
-	  		var d = new Date();
-	  		var delta = (d - new Date(user2.epic_last_recruit)) / 60000;
-	  		if (user2.epic_last_recruit && delta < 10) {
-		  		return io.sockets.connected[ socket.id ].emit("alert", { error: 'You can not recruit again so soon, please wait ' + (delta).toFixed(1) + ' minutes.' });
-		  	}
-	  		user2.epic_last_recruit = new Date();
-
-	  		user2.save(function () {
-		  		
-		  		User.findOne({ name: msg.user.toLowerCase() }).select('name epic_id socket_id is_mod is_admin').exec(function (err, user) {
-		  			if (!user || socket.handshake.query.name == user.name || user.is_mod || user.is_admin || (user.epic_id && user.epic_id.indexOf('aoc') > -1)) {
-		  				return io.sockets.connected[ socket.id ].emit("alert", { error: 'Can not recruit that player' });
-		  			}
-		  			user.epic_id = 'aoc_pend,' + socket.handshake.query.name;
-		  			if (user.socket_id && io.sockets.connected[ user.socket_id ]) io.sockets.connected[ user.socket_id ].emit("update", { refresh: true });
-		  			io.sockets.connected[ socket.id ].emit("alert", { message: 'You have sent ' + user.name + ' an invite.', title: 'Sent' });  	
-		  			user.save(function (err) {
-		  				if (err) console.log(err);
-		  			});
-
-		  		});
-	  		}); //user2 save callback
-  		}); //user2 find
-  	});
-
-  	socket.on('epic/aoc/attack', function(msg){ //for upgrading the AoC civvies weapons
-  		User.findOne({ _id: socket.handshake.query.id}).select('epic_collected epic_last_attack').exec(function (err, user) {
-  			Epic.findOne({ _id: '54c3f61c195ce39c30982562' }).select('total').exec(function (err, civvies) {
-  				if (!civvies) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Can not attack at the moment' });
-	  			var power = user.epic_collected;
-	  			var cap = (200 + (civvies.total / 100)).toFixed(2);
-	  			if (power < cap) {
-	  				user.epic_collected = 0;
-	  			} else {
-	  				power = cap;
-	  				user.epic_collected -= cap;
-	  			}
-	  			civvies.total += 1;
-	  			civvies.save(function (err) { if (err) console.log(err); });
-	  			if (msg.is_chained) {
-	  				power = power * 1.5;
-	  			}
-	  			var d = new Date();
-	  			var delta = d - new Date(user.epic_last_attack);
-	  			if (user.epic_last_attack && delta < 60000 * 10) {
-	  				return io.sockets.connected[ socket.id ].emit("alert", { error: 'You can not attack again so soon' });
-	  			}
-	  			user.epic_last_attack = new Date();
-	  			user.save(function (err) {
-	  				Epic.find({ total: { $gt: 0 }, name: { $ne: 'Civilians' } }).select('total name text').sort('players').limit(1).exec(function (err, forts) {
-	  					forts[0].total = Math.floor( forts[0].total - power);
-	  					if (forts[0].total <= 0) {
-	  						io.emit('alert', { message: forts[0].text, title: forts[0].name + ' has fallen!' });
-	  					}
-	  					io.emit('update', { fort: forts[0]._id, fort_health: forts[0].total });
-	  					forts[0].save();
-	  					io.sockets.connected[ socket.id ].emit("alert", { message: 'You attack fort "' + forts[0].name + '" for ' + power + ' health.', title: 'Attack!' });
-	  					if (power > 0) io.emit("epic/aoc/log", { player: socket.handshake.query.name, power: power, fort: forts[0].name });
-	  				});
-	  			});
-  			});
-  		});
-  	});
-  	socket.on('epic/aoc/signup', function(msg){ //for upgrading the AoC civvies weapons
-  		User.findOne({ _id: socket.handshake.query.id }).select('epic_collected epic_id').exec(function (err, user) {
-  			if (msg.join) {
-  				user.epic_id = 'aoc_civ';
-  				Epic.findOne({ _id: '54c3f61c195ce39c30982562' }).select('players').exec(function (err, epic) {
-  					epic.players = epic.players + 1;
-  					epic.save();
-  				});
-  				io.emit("chat message", {
-					_id: Math.random() + 'aoc',
-					text: '@' + socket.handshake.query.name + ' marks their door with a red X.',
-					badge: 15,
-					user: ':',
-					created_at: new Date(),
-					sync: user._id
-				});
-				var newmessage = new Chat({
-					text: '@' + socket.handshake.query.name + ' marks their door with a red X.',
-					user: ':',
-					created_at: new Date(),
-					badge: 15,
-					room: 'default'
-				});
-				newmessage.save(function (err, m) {
-					console.log(err + m);
-				});
-  			} else {
-				user.epic_id = null;
-  			}
-  			user.epic_collected = 0;
-  			user.save(); 
-  		});
-  	});
-  	socket.on('epic/aoc/upgrade', function(msg){ //for upgrading the AoC civvies weapons
-  		User.findOne({ _id: socket.handshake.query.id }).select('epic_collected gold').exec(function (err, user) {
-  			var power = Number(msg.power);
-  			var cost = { 1: 100000, 5: 450000, 10: 875000 };
-  			if (cost[power] > user.gold) return;
-  			user.gold -= cost[power];
-  			user.epic_collected += power;
-  			user.save();
-  			io.sockets.connected[ socket.id ].emit("update", { gold: user.gold, epic: user.epic_collected });
-  		});
-  	});
-
-  	socket.on('epic/aoc/knight', function(msg){ //for upgrading the AoC knights (+2 scaling fort health)
-  		Epic.findOne({ _id: '54c3f61c195ce39c30982562' }).select('total').exec(function (err, civvies) {
-	  		User.findOne({ _id: socket.handshake.query.id }).select('epic_last_attack gold').exec(function (err, user) {
-	  			if (err || !user) return console.log('no user found');
-	  			var health = (msg.health)? Number(msg.health) : 2;
-	  			var gold = Number(user.gold);
-	  			var cost = 10000000;
-
-	  			if (user.epic_last_attack) {
-	  				var d = new Date();
-		  			var delta =  new Date(user.epic_last_attack) - d; //last_attack is the future date
-			        if (delta > 0) {
-			             return io.sockets.connected[ socket.id ].emit("alert", { error: 'Repair too soon' });
-			        }
-		    	}
-	  			var cooldown  = 0.5 + (1 / ((0.0002 * civvies.total) + 1)); //minutes to wait
-        		user.epic_last_attack = new Date(new Date().getTime() + (cooldown * 60000)); //that number of minutes in the future
-        		console.log('cooldown for knights: ' + cooldown);
-
-		  		//console.log(socket.handshake.query.name + ' -> ' + gold + ' -> ' + (gold < cost) + ' -> ' + (gold - cost));
-	  			if (gold < cost) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Not enough money.' });
-	  			gold -= cost;
-	  			user.gold = gold;
-		  		user.save(function (err, user) {
-		  			if (err) return console.log(err);
-			  		Epic.findOne({ _id: msg.fort }).select('total name players').exec(function (err, fort) {
-			  			fort.total += Number(health);
-			  			var cap = 30000 * fort.players;
-			  			if (fort.name != 'The Castle' && fort.total > cap) fort.total = cap;
-			  			io.sockets.connected[ socket.id ].emit("update", { gold: user.gold, fort: fort._id, fort_health: fort.total });
-			  			io.emit("epic/aoc/log", { player: socket.handshake.query.name, health: health, fort: fort.name });
-			  			fort.save();
-			  		});
-		  		});
-		  	});
-		});
-  	});
-  	socket.on('accumulation', function(msg){
-
-  		User.findOne({ _id: socket.handshake.query.id }).select('highest_accumulation last_icecube_at accumulation_time chapters_unlocked').exec(function (err, user) {
-  			if (!user.highest_accumulation || msg.a > user.highest_accumulation) user.highest_accumulation = msg.a;
-  			if (!user.accumulation_time || msg.t > user.accumulation_time) user.accumulation_time = msg.t;
-  			if (msg.is_first_win) {
-  				user.last_icecube_at = new Date();
-  			}
-
-  			if (msg.t > 20) {
-	  			if (!user.chapters_unlocked) user.chapters_unlocked = [];
-	  			var chance_to_unlock = 0.75 - (0.15 * user.chapters_unlocked.length);
-	  			if (chance_to_unlock < 0.05) chance_to_unlock = 0.05;
-	  			if (msg.t > 60) chance_to_unlock += 0.025;
-	  			if (msg.t > 120) chance_to_unlock += 0.025;
-
-	  			var chapter_unlock = (Math.random() < chance_to_unlock);
-	  			if (!chapter_unlock && msg.flavour && msg.addon && msg.flavour == '523d5ea90a0d080000000002' && msg.addon == '523d5bb9fbdef6f047000023') chapter_unlock = (Math.random() < chance_to_unlock);
-	  			if (chapter_unlock) {
-	  				Chapter.find({ _id: { $nin: user.chapters_unlocked }, saga: 'The Chronicles of Ice Cream Stand' }).sort('chapter_number').limit(1).exec(function (err, chap) {
-	  					if (chap.length > 0) {
-	  						user.chapters_unlocked.push(chap[0]._id);
-	  						user.markModified('chapters_unlocked');
-	  						io.sockets.connected[ socket.id ].emit("update", { chapter: chap[0].title });
-	  					}
-	  					
-	  					user.save();
-	  				});
-	  				return;
-	  			}
-  			}
-  			user.save(function (err) {
-  				if (err) return console.log(err);
-  			});
-  		});
-  	});
-  	socket.on('sell', function(post){
-		if (!post.v || parseFloat(post.v) < 1.45) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Please update to the latest version.' });
-		User.findOne({ _id: socket.handshake.query.id }).select('today_trending socket_id gold total_gold today_gold total_prestige_gold week_gold last_flavor last_frankenflavour last_frankenflavour_at upgrade_frankenflavour highest_accumulation items upgrade_coldhands trend_bonus prestige_bonus icecream_sold flavors_sold last_addon').exec(function (err, u) {
-		
-		if (!u || err) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Please log in.' });;
-		if (u.socket_id != socket.id) {
-			if (u.socket_id && io.sockets.connected[ u.socket_id ]) {
-				return io.sockets.connected[ u.socket_id ].emit("update", { refresh: true, error: 'You. Must. Refresh. (I see you in a new location)' });
-			}
-			u.socket_id = socket.id;
-			console.log(socket.handshake.query.name + ' socket id mismatch >:( ');
-		} 
-		var amount = parseInt(post.a);
-		var infer_amount;
-		var now = new Date();
-		var now_time = now.getTime();
-
-		if (parseFloat(post.addon) > 4.5) return io.sockets.connected[ socket.id ].emit("alert", { error: 'invalid add-on amount' });
-		if (amount > ((u.upgrade_coldhands+1) * 100) + u.upgrade_autopilot || amount < 0) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Slow down, you move too fast.' });
-		var cone = parseFloat(post.cone);
-		if (cone > 4.5) return io.sockets.connected[ socket.id ].emit("alert", { error: 'invalid cone amount' });
-		var base = parseFloat(post.cbv);
-		if (base > 7) return io.sockets.connected[ socket.id ].emit("alert", { error: 'invalid base amount' });
-		var combo = parseFloat(post.c);
-		if (combo > 3) return io.sockets.connected[ socket.id ].emit("alert", { error: 'invalid combo amount (' + combo  + ')' });
-		var expertise = (post.e)? parseInt(post.e) : 0;
-		if (expertise > 15) return io.sockets.connected[ socket.id ].emit("alert", { error: 'invalid expertise amount (' + expertise  + ')' });
-
-		var trending_flavour = parseFloat(post.t);
-		var flavour_position = parseInt(post.fp);
-		var is_franken_refresh = null;
-
-		if (post.ha && parseFloat(post.ha) > u.highest_accumulation) {
-			u.highest_accumulation = parseFloat(post.ha);
-		}
-		if (u.last_frankenflavour && now_time - new Date(u.last_frankenflavour_at) > 1200000) { //1200000 == 20 mins
-			u.last_frankenflavour = null;
-			is_franken_refresh = true;
-		}
-
-		//var on_autopilot = (!workers && u.upgrade_autopilot && amount === u.upgrade_autopilot);
-		if (trending_flavour) base += trending_flavour; //trending flavor
-		if (post.ta == 'true') base += u.trend_bonus;   //trending event	
-		if (!isNaN(combo)) { base += combo; } //combo bonus
-		if (!isNaN(cone)) { base += cone; } //combo bonus
-		
-
-		var prestige_bonus = base * (u.prestige_bonus / 100); //base includes the modifiers here
-		var expertise_bonus = base * (.1 * expertise);
-		infer_amount =  base + parseFloat(post.addon) + expertise_bonus + prestige_bonus; 
-		var infer_change = amount * infer_amount;
-		var infer_gold = parseFloat(u.gold + infer_change).toFixed(2);
-				
-		if (isNaN(infer_gold)) { return io.sockets.connected[ socket.id ].emit("alert", { error: 'incorrect amount of money', reload: true }); }
-		//update totals
-		if (!u.total_prestige_gold) u.total_prestige_gold = 0;
-
-		//The real magic happens here
-		u.gold = infer_gold;
-		u.total_gold += infer_change;
-		u.total_prestige_gold += infer_change;
-		u.today_gold += infer_change;
-		u.week_gold += infer_change;
-		u.icecream_sold += amount;
-		if (cache_trend_id === u.last_flavor) u.today_trending += amount;
-
-		//flavours sold
-		if (!flavour_position) flavour_position = 0;
-		var f_sold =  parseInt(u.flavors_sold[flavour_position]) || 0;
-		u.flavors_sold[flavour_position] = f_sold + amount;
-		u.markModified("flavors_sold");
-
-		u.save(function (err) {
-			var randomnumber = Math.random()*10000; 
-			if (randomnumber < 15) { //lower flavour value
-				Flavor.findOne({ _id: u.last_flavor}).select('value base_value name').exec(function (err, flavor) {
-					if (flavor.value > 0.10 && flavor.base_value > 1) {
-						flavor.value = Math.round( (flavor.value - 0.05) * Math.pow(10,3) ) / Math.pow(10,3);
-						if (flavor.value < 0.10) flavor.value = 0.20;
-					} else if (flavor.value > 0.35 && flavor.base_value <= 1) {
-						flavor.value = Math.round( (flavor.value - 0.01) * Math.pow(10,3) ) / Math.pow(10,3);
-					} else { return; }
-					flavor.save(function (err) { if (err) console.log(err); });
-				});
-			} else if (randomnumber < 20) { //add vote
-				Flavor.findOne({ _id: u.last_flavor}).select('votes value').exec(function (err, flavor) {
-					if (!flavor.votes) flavor.votes = 0;
-					flavor.votes++;
-					flavor.save(function (err) { if (err) console.log(err); });
-				});
-			} else if (randomnumber < 125 && u.last_flavor == '524dd6ce8c8b720000000002' && u.last_addon == '523d5bb9fbdef6f047000023' && u.upgrade_frankenflavour == 1 && (!u.items || u.items.indexOf('lab parts') === -1)) {
-							if (!u.items) u.items = [];
-							u.items.push('lab parts');
-							u.save(function (err) {
-								io.emit("chat message", {
-						  			_id: Math.random() + 'unlock',
-						  			text: '@' + socket.handshake.query.name + ' has discovered the second Lab Part.',
-						  			badge: 1,
-						  			user: ':',
-						  			created_at: new Date(),
-						  			sync: u._id
-						  		});
-							});
-			} else if (randomnumber < 112 && u.last_flavor == '5238fe64c719600000000001' && u.last_addon == '52ec468c0b26820000000002' && u.upgrade_frankenflavour == 2 && (!u.items || u.items.indexOf('lab parts') === -1)) {
-							if (!u.items) u.items = [];
-							u.items.push('lab parts');
-							u.save(function (err) {
-								io.emit("chat message", {
-						  			_id: Math.random() + 'unlock',
-						  			text: '@' + socket.handshake.query.name + ' has discovered the final Lab Part.',
-						  			badge: 1,
-						  			user: ':',
-						  			created_at: new Date(),
-						  			sync: u._id
-						  		});
-							});
-			} else if (randomnumber < 50 && u.last_flavor == '524d106b132031000000000f' && u.last_addon == '523d5bb9fbdef6f047000023' && u.last_frankenflavour == '524dd6fc8c8b720000000004') {
-				Cow.findOne({ user_id: u._id, is_active: true }, function (err, cow) {
-					if (!cow) return false;
-					if (!cow.skins_unlocked) cow.skins_unlocked = [];
-					if (cow.skins_unlocked.indexOf('toy') > -1) return false;
-					cow.skins_unlocked.push('toy');
-					cow.markModified('toy');
-					cow.save();
-
-					achievement_register('5494854f378bcd8043101d59', u._id);
-					u.save(function (err) {
-						io.emit("chat message", {
-				  			_id: Math.random() + 'unlock',
-				  			text: '@' + socket.handshake.query.name + ' has unlocked a rare skin.',
-				  			badge: 1,
-				  			user: ':',
-				  			created_at: new Date(),
-				  			cow_sync: u._id
-				  		});
-					});
-
-				});
-							
-			} else if (randomnumber < 50 && u.last_flavor == '5238fe64c719600000000001' && u.last_addon == '52ec468c0b26820000000002') {
-				Cow.findOne({ user_id: u._id, is_active: true }, function (err, cow) {
-					if (!cow) return false;
-					if (!cow.skins_unlocked) cow.skins_unlocked = [];
-					if (cow.skins_unlocked.indexOf('cyber') > -1) return false;
-					cow.skins_unlocked.push('cyber');
-					cow.markModified('cyber');
-					cow.save();
-
-					achievement_register('54d2f2c1e6183d601a14d04b', u._id);
-					u.save(function (err) {
-						io.emit("chat message", {
-				  			_id: Math.random() + 'unlock',
-				  			text: '@' + socket.handshake.query.name + ' has unlocked a rare skin.',
-				  			badge: 1,
-				  			user: ':',
-				  			created_at: new Date(),
-				  			cow_sync: u._id
-				  		});
-					});
-
-				});
-							
-			} else if (cache_trend_id === u.last_flavor) {
-				Trend.findOne({ $and: [ {total_sold: {$lt: 75000}}, {total_sold: {$gte: 0}} ] }, function (err, trend) {
-					if (!trend) return;
-					var next_bonus = 76000 - (20000 * trend.bonus);
-					var delta = (amount > 100 || amount < 0)? 100 : amount;
-					trend.total_sold += delta;
-					if (trend.total_sold > next_bonus) { trend.bonus = trend.bonus - 0.05; }
-					trend.save(function (err) { if (err) console.log(err); });
-				});
-			}
-			if (io.sockets.connected[ socket.id ]) {
-				io.sockets.connected[ socket.id ].emit("update", {
-					gold: u.gold,
-					ifr: is_franken_refresh,
-					expertise: u.flavors_sold[flavour_position],
-					expertise_position: flavour_position
-				});
-			}
-			}); //end user save
-		}); //end user findOne
-  	});
-  	socket.on('sell/worker', function(post){
-		if (!post.v || parseFloat(post.v) < 1.45) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Please update to the latest version.' });
-
-		User.findOne({ _id: socket.handshake.query.id }).select('socket_id gold total_gold total_prestige_gold today_gold week_gold upgrade_machinery').exec(function (err, u) {
-			if (!u || err) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Please log in.' });
-			if (u.socket_id != socket.id) {
-				if (u.socket_id && io.sockets.connected[ u.socket_id ]) {
-					return io.sockets.connected[ u.socket_id ].emit("update", { refresh: true, error: 'You. Must. Refresh. (I see you in a new location)' });
-				}
-				u.socket_id = socket.id;
-				console.log(socket.handshake.query.name + ' socket id mismatch >:( ');
-			} 
-			var amount = parseInt(post.a);
-			var infer_amount = parseFloat(post.d); //post.d is the average ice cream flavor value
-			var infer_sleep_amount = parseFloat(post.dsq); //post.d is the average ice cream flavor value
-			if (!infer_sleep_amount) infer_sleep_amount = 0;
-			if (infer_amount > 100) return io.sockets.connected[ socket.id ].emit("alert", { error: 'worker amount too high ($' + infer_amount + ')' });
-			var infer_change = amount * (1 + infer_sleep_amount) * infer_amount * (1 + (0.1 * u.upgrade_machinery) );
-			if (post.ds =='true') { infer_change = infer_change * 30; } //deep sleep
-			if (!u.total_prestige_gold) u.total_prestige_gold = 0;
-
-			u.gold = parseFloat(u.gold + infer_change).toFixed(2); //instead interfer the new gold total
-			u.total_gold += infer_change;
-			u.total_prestige_gold += infer_change;
-			if (u.gold > u.total_prestige_gold) u.total_prestige_gold = u.gold;
-			u.today_gold += infer_change;
-			u.week_gold += infer_change;
-
-			u.save(function (err) {
-				if (err) console.log(socket.handshake.query + ': cant update user, err: ' + err);
-			});
-			if (io.sockets.connected[ socket.id ]) io.sockets.connected[ socket.id ].emit("update", { gold: u.gold });
-		});
-
-	});
-
-	//TODO move the whole message creation block to the socket layer
-  	socket.on('message', function(msg){ //for pushing updates to a player after they are messaged
-
-  		User.findOne({ name: msg.to }).select('socket_id').exec(function (err, user) {  //find the player being messages
-  			if ( user.socket_id && io.sockets.connected[ user.socket_id ] ) { //if that player is connected
-
-  				PrivateMessage.find({to: user._id, from: socket.handshake.query.name, is_read : { $ne: true } }).lean(true).exec(function (err, messages) { //find the unread messages
-  					io.sockets.connected[ user.socket_id ].emit("update", { messages: messages });  //send out the unread messages
-  				});
-
-  			}
-  		});
-  	});
-  	socket.on('chat message', function(msg){
-  		if (!msg.text) return false;
-  		var t = msg.text.replace(/^\s+|\s+$/g,'');
-  		Message.find().sort({$natural:-1}).limit(1).lean(true).exec(function (err, messages) {
-			if (t == messages[0].text) {
-				io.sockets.connected[ socket.id ].emit("alert", {
-					'title': 'Error',
-					'message': 'This message has already been sent'
-				});
-				return false;
-			}
-			
-	  		User.findOne({ _id: socket.handshake.query.id }).select('dunce_until room party_until dunce_message shadow_ban is_admin is_mod name last_flavor quests prestige_level badges').lean(true).exec(function (err, user) {
-		  		if (!user.room) user.room = 'default';
-		  		if (user.room == 'default' && is_default_locked && !user.is_mod && !user.is_admin) {
-					io.sockets.connected[ socket.id ].emit("alert", {
-						'title': 'Error',
-						'message': 'This chat room is currently LOCKED, only mods can talk.'
-					});
-					return false;
-				}
-		  		if (user.shadow_ban && user.room != 'swamp') {
-		  			io.sockets.connected[ socket.id ].emit("alert", { 'title': 'Error', 'message': 'You can not talk at this time.' });
-		  			return false;
-		  		}
-		  		if (msg.badge && user.badges && user.badges.indexOf(parseInt(msg.badge) ) === -1) {
-		  			io.sockets.connected[ socket.id ].emit("alert", { 'title': 'Error', 'message': 'Invalid Badge' });
-		  			return false;
-		  		}
-		  		if (user.prestige_level === 0 && user.quests.length < 2) {
-		  			io.sockets.connected[ socket.id ].emit("alert", { 'title': 'Error', 'message': 'Please play the game a bit first. Sorry for any interuption.' });
-		  			return false;
-		  		}
-
-		  		if (user.dunce_until) {
-		  			var d = new Date();
-		  			if (new Date(user.dunce_until) < d) {
-		  				User.findOne({ _id: user._id }).select('dunce_until').exec(function (err, dunce) {
-		  					dunce.dunce_until = null;
-		  					dunce.save();
-		  				});
-		  			} else {
-		  				msg.badge = 13;
-		  			}
-		  		}
-		  		if (user.party_until) {
-		  			var d = new Date();
-		  			if (new Date(user.party_until) < d) {
-		  				User.findOne({ _id: user._id }).select('party_until').exec(function (err, user2) {
-		  					user2.party_until = null;
-		  					user2.save();
-		  				});
-		  			} else {
-		  				msg.badge = 14;
-		  			}
-		  		}
-		  		if (t.toLowerCase().substring(0, 4) == '/ban') {
-		  			if (!user.is_mod && !user.is_admin) {
-		  				io.sockets.connected[ socket.id ].emit("alert", {
-							'title': 'Error',
-							'message': 'I can\'t let you do that @' + user.name
-						});
-			  			return false;
-		  			}
-		  			var parts = t.substring(5).split(' ');
-		  			var target = parts[0].toLowerCase().trim();
-		  			var message = '';
-		  			for (var i = 1; i < parts.length; i++) { message = message + parts[i] + ' '; }
-		  			var find = (target.length > 20)? { _id: target} : { name: target };
-		  			User.findOne(find).select('name room shadow_ban socket_id').exec(function (err, user_dunce) {
-		  				if (!user_dunce) {
-		  					io.sockets.connected[ socket.id ].emit("alert", {
-								'title': 'Could not find',
-								'message': 'could not find player: @' + target 
-							});
-							return;
-		  				}
-		  				if (user_dunce.shadow_ban) {
-		  					user_dunce.shadow_ban = null;
-
-		  					io.sockets.connected[ socket.id ].emit("alert", {
-								'title': 'Banned',
-								'message': 'Unbanned @' + user_dunce.name + '.'
-							});
-		  					
-							
-						} else {
-							user_dunce.shadow_ban = true;
-							user_dunce.room = 'swamp';
-							io.sockets.connected[ socket.id ].emit("alert", {
-								'title': 'Banned',
-								'message': 'Banned ' + user_dunce.name + '. Reason: ' + message 
-							});
-
-			  				var pm = new PrivateMessage({
-								from: user.name,
-								to: user_dunce._id,
-								text: 'You have been muted. Reason: ' + message
-							});
-							pm.save();
-
-							if (user_dunce.socket_id && io.sockets.connected[ user_dunce.socket_id ]) {
-								io.sockets.connected[ socket.id ].emit("update", {
-									'room': 'swamp',
-								});
-							}
-						}
-						user_dunce.save();
-		  			});
-		  			return false;
-		  		}
-		  		if (t.toLowerCase().substring(0, 5) == '/lock') {
-		  			if (!user.is_mod && !user.is_admin) {
-		  				io.sockets.connected[ socket.id ].emit("alert", {
-							'title': 'Error',
-							'message': 'I can\'t let you do that @' + user.name
-						});
-			  			return false;
-		  			}
-		  			is_default_locked = !is_default_locked;
-		  			io.sockets.connected[ socket.id ].emit("alert", {
-						'title': 'Chat Lock',
-						'message': 'Chat is now ' + ( is_default_locked? 'locked' : 'unlocked') 
-					});
-					return false;
-		  		}
-		  		if (t.toLowerCase().substring(0, 10) == '/party off') {
-		  			if (!user.is_mod && !user.is_admin) {
-		  				io.sockets.connected[ socket.id ].emit("alert", {
-							'title': 'Error',
-							'message': 'I can\'t let you do that @' + user.name
-						});
-		  			}
-		  			User.find({ party_until: { $ne: null} }).select('party_until').exec(function (err, users) {
-		  				for (var i = 0; i < users.length; i++) {
-		  					users[i].party_until = null;
-		  					users[i].save(function (err) { if (err) console.log(err); });
-		  				}
-		  				if (users.length > 0) {
-			  				io.emit("chat message", {
-						  		_id: Math.random() * 9999999 + 'party',
-						  		text: '(Party) THIS PARTY IS OVER',
-						  		badge: 14,
-						  		user: ':',
-						  		is_admin: true,
-						  		created_at: new Date(),
-						  		party: '?'
-					  		});
-		  				}
-		  			});
-		  			return false;
-		  		}
-		  		if (t.toLowerCase().substring(0, 6) == '/party') {
-		  			Cow.findOne({ user_id: user._id, is_active: true}, function (err, cow) {
-		  				var is_match = false;
-		  				if (cow && cow.items) {
-			  				for (var i = 0; i < 4; i++) {
-			  					if (cow.items[i] && cow.items[i].indexOf('hat_birthday') > -1) {
-			  						is_match = true;
-			  						break;
-			  					}
-			  				}
-		  				}
-		  				if (!is_match && !user.party_until && !user.is_admin) {
-		  					io.sockets.connected[ socket.id ].emit("alert", {
-								'title': 'Error',
-								'message': 'I can\'t let you do that @' + user.name
-							});
-							return;
-		  				}
-		  				var target = t.substring(7).replace(/[^a-zA-Z0-9_]/gi, '').toLowerCase().trim();
-		  				User.findOne({ name: target }).select('is_away name shadow_ban party_until dunce_until').exec(function (err, user2) {
-		  					if (!user2 || user2.shadow_ban) {
-			  					io.sockets.connected[ socket.id ].emit("alert", {
-									'title': 'Error',
-									'message': 'cant find partyer: @' + target
-								});
-								return;
-		  					}
-		  					if (user2.is_away) {
-			  					io.sockets.connected[ socket.id ].emit("alert", {
-									'title': 'Error',
-									'message': 'This player is away and can\'t party right now :('
-								});
-								return;
-		  					}
-		  					if (user._id == user2._id) {
-			  					io.sockets.connected[ socket.id ].emit("alert", {
-									'title': 'Error',
-									'message': 'You cant party yourself. (Especially in public).'
-								});
-								return;
-		  					}
-		  					if (user2.party_until) {
-		  						io.sockets.connected[ socket.id ].emit("alert", {
-									'title': 'Error',
-									'message': '@' + user2.name + ' is already partying!'
-								});
-		  						return;
-		  					} 
-		  					if (user2.dunce_until) {
-		  						if (new Date(user2.dunce_until) > new Date()) {
-			  						io.sockets.connected[ socket.id ].emit("alert", {
-										'title': 'Error',
-										'message': '@' + user2.name + ' is in the corner. :*('
-									});
-			  						return;
-		  						}
-		  						user2.dunce_until = null;
-		  					} 
-			  				var d = new Date();
-			  				user2.party_until = new Date(d.getTime() + (1000 * 60 * 10));
-
-		  					user2.save(function (err) {
-			  					if (err) console.log(err);
-			  					io.emit("chat message", {
-					  				_id: Math.random() * 9999999 + 'party',
-					  				text: '(Party) @' + user2.name.substring(0,1).toUpperCase() + user2.name.substring(1) + ' must now party (10 minutes).',
-					  				badge: 14,
-					  				user: ':',
-					  				is_admin: true,
-					  				created_at: new Date(),
-					  				party: user2.name
-				  				});
-		  					});
-		  				});
-		  			});
-			  		return false;
-		  		}
-
-		  		if (t.toLowerCase().substring(0, 6) == '/dunce') {
-		  			if (!user.is_mod && !user.is_admin) {
-		  				io.sockets.connected[ socket.id ].emit("alert", { 'title': 'Error', 'message': 'I can\'t let you do that ' + user.name });
-			  			return false;
-		  			}
-		  			var parts = t.substring(7).split(' ');
-		  			var dunce = parts[0].toLowerCase();
-		  			var minutes = (isNaN(parts[1]))? null : parts[1];
-		  			var message = '';
-		  			for (var i = (minutes)? 2 : 1; i < parts.length; i++) { message = message + parts[i] + ' '; }
-
-		  			var find = (dunce.length > 20)? { _id: dunce} : { name: dunce };
-		  			User.findOne( find ).select('name dunce_message dunce_strikes dunce_until').exec(function (err, user_dunce) {
-		  				if (!user_dunce) {
-		  					io.sockets.connected[ socket.id ].emit("alert", {
-								'title': 'Error',
-								'message': 'cant find user: @' + dunce
-							});
-		  				}
-		  				if (user_dunce.dunce_until) {
-		  					user_dunce.dunce_until = null;
-		  				} else {
-		  					var d = new Date();
-		  					if (!minutes) minutes = 60;
-		  					user_dunce.party_until = null;
-		  					user_dunce.dunce_until = new Date(d.getTime() + (1000 * 60 * minutes));
-		  					user_dunce.dunce_message = message;
-		  					if (!user_dunce.dunce_strikes) user_dunce.dunce_strikes = 0;
-		  					user_dunce.dunce_strikes++;
-		  				}
-		  				user_dunce.save(function (err) {
-		  					if (err) console.log(err);
-		  					io.emit("chat message", {
-				  				_id: Math.random() * 9999999 + 'TGives',
-				  				text: (user_dunce.dunce_until)? '(Dunce) @' + user_dunce.name.substring(0,1).toUpperCase() + user_dunce.name.substring(1) + '  has been dunced for ' + minutes + ' minutes by @' + socket.handshake.query.name + '. Reason: ' + message : '(Dunce) ' + user_dunce.name + ' is no longer a dunce according to @' + socket.handshake.query.name,
-				  				badge: 13,
-				  				user: ':',
-				  				is_admin: true,
-				  				created_at: new Date(),
-				  				dunce: user_dunce.name
-			  				});
-		  				});
-		  			});
-		  			return false;
-		  		}
-
-		  		/*
-		  		if (user.last_flavor == '523d5e603095960000000001') {
-
-		  			if ((!user.badges || user.badges.indexOf(6) == -1) && tgives.indexOf(socket.id) == -1) {
-			  			tgives.push( socket.id );
-			  			console.log(tgives);
-			  			io.sockets.connected[ socket.id ].emit("chat message", {
-			  				_id: Math.random() * 9999999 + 'TGives',
-			  				text: '(Thanksgiving badge) ' + socket.handshake.query.name + ', in the spirit of thanksgiving, what are you grateful for?',
-			  				badge: 6,
-			  				user: ':',
-			  				is_admin: true,
-			  				created_at: new Date()
-			  			});
-			  		} else if (tgives.indexOf(socket.id) > -1 && t.toLowerCase().indexOf('thanksgiving') > -1) {
-			  			console.log('Badge!');
-			  			
-			  			User.findOne({ _id: socket.handshake.query.id }).exec(function (err, user_badge) {
-			  				if (!user_badge.badges) user_badge.badges = [];
-			  				user_badge.badges.push(6);
-			  				user_badge.save();
-
-			  				io.emit("chat message", {
-				  				_id: Math.random() * 9999999 + 'TGives',
-				  				text: socket.handshake.query.name + ' has earned their Thanksgiving badge',
-				  				badge: 6,
-				  				user: ':',
-				  				created_at: new Date(),
-				  				add_badge: 6,
-				  				add_badge_id: socket.handshake.query.id
-				  			});
-				  			tgives.splice(tgives.indexOf(socket.id), 1);
-
-			  			});
-			  			if (!user.badges) user.badges = [];
-			  			user.badges.push(6);
-			  		}
-
-		  		}
-		  		*/
-
-			  		var patt = /(fuck|shit|damn|dammit|nigga|pussy|blowjob|cunt|bitch|nigger|slut|asshole|tits|dick)/g;
-					if (t.toLowerCase() == '/motivate' || (!user.is_admin && !user.is_mod && patt.test(t.toLowerCase())) ) {
-						t = motivationals[Math.floor( Math.random() * motivationals.length )];
-					}
-
-				t = t.trim();
-				var newchat = new Chat({
-		  				is_admin: user.is_admin,
-						text: t,
-						badge: msg.badge,
-						user: user.name,
-						user_id: user._id,
-						room: user.room,
-						created_at: new Date()
-				});
-				newchat.save(function (err, m) {
-					if (err) return console.log('socket msg error: ' + err);
-					io.emit('chat message', newchat);
-				});
-				
-  			});
-		});
-  });
-});
+//var io = require('./io');
+//io.listen(server);
+var io = require('./io').listen(server, cache_trend_id);
 
 /* routes */
+var routes_cow = require('./routes/user');
+app.use('/user', routes_cow);
+
+var routes_cow = require('./routes/cow');
+app.use('/cow', routes_cow);
+
+var routes_admin = require('./routes/admin');
+app.use('/admin', routes_admin);
+
+var routes_stats = require('./routes/stats');
+app.use('/stats', routes_stats);
+
+
 app.get('/', checkAuth, function(req, res) {
 	if (req.headers.host.slice(0, 4) === 'www.') {
         return res.redirect(req.protocol + '://' + req.headers.host.slice(4) + req.originalUrl);
@@ -1681,7 +714,21 @@ app.get('/trending', function(req, res){
 		}
 	});
 });
+
 app.get('/auth/facebook', passport.authenticate('facebook', { scope: ['read_stream', 'publish_actions', 'email', 'user_friends'] }));
+
+// app.get('/auth/facebook', function (req, res, next) {
+//   passport.authenticate('facebook', 
+//   	{ scope: ['read_stream', 'publish_actions', 'email', 'user_friends'] },
+//   	function (err, user, info) {
+// 	    if (err) { return next(err); }
+// 	    if (!user) { return res.redirect('/login'); }
+
+// 	    req.session.user_id = user._id;
+// 	    res.redirect('/');
+
+//   })(req, res, next);
+// });
 
 // Facebook will redirect the user to this URL after approval.  Finish the
 // authentication process by attempting to obtain an access token.  If
@@ -1703,41 +750,6 @@ app.get('/switchtobeta', function(req, res){
 		user.release_channel = 1;
 		user.save();
 		res.redirect('/');
-	});
-});
-app.get('/epic/clear', checkAdmin, function(req, res){
-	User.find({
-		epic_id: { $ne: null}
-	}).select('epic_id epic_collected').exec(function (e, users) {
-		for (var i = 0; i < users.length; i++) {
-			var u = users[i];
-			u.epic_id = null;
-			u.epic_collected = 0;
-			u.save();
-		}
-		
-	});
-
-	Epic.find({}, function (e, epics) {
-			for (var i = 0; i < epics.length; i++) {
-				var epic = epics[i];
-				epic.total = 0;
-				epic.players = 0;
-				epic.save();
-			}
-			
-	});
-
-	res.send('CLEARED');
-});
-app.get('/event/edit', checkAdmin, function(req, res){
-	Topping.find({ }).sort('event').select('name event').exec(function (err, addons) {
-		var ret = '<table>';
-		for (var i = 0; i < addons.length; i++) {
-			var addon = addons[i];
-			ret = ret + '<tr><Td>' + addon.name + '</td><td>' + addon.event + '</td><td><a href="/edit_addon?name=' + addon.name + '">edit</td></tr>';
-		}
-		res.send(ret);
 	});
 });
 app.get('/event', function(req, res){
@@ -1764,15 +776,13 @@ app.get('/event', function(req, res){
 	});
 });
 app.get('/edit_flavor', checkAdmin, function(req, res){ 
-	try {
 	var f_name = req.param('name', null);  // second parameter is default
 	Flavor.findOne({name : f_name.toLowerCase()}, function (err, flavor) {
 		if (!flavor || err) return res.send('cant find');
 		res.send('<form action="flavors" method="POST">Name: <input name="_id" type="hidden" value="' + flavor._id + '"><input name="name" placeholder="name" value="' + flavor.name + 
 			'"><br/>Description: <input name="description" placeholder="desc" value="' + flavor.description + '"><br/>Cost: <input name="cost" placeholder="cost" value=' + flavor.cost + 
-			'><br/>Value: <input name="base_value" placeholder="base value" value=' + flavor.base_value + '><br />svg support: <input name="svg" type="checkbox"><input type="submit"></form>');
+			'><br/>Value: <input name="base_value" placeholder="base value" value=' + flavor.base_value + '><br /><input type="submit"></form>');
 	});
-	} catch (err) { res.send(500, err); }
 });
 app.get('/quests_restart', function(req, res){ 
 	User.findOne({ _id: req.session.user_id }, function (err, user) {
@@ -1788,38 +798,6 @@ app.get('/tutorials_restart', function(req, res){
 		user.tutorial = 0;
 		user.save(function (err,u) { res.redirect('/'); });
 	});
-});
-app.get('/gold_restart', checkAdmin, function(req, res){ 
-	try {
-	var f_name = req.param('name', null);  // second parameter is default
-	User.findOne({ name: f_name }, function (err, user) {
-		if (err || !user) return res.send(500, 'er: ' + err);
-		user.total_gold = 0;
-		user.gold = 0;
-		user.save(function (err,u) { res.send(u); });
-	});
-	} catch (err) { res.send(500, err); }
-});
-app.get('/password_restart', checkAdmin, function(req, res){ 
-	try {
-	var f_name = req.param('name', null);  // second parameter is default
-	var pass = req.param('password', null);  // second parameter is default
-	User.findOne({ name: f_name }).select('+password').exec(function (err, user) {
-		if (err || !user) return res.send(500, 'er: ' + err);
-		user.password = pass;
-		user.save(function (err,u) { res.send(u); });
-	});
-	} catch (err) { res.send(500, err); }
-});
-app.get('/squelch', checkAdmin, function(req, res){ 
-	try {
-	var f_name = req.param('name', null);  // second parameter is default
-	User.findOne({ name: f_name }).exec(function (err, user) {
-		if (err || !user) return res.send(500, 'er: ' + err);
-		user.chat_squelch = !user.chat_squelch;
-		user.save(function (err,u) { res.send(u); });
-	});
-	} catch (err) { res.send(500, err); }
 });
 app.post('/forgot', function(req, res){
 	if (!req.body.email) return res.render('login', {alert: 'Please enter a valid email'});
@@ -1889,46 +867,6 @@ function verify_mailoptions(user) {
 		};
 	return mailOptions;
 }
-app.post('/user_update', function(req, res){
-	try {
-	var post = req.body;
-	User.findOne({ _id: req.session.user_id }, function (err, user) {
-		if (err || !user) return res.send(err);
-		var username = post.username.replace(/[^a-zA-Z0-9_]/gi, '', '').toLowerCase();
-		if (username.length > 14) return res.send('name too long');
-		if (username.length < 2) return res.send('name too short');
-		user.name = username;
-		if (post.password) user.password = post.password;
-		if (post.email && user.email != post.email) {
-			user.email = post.email.toLowerCase();
-			user.email_verified = false;
-			var mailOptions = verify_mailoptions(user);
-			smtpTransport.sendMail(mailOptions, function(error, response){
-					if (error) console.log(error);
-					console.log(response);
-			}); 
-		}
-		if (post.worker_increment && !isNaN(post.worker_increment)) {
-			if (post.worker_increment > 100) post.worker_increment = 100;
-			user.worker_increment = post.worker_increment;
-		}
-		if (post.release_channel) {
-			if (post.release_channel == 2 && (!user.badges || user.badges.indexOf(1) == -1)) post.release_channel = 1; //need donor status
-			user.release_channel = post.release_channel;
-		}
-		// if (post.cow_name) {
-		// 	if (post.cow_name.length < 2 || post.cow_name.length > 12) return res.send('Invalid Cow Name');
-		// 	user.cow_name = post.cow_name.replace(/(<|>)/gi, '');
-		// }
-		user.ignore = post.ignore.trim().toLowerCase();
-		user.is_guest = false;
-		user.save(function (err, u) {
-			if (err) return res.send('can\'t update - maybe the username is taken?');
-			res.redirect('/');
-		});
-	});
-	} catch (err) { res.send(500, err); }
-});
 app.get('/edit_addon', checkAdmin, function(req, res){
 	try {
 	var f_name = req.param('name', null);  // second parameter is default
@@ -2014,15 +952,15 @@ app.get('/add_combo', checkAdmin, function(req, res){
 	} catch (err) { res.send(500, err); }
 }); 
 app.post('/combo', checkAdmin, function(req, res){
-	try {
 	var post = req.body;
+
 	Flavor.findOne({name : post.flavor_name.toLowerCase()}, function (err, flavor) {
 		if (!flavor) return res.send('cant find base flavor');
 		Topping.findOne({name : post.topping_name.toLowerCase()}, function (err, topping) {
 			if (!topping) return res.send('cant find addon');
 			Flavor.findOne({name : post.franken_name.toLowerCase()}, function (err, franken) {
-				if (!franken) return res.send('cant find frankenflavor');
-				Combo.findOne({flavor_id : flavor._id, topping_id : topping._id}, function (err, combo) {
+				
+				Combo.findOne({ name: post.name.toLowerCase() }, function (err, combo) {
 					if (combo) {
 						combo.value = post.value;
 						combo.save(function(err, f) {
@@ -2030,11 +968,12 @@ app.post('/combo', checkAdmin, function(req, res){
 						 res.send(f);
 						});
 					} else {
+
 						var newcombo = new Combo(post);
 						newcombo.name = post.name.toLowerCase();
 						newcombo.value = post.value;
 						newcombo.flavor_id = flavor._id;
-						newcombo.franken_id = franken._id;
+						if (franken) newcombo.franken_id = franken._id;
 						newcombo.topping_id = topping._id;
 						newcombo.flavour_sold = post.sold;
 						newcombo.save(function(err, f) {
@@ -2046,7 +985,7 @@ app.post('/combo', checkAdmin, function(req, res){
 			});
 		});
 	}); 
-	} catch (err) { res.send(500, err); }
+
 });
 app.post('/vote/:flavor', function(req, res){
 	User.findOne({ _id: req.session.user_id }).select('last_vote_at').exec(function (err, user) {
@@ -2083,30 +1022,30 @@ app.post('/vote/:flavor', function(req, res){
 	});
 });
 app.post('/flavors', checkAdmin, function(req, res){
-	try {
 	var post = req.body;
-	Flavor.findOne({_id : post._id}, function (err, flavor) {
-		if (flavor) {
-			flavor.name = post.name.toLowerCase();
-			flavor.description = post.description;
-			flavor.cost = post.cost;
-			flavor.base_value = post.base_value;
-			flavor.svg = post.svg;
-			flavor.save(function(err, f) {
-				 if (err) return res.send('Error,' + err);
-				 res.send(f);
-			});
-		} else {
-			var newflavor = new Flavor(post);
+	if (!post._id || post._id.length < 8) {
+		var newflavor = new Flavor(post);
 			newflavor.name = newflavor.name.toLowerCase();
 			newflavor.value = newflavor.base_value;
 			newflavor.save(function(err, f) {
 				 if (err) return res.send('Error,' + err);
 				 res.send(f);
 			});
-		}
-	});
-	} catch (err) { res.send(500, err); }
+	} else {
+		Flavor.findOne({_id : post._id}, function (err, flavor) {
+			if (flavor) {
+				flavor.name = post.name.toLowerCase();
+				flavor.description = post.description;
+				flavor.cost = post.cost;
+				flavor.base_value = post.base_value;
+				flavor.svg = post.svg;
+				flavor.save(function(err, f) {
+					 if (err) return res.send('Error,' + err);
+					 res.send(f);
+				});
+			}
+		});
+	}
 });
 app.get('/add_toppings', checkAdmin, function(req, res){
 	res.send('<form action="toppings" method="POST">' +
@@ -2115,34 +1054,36 @@ app.get('/add_toppings', checkAdmin, function(req, res){
 	'<br /><input type="submit">');
 });
 app.post('/toppings', checkAdmin, function(req, res){
-	try {
+
 	var post = req.body;
-	Topping.findOne({_id : post._id}, function (err, topping) {
-		if (topping) {
-			topping.name = post.name.toLowerCase();
-			topping.event = post.event;
-			topping.cost = post.cost;
-			topping.base_value = post.base_value;
-			topping.value = topping.base_value;
-			if (post.remove) {
-				topping.remove();
-				return res.send('deleted');
-			}
-			topping.save(function(err, f) {
-				 if (err) return res.send('Error,' + err);
-				 res.send(f);
-			});
-		} else {
-			var newtopping = new Topping(post);
+	if (!post._id || post._id.length < 8) {
+		var newtopping = new Topping(post);
 			newtopping.name = newtopping.name.toLowerCase();
 			newtopping.value = newtopping.base_value;
 			newtopping.save(function(err, f) {
 				 if (err) return res.send('Error,' + err);
 				 res.send(f);
-			});
-		}
-	});
-	} catch (err) { res.send(500, err); }
+		});
+	} else {
+		Topping.findOne({_id : post._id}, function (err, topping) {
+			if (topping) {
+				topping.name = post.name.toLowerCase();
+				topping.event = post.event;
+				topping.cost = post.cost;
+				topping.base_value = post.base_value;
+				topping.value = topping.base_value;
+				if (post.remove) {
+					topping.remove();
+					return res.send('deleted');
+				}
+				topping.save(function(err, f) {
+					 if (err) return res.send('Error,' + err);
+					 res.send(f);
+				});
+			}
+		});
+	}
+	
 });
 function shop_item(item, i, user, cow, res) {
 	if (item['match-expertise']) {
@@ -2151,7 +1092,9 @@ function shop_item(item, i, user, cow, res) {
 	    var sold = user.flavors_sold[f_pointer];
 	    if (sold < 6076015 ) return res.send('{"error":"Need ' + (6076015 - sold) + ' more sales"}');
 	}
-
+	if (item['match-badge']) {
+	    if ( user.badges.indexOf( item['match-badge'] ) == -1 ) return res.send('{"error":"Need a specific badge first"}');
+	}
 	if (item.note) {
 	    return res.json({ error: item.note });
 	}						
@@ -2405,12 +1348,10 @@ app.post('/unlock', function(req, res){
 	} else if (post.type=='adopt_cow') {
 		User.findOne({ _id: req.session.user_id }, function (err, user) {
 			if (err || !user) return res.send(500);
-			var cost = 100;
-			if (user.gold < cost) return res.json({ error: 'A paperwork fee of 100 is needed before you can adopt.'});
 			Cow.findOne({ user_id: req.session.user_id, is_active: true }).lean(true).exec(function (err, cow) {
 				if (cow) return res.json({ error: 'You already have a cow! What would ' + cow.name + ' think.'});
-				user.gold -= cost;
-				var cow_names = ['Betty', 'Billy', 'Bessy', 'Bonny'];
+
+				var cow_names = ['Betty', 'Billy', 'Bessy', 'Bonny', 'Bucky'];
 				user.save(function (err) {
 					var newCow = new Cow({
 						name: cow_names[ Math.floor( Math.random() * cow_names.length) ],
@@ -2504,7 +1445,7 @@ app.post('/unlock', function(req, res){
 		User.findOne({ _id: req.session.user_id }, function (err, user) {
 			if (err || !user) return res.send(500);
 			var cost = 50000000 + (user.upgrade_legendary * 100000000);
-			if (user.upgrade_legendary == 2) return res.send('{"error":"You have reached the maximum level"}');
+			if (user.upgrade_legendary == 3) return res.send('{"error":"You have reached the maximum level"}');
 			if (user.gold < cost) return res.send('{"error":"Need money"}');
 			if (user.flavors.length < (user.upgrade_flavor + 1) * 3) return res.send('{"error":"Please unlock all of the new flavors first"}');
 			if (user.toppings.length < (user.upgrade_addon + 1) * 3) return res.send('{"error":"Please unlock all of the new add-ons first"}');
@@ -2540,7 +1481,7 @@ app.post('/unlock', function(req, res){
 			var x = user.total_prestige_gold;
 			var gold_bonus = 25 * (x / (x + 1000000));
 			var x2 = user.flavors.length + user.toppings.length;
-			var unlock_bonus = (x2 / 174) * 25; 
+			var unlock_bonus = (x2 / 180) * 25; 
 			var x_total = gold_bonus + unlock_bonus;
 			if (x_total > 50) x_total = 50;
 
@@ -2606,17 +1547,22 @@ app.post('/unlock', function(req, res){
 	} else if (post.type=='cone') { 
 		User.findOne({ _id: req.session.user_id }, function (err, user) {
 			var cones = {
-				babycone: { cost: 1000000, prestige: 25},
-				chocolate: { cost: 10000000, prestige: 75},
-				sprinkle: { cost: 500000000, prestige: 150},
-				sprinkle: { cost: 500000000, prestige: 150},
-				sugarcone: { cost: 1000000000, prestige: 200},
-				waffle: { cost: 5000000000, prestige: 300},
-				whitechocolate: { cost: 20000000000, prestige: 399},
-			}
+				baby: { cost:                    1000, prestige: 0},
+				waffle: { cost:                100000, prestige: 0},
+				chocolate: { cost:           50000000, prestige: 25},
+				whitechocolate: { cost:    1000000000, prestige: 75},
+				sugar: { cost:             5000000000, prestige: 150},
+				sprinkle: { cost:         20000000000, prestige: 200},
+				mintycat: { cost:        200000000000, prestige: 300},
+				doublechocolate: { cost: 500000000000, prestige: 399},
+			};
+
 			var cone = cones[post.id];
 			if (!cone) return res.send('{"error":"40C: Cone not found"}');
-			if (!user.prestige_bonus || user.prestige_bonus < cone.prestige) return res.send('{"error":"Need Prestige"}');
+			if (!user.prestige_bonus) {
+				user.prestige_bonus = 0;
+			}
+			if (user.prestige_bonus < cone.prestige) return res.send('{"error":"Need Prestige"}');
 			if (user.gold < cone.cost) return res.send('{"error":"not enough money"}');
 			if (user.cones && user.cones.indexOf(post.id) !== -1) return res.send('{"error":"Already unlocked"}');
 			user.cones.push(post.id);
@@ -2701,29 +1647,6 @@ app.get('/me', function(req, res){
 		}
 	});
 });
-app.get('/cow/:id', function(req, res){
-	Cow.findOne({ _id: req.params.id}).lean(true).exec(function (err, cow) {
-		User.findOne({ _id: cow.user_id}).select('name').lean(true).exec(function (err, user) {
-			res.json({
-				cow: cow,
-				user: user
-			});
-		});
-	});
-});
-app.get('/cow/:id/delete', checkAdmin, function(req, res){
-	Cow.findOne({ _id: req.params.id}).exec(function (err, cow) {
-		cow.remove();
-		res.send('y');
-	});
-});
-app.get('/cow/:id/activate', checkAdmin, function(req, res){
-	Cow.findOne({ _id: req.params.id}).exec(function (err, cow) {
-		cow.is_active = !cow.is_active;
-		cow.save();
-		res.send(cow);
-	});
-});
 app.get('/me/cow', function(req, res){
 	Cow.findOne({ user_id: req.session.user_id, is_active: true }).lean(true).exec(function (err, cow) {
 		res.send(cow);
@@ -2731,6 +1654,7 @@ app.get('/me/cow', function(req, res){
 });
 app.post('/admin/cow', checkAdmin, function(req, res){
 	var cow = new Cow(req.body.cow);
+	cow.created_at = new Date();
 	cow.save(function (err, cow) {
 		if (err) return res.send(err);
 		return res.send(cow);
@@ -2777,69 +1701,13 @@ app.post('/epic/join', function(req, res){
 		res.json({ success: true });
 	});
 });
-app.post('/admin/epic', checkAdmin, function(req, res){
-	var epic = new Epic(req.body.epic);
-	epic.save(function (err, epic) {
-		if (err) return res.send(err);
-		return res.send(epic);
-	});
-});
-app.get('/admin/epic/:id/remove', checkAdmin, function(req, res){
-	Epic.findOne({ _id: req.params.id }, function (err, epic) {
-		epic.remove();
-		res.redirect('/admin');
-	});
-});
-app.get('/admin/combo/:id/edit', checkAdmin, function(req, res){
-	Combo.findOne({ _id: req.params.id }).lean(true).exec(function (err, combo) {
-		res.send( helper_update_object(combo, 'combo') );
-	});
-});
-app.post('/admin/combo/:id/edit', checkAdmin, function(req, res){
-	Combo.findOne({ _id: req.params.id }, function (err, combo) {
-		if (!req.body) return res.send('no combo updates');
 
-		combo.name = req.body.combo.name;
-		combo.topping_id = req.body.combo.topping_id;
-		combo.flavor_id = req.body.combo.flavor_id;
-		combo.flavor_id = req.body.combo.flavor_id;
-		combo.value = req.body.combo.value;
-
-		combo.save(function (err, combo) {
-			res.redirect('/admin');
-		});
-	});
-});
-app.get('/admin/epic/:id/edit', checkAdmin, function(req, res){
-	Epic.findOne({ _id: req.params.id }).select('name total text event players').lean(true).exec(function (err, epic) {
-		res.send( helper_update_object(epic, 'epic') );
-	});
-});
-app.post('/admin/epic/:id/edit', checkAdmin, function(req, res){
-	Epic.findOne({ _id: req.params.id }, function (err, epic) {
-		if (!req.body) return res.send('no epic updates');
-		epic.name = req.body.epic.name;
-		epic.total = req.body.epic.total;
-		epic.text = req.body.epic.text;
-		epic.event = req.body.epic.event;
-		epic.players = req.body.epic.players;
-		epic.save(function (err, epic2) {
-			res.redirect('/admin');
-		});
-	});
-});
 app.get('/session', function(req, res){
 	res.send( req.session.user_id );
 });
-app.get('/admin', checkAdmin, function(req, res){
-	Epic.find({}, function (err, epics) {
-		Chapter.find({}).sort('saga chapter_number').exec(function (err, chapters) {
-			res.render('admin', { epics: epics, chapters: chapters });
-		});
-	});
-});
 app.get('/me/cows/friends', function(req, res){ //show my friends cows
 	User.findOne({_id: req.session.user_id}).select('friends').lean(true).exec(function (err, user) { //find my friends
+		if (!user || !user.friends) return false;
 		Cow.find({ user_id: { $in: user.friends} }).sort('-created_at').limit(5).lean(true).exec(function (err, cows) {
 			res.send(cows);
 		});
@@ -2848,149 +1716,6 @@ app.get('/me/cows/friends', function(req, res){ //show my friends cows
 app.get('/me/cows', function(req, res){
 	Cow.find({ user_id: req.session.user_id, }).lean(true).sort('is_active created_at').exec(function (err, cows) {
 		res.send(cows);
-	});
-});
-app.post('/cow/update', function(req, res){
-	if (!req.session.user_id) {
-		return res.json({ err: 'Could not pull up your user record', refresh: true });
-	}
-	// req.session._garbage = Date();
- //    req.session.touch();
-
-	Cow.findOne({ user_id: req.session.user_id, is_active: true }).exec(function (err, cow) {
-		if (err) return res.send(err);
-		if (!cow) return res.json({ err: 'no cow found' });
-		if (req.body.h) cow.happiness = Math.floor(req.body.h);
-		if (req.body.name && req.body.name.length <= 20) cow.name = req.body.name;
-		if (req.body.skin) cow.skin = req.body.skin;
-		if (!cow.experience) cow.experience = 0;
-
-		if (req.body.experience) {
-			if (cow.experience < req.body.experience - 10 || cow.experience > req.body.experience) return res.json({ resync: true, err: 'Your cow is out of sync', experience: cow.experience });
-			cow.level = 100 * ( cow.experience / ( cow.experience + 1000 ) );
-			cow.experience = req.body.experience;
-		}
-		if (req.body.memory) {
-			if (!cow.memories) cow.memories = [];
-			cow.memories.push(req.body.memory);
-			cow.markModified('memories');
-		}
-		if (req.body.items) {
-			if (req.body.items_check) {
-				var b = new Buffer(req.body.items_check, 'base64');
-				var s = b.toString();
-				if (JSON.stringify(req.body.items) != s) {
-					return res.json({ err: 'Item check failed'});
-				}
-			}
-			for (var i = 0; i < req.body.items.length; i++) {
-				var item = req.body.items[i].split('/');
-				if (item[1] > 10 || item[2] > 10 || item[3] > 10) {
-					req.body.items.splice(i, 1);
-				}
-			}
-			cow.items = req.body.items;
-			if (false && cow.items[cow.items.length - 1] == 'wings_bat') {
-				User.findOne({ _id: req.session.user_id }, function (err, user) {
-					if (user.badges.indexOf(7) == -1) {
-						user.badges.unshift(7);
-						user.markModified('badges');
-						user.save();
-					}
-				});
-			}
-			if (cow.items.length > 12) {
-				cow.items = cow.items.slice(0, 12);
-			}
-			cow.markModified('items');
-		}
-		cow.save(function (err) {
-			if (err) return res.send(err);
-			res.send(cow);
-		});
-	});
-});
-app.post('/cow/new', function(req, res){
-	if (!req.session.user_id) return res.send('please log in');
-	Cow.find({ user_id: req.session.user_id }).exec(function (err, cows) {
-		var len = cows.length;
-		var previous_skins;
-		for (var i = 0; i < len; i++) {
-			if (cows[i].is_active) {
-				if (cows[i].level < 5) {
-					return res.json({ err: 'Your cow is not ready (Only level ' + cows[i].level + ')'});
-				}
-				cows[i].is_active = false;
-				previous_skins = cows[i].skins_unlocked;
-				cows[i].save();
-			}
-		}
-		var newcow = new Cow({
-			name: req.body.name,
-			user_id: req.session.user_id,
-			strength: Math.floor((Math.random() * 8) + 8 + len),
-			intelligence: Math.floor((Math.random() * 8) + 8 + len),
-			constitution: Math.floor((Math.random() * 8) + 8 + len),
-			is_active: true,
-			skins_unlocked: previous_skins,
-			created_at: new Date()
-		});
-		newcow.save(function (err, newcow) {
-			if (err) return res.send(err);
-			res.send(newcow);
-		});
-	});
-});
-app.get('/suggestion/user', function(req, res){
-	User.findOne({ _id: req.session.user_id }).select('friends').exec(function (err, me) {
-		if (!me) return res.json({ err: 'not signed in' });
-		var now = new Date();
-		var dayago = new Date(now.getTime() - 48*60*60*1000);
-		if (!me.friends) me.friends = [];
-		User.find({ 
-			email_verified: true,
-			_id: {'$ne': me._id },
-			_id: { '$nin': me.friends },
-			updated_at: { '$gt': dayago }
-		}).lean(true).sort('-updated_at').select('name friends').limit(25).exec(function (err, users) {
-			if (!users) return res.send(500);
-			for (var i = 0; i < users.length; i++) {
-				if (users[0].friends.length < 5) {
-					return res.json({ user: users[i].name });
-				}
-			}
-
-			return res.json({ user: users[0].name });
-		});
-	});
-});
-app.get('/user/full/:name', checkAdmin, function(req, res){
-	User.findOne({ name: req.params.name }).lean(true).exec(function (err, user) {
-			res.send(user);
-	});
-});
-app.get('/user/:name/cow', function(req, res){
-	User.findOne({ name: req.params.name }).lean(true).exec(function (err, user) {
-		Cow.findOne({ user_id: user._id, is_active: true }).lean(true).exec(function (err, cow) {
-			res.send(cow);
-		});
-	});
-});
-app.get('/user/:name/cows', function(req, res){
-	User.findOne({ name: req.params.name }).lean(true).exec(function (err, user) {
-		Cow.find({ user_id: user._id }).lean(true).exec(function (err, cows) {
-			res.send(cows);
-		});
-	});
-});
-app.get('/user/:name/cow/:item', checkAdmin, function(req, res){
-	User.findOne({ name: req.params.name }).lean(true).exec(function (err, user) {
-		Cow.findOne({ user_id: user._id }).exec(function (err, cow) {
-			cow.items.unshift(req.params.item);
-			cow.markModified('items');
-			cow.save();
-			res.send(cow);
-		});
 	});
 });
 app.get('/reward', checkAdmin, function(req, res){
@@ -3268,6 +1993,16 @@ app.post('/toggle', function(req, res){
 		}); 
 	});
 });
+app.post('/toggle/background', function(req, res){
+	User.findOne({ _id: req.session.user_id }).select('active_background').exec(function (err, u) {
+		if (err || !u) return res.send(500, err);
+		u.active_background = req.body.value;
+		u.save(function (err) {
+			if (err) return res.send(500, err);
+			res.send(200, '{}');
+		}); 
+	});
+});
 app.post('/toggle_animations', function(req, res){
 	try {
 	var post = req.body;
@@ -3493,7 +2228,7 @@ app.post('/complete_quest', function(req, res){
 						}
 					}
 					u.markModified("quests");
-					u.next_quest_at = new Date(new Date().getTime() + ( u.quests.length * u.quests.length )*10000);
+					u.next_quest_at = new Date(new Date().getTime() + ( u.quests.length * u.quests.length )*30000);
 					u.save(function (err) {
 						if (err) return res.send(500, err);
 						if (new_refer && u.referal_code) {
@@ -3826,10 +2561,8 @@ app.get('/remove_old_messages', checkAdmin, function(req, res){
 	});
 });
 app.get('/online/all', function(req, res){
-	var now = new Date();
-	var fiveminago = new Date(now.getTime() - 30*60*1000);
-	User.count( {updated_at : {$gt: fiveminago}} ).exec(function (err, count) {
-			res.send({ c: count});
+	User.count({}).exec(function (err, count_total) {
+			res.send({ c: count_total});
 	});
 });
 app.get('/online/total', function(req, res){
@@ -3891,11 +2624,6 @@ app.get('/messages/read/:from/:to', function(req, res){
 		]}).sort('-created_at').skip(skip).limit(50).lean(true).exec(function (err, pms) {
 				res.send(pms);
 		});
-	});
-});
-app.get('/cows', function(req, res){
-	Cow.find().limit(100).lean(true).exec(function (err, cows) {
-		res.send(cows);
 	});
 });
 app.get('/redeem_friend', function(req, res){
@@ -4133,11 +2861,24 @@ app.get('/facebook/friends', function (req, res) {
 	});
 
 });
-app.get('/facebook/share/frankenflavour', function (req, res) {
-	User.findOne({ _id: req.session.user_id}).lean(true).select('facebook_token facebook_id').exec(function (err, user) {
-		facebook.postMessage(user.facebook_token, 'Testing...', res);
+
+app.get('/facebook/share/frankenflavour/:flavour1/:flavour2', function (req, res) {
+	User.findOne({ _id: req.session.user_id}).lean(true).select('facebook_token facebook_id last_flavor last_frankenflavour').exec(function (err, user) {
+		if (!user || !user.facebook_token) return res.redirect('/auth/facebook');
+		Flavor.findOne({_id: req.params.flavour1 }, function (err, flavour) {
+			Flavor.findOne({_id: req.params.flavour2 }, function (err, flavour2) {
+				var franken_name = helper_franken_name(flavour.name, flavour2.name);
+				facebook.postMessage(user.facebook_token, 'I created ' + franken_name + ' in Ice Cream Stand by combining  ' + flavour.name + ' and ' + flavour2.name + '!', res);
+			});
+		});
+		
 	});
 });
+function helper_franken_name(name1, name2) {
+    var f_1_half = name1.substring( 0, name1.length / 2);
+    var f_2_half = name2.substring(name2.length / 2);
+    return f_1_half + f_2_half;
+}
 app.get('/sign_up', function (req, res) {
 	res.render('login', {sign_up : true});
 });
@@ -4362,108 +3103,6 @@ app.get('/me/avatar', function(req, res){
 		return res.json({ avatar: gravatar_hash });
 	});
 });
-app.get('/user/:name', function(req, res){
-	if (!req.session.user_id) return res.send('please sign in');
-	var name = req.params.name;
-	User.findOne({name : name }).select("-ip").lean(true).exec(function (err, user) {
-		if (err || !user) return res.json({error: 'can\'t find user'});
-		Flavor.findOne({_id:user.last_flavor}).select('name').lean(true).exec(function (err, f) {
-			Topping.findOne({_id:user.last_addon }).select('name').lean(true).exec(function (err, a) {
-				Cow.find({ user_id: user._id }).sort('-created_at').limit(3).lean(true).exec(function (err, cows) {
-					if (err || !f) return res.send(err);
-					var release = ['main', 'beta', 'alpha'];
-					var t = 'Ice Creamizen';
-					var t_array = ['Artisan', 'Stand Mogul', 'King Sherbet'];
-					if (user.prestige_bonus > 25) t = t_array[0];
-					if (user.prestige_bonus > 75) t = t_array[1];
-					if (user.carts === 1000) t = 'Cart Lord';
-					if (user.employees === 1000) t = 'Employee Lord';
-					if (user.trucks === 1000) t = 'Truck King';
-					if (user.robots === 1000) t = 'Robot Over-lord';
-					if (user.rockets === 1000) t = 'Rocketman';
-					if (user.aliens === 1000) t = 'Martian';
-					if (user.combos && user.combos.length > 90) t = 'Combo Chief';
-					for (var i = 0; i < user.flavors_sold.length; i++) {
-						if (user.flavors_sold[i] >= 5000000) {
-							t = 'Stone Cold'; break;
-						}
-					}
-					if (user.prestige_bonus > 398) t = t_array[2];
-					if (user.is_mod) t = 'Moderator';
-					if (user.is_admin) t = 'Admin';
-					if (user._id == '536b8c9d769cf0202d501e4e') t = 'Lore Master';
-					if (user._id == '543d5b077a4c5bd020298ff1') t = 'Designer';
-					if (user.title) t = user.title;
-
-					var gravatar_hash;
-					if (user.email) {
-						gravatar_hash = crypto.createHash('md5').update(user.email).digest('hex');
-					}
-					if (user.dunce_until && new Date(user.dunce_until) > new Date()) {
-						if (!user.badges) user.badges = [];
-						user.badges.unshift(13);
-					}
-					if (user.party_until && new Date(user.party_until) > new Date()) {
-						if (!user.badges) user.badges = [];
-						user.badges.unshift(14);
-					}
-					res.json({
-						_id: user._id,
-						name: user.name,
-						created_at: user.created_at,
-						last_flavor: f.name,
-						last_addon: a.name,
-						flavors: user.flavors.length,
-						combos: user.combos.length,
-						cold_hands: user.upgrade_coldhands,
-						cone: (user.cones && user.cones.length > 0)? user.cones[user.cones.length - 1] : 'default',
-						badges: user.badges,
-						toppings: user.toppings.length,
-						quests: user.quests.length,
-						achievements: user.achievements.length,
-						carts: user.carts,
-						employees: user.employees,
-						trucks: user.trucks,
-						robots: user.robots,
-						release_channel: user.release_channel,
-						accumulation_time: user.accumulation_time,
-						rockets: user.rockets,
-						aliens: (user.aliens)? user.aliens : 0,
-						autopilot: user.upgrade_autopilot,
-						release_channel: release[user.release_channel],
-						sold: user.icecream_sold,
-						updated_at: timeSince(user.updated_at),
-						prestige_level: user.prestige_level,
-						prestige_bonus: user.prestige_bonus,
-						gold: user.gold,
-						title: t,
-						cow_level: user.cow_level,
-						cows: cows,
-						cow: cows[0],
-						friend: (user.friends && user.friends.indexOf(req.session.user_id) > -1),
-						gravatar: gravatar_hash,
-						is_night: user.is_night,
-						is_away: user.is_away
-					}); 
-				});
-			});
-		});
-	});
-});
-app.post('/user/find/ip', function(req, res){
-	var name =  req.body.name.toLowerCase();
-	if (!name) return res.send('name missing');
-	User.findOne({ _id: req.session.user_id }, function (err, u) {
-		if (!u.is_mod && !u.is_admin) return res.send('Woah woah woah, you are not a moderator.');
-		User.findOne({ name: name }).select('name ip').lean(true).exec(function (err, initial) {
-			if (!initial) return res.send('Could not find user');
-			if (!initial.ip) return res.send('Missing IP');
-			User.find({ ip: initial.ip }).select('name ip shadow_ban mute_reason updated_at').sort('-updated_at').lean(true).exec(function (err, users) {
-				res.send(users);
-			});
-		});
-	});
-});
 app.get('/lang/:lang', function(req, res){
 	req.session.lang = req.params.lang;
 	res.redirect('/');
@@ -4482,83 +3121,60 @@ app.get('/chapter/:id', function(req, res){
 		res.send(chapter);
 	});
 });
-app.post('/admin/chapter', checkMod, function(req, res){
-	var newChapter = new Chapter(req.body.chapter);
-	newChapter.save(function (err, chap) {
-		if (err) return res.send(err);
-		res.redirect('/admin');
-	});
-});
-app.get('/admin/chapter/:id/remove', checkMod, function(req, res){
-	Chapter.findOne({ _id: req.params.id }).exec(function (err, chapter) {
-		chapter.remove();
-		res.redirect('/admin');
-	});
-});
-app.get('/admin/chapter/:id/edit', checkMod, function(req, res){
-	Chapter.findOne({ _id: req.params.id }).lean(true).exec(function (err, chapter) {
-		if (!chapter.badge_id) chapter.badge_id = 0;
-		res.send( helper_update_object(chapter, 'chapter') );
-	});
-});
-app.post('/admin/chapter/:id/edit', checkMod, function(req, res){
-	Chapter.findOne({ _id: req.params.id }, function (err, chapter) {
-		if (!chapter) return res.send('no chapter found');
-		var changes = '';
-		for (var i in req.body.chapter) {
-			if (chapter[i] != req.body.chapter[i]) {
-				changes = changes + '<br> Updated: ' + i;
-				chapter[i] = req.body.chapter[i];
-			}
-		}
 
-		chapter.save(function (err, chapter) {
-			if (err) return res.send(err);
-			res.send(changes);
-		});
-	});
-});
+
 app.get('/easter/:num/:str', function(req, res){
-	return res.send('All fled, all done, so lift me on the pyre. The feast is over and the lamps expire.');
-	User.findOne({ _id: req.session.user_id }).select('easter name badges').exec(function (err, u) {
+	//return res.send('All fled, all done, so lift me on the pyre. The feast is over and the lamps expire.');
+	User.findOne({ _id: req.session.user_id }).select('easter2 name badges').exec(function (err, u) {
 		var str = new Buffer(req.params.str, 'base64').toString('ascii');
 		var n = parseInt(req.params.num);
-		if (n != 6 && n != 4 && str != 'e at ics' + n + 'pleasedontcheat' + u.name) {
+		if (n != 6 && n != 4 && str != 'e2 at ics' + n + 'pleasedontcheat' + u.name) {
 			return res.send('That\'s a bad egg.');
 		}
-		if (n == 6 && req.params.str != 'Pvj4f') return res.send('That\'s a bad egg (2).');
-		if (n == 4 && req.params.str != 's9lpj6') return res.send('That\'s a bad egg (2).');
+		if (n == 6 && req.params.str != 'Pvj4f2') return res.send('That\'s a bad egg (2).');
+		if (n == 4 && req.params.str != 's9lpj62') return res.send('That\'s a bad egg (2).');
 
-		if (u.easter.indexOf(n) > -1) {
+		if (u.easter2.indexOf(n) > -1) {
 			var append = '';
 			if (!req.xhr) append = " - Returning to the game in 5 seconds.... <script>setTimeout(function(){window.location.href='/'},5000);</script>";
 			return res.send('You have already found this egg' + append);
 		}
-		u.easter.push(n);
-		if (u.easter.length == 10 && u.badges.indexOf(5) == -1) {
-			u.badges.push(5);
+		u.easter2.push(n);
+		if (u.easter2.length == 10 && u.badges.indexOf(18) == -1) {
+			u.badges.push(18);
 			u.save(function (err, u) {
-				var newmessage = new Chat({
-					text: u.name + ' has found all of the eggs and unlocked the Easter badge!',
-					user: ':',
-					created_at: new Date,
-					badge: 5
+				donor_welcome_queue.push({
+					text: '@' + u.name + ' has found all of the eggs and unlocked the Easter badge and cow skin!',
+					badge: 18,
+					room: 'default'
 				});
-				newmessage.save(function (err, m) {
-					if (err) return res.send(err);
-					var append = '';
-					if (!req.xhr) append = " - Returning to the game in 5 seconds.... <script>setTimeout(function(){window.location.href='/'},5000);</script>";
-					res.send('Congratulations! You have unlocked the Easter badge. (Refresh to see your updated badges).' + append);
-				});
+				
+				var append = '';
+				if (!req.xhr) append = " - Returning to the game in 5 seconds.... <script>setTimeout(function(){window.location.href='/'},5000);</script>";
+				res.send('Congratulations! You have unlocked the Easter badge. (Refresh to see your updated badges).' + append);
 			});
 		} else {
 			u.save(function (err, u) {
 				if (err) return res.send(err);
 				var append = '';
 				if (!req.xhr) append = " - Returning to the game in 5 seconds.... <script>setTimeout(function(){window.location.href='/'},5000);</script>";
-				res.send('You\'ve found an egg! That\'s ' + u.easter.length + ' out of 10' + append);
+				res.send('You\'ve found an egg! That\'s ' + u.easter2.length + ' out of 10' + append);
 			});
 		}
+	});
+});
+app.get('/epic/aoc/award/', checkAdmin, function(req, res){
+	User.find({ epic_last_attack: { $ne: null }  }).select('titles epic_id epic_collected').exec(function (err, users) {
+		for (var i = 0; i < users.length; i++) {
+			var user = users[i];
+			user.epic_collected = 0;
+			user.epic_id = null;
+			if (!user.titles) user.titles = [];
+			user.titles.push('The Usurper');
+			user.markModified('titles');
+			user.save(function (err) { if (err) console.log(err); });
+		}
+		res.send('yes!');
 	});
 });
 app.get('/cheetah/award/:name', checkAdmin, function(req, res){
@@ -4581,9 +3197,7 @@ app.get('/cheetah/award/:name', checkAdmin, function(req, res){
 		});
 	});
 });
-app.get('/stats', function(req, res){
-	res.send('<body><script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script><script src="https://s3.amazonaws.com/icecreamstand.com/stats.js.gz"></script></body>');
-});
+
 app.get('*', function(req, res){
   res.send('<head><title>404 - Ice Cream Stand</title></head><body><h1 style="padding-top: 100px;">404</h1><h2>Ice Cream Not Found <a href="http://icecreamstand.ca/">Back</a></h2><link rel="stylesheet" href="http://static.icecreamstand.ca/common.css.gz" /></body>', 404);
 });
@@ -4623,33 +3237,6 @@ function log_error(err) {
 	        });
 	    }
 	});
-}
-function timeSince(date) {
-
-    var seconds = Math.floor((new Date() - date) / 1000);
-
-    var interval = Math.floor(seconds / 31536000);
-
-    if (interval > 1) {
-        return interval + " years";
-    }
-    interval = Math.floor(seconds / 2592000);
-    if (interval > 1) {
-        return interval + " months";
-    }
-    interval = Math.floor(seconds / 86400);
-    if (interval > 1) {
-        return interval + " days";
-    }
-    interval = Math.floor(seconds / 3600);
-    if (interval > 1) {
-        return interval + " hours";
-    }
-    interval = Math.floor(seconds / 60);
-    if (interval > 1) {
-        return interval + " minutes";
-    }
-    return "<1 minute";
 }
 function generate_dynamic(user) {
 	var c_i = Math.floor( Math.random() * 4), //category
@@ -4810,7 +3397,7 @@ schedule.scheduleJob({hour: 0, minute: 10, dayOfWeek: 0}, function(){
 
 //reset weekly
 schedule.scheduleJob({hour: 0, minute: 12, dayOfWeek: 0}, function(){
-	User.find( { week_gold: { $gt: 0} }).select('week_gold').sort('-week_gold').exec(function (err, users) {
+	User.find( { week_gold: { $gt: 0} }).select('week_gold').limit(200).sort('-week_gold').exec(function (err, users) {
 		var l = users.length;
 		for (var i = 0; i < l; i++) {
 			var u = users[i];
@@ -4823,8 +3410,9 @@ schedule.scheduleJob({hour: 0, minute: 12, dayOfWeek: 0}, function(){
 //cheetah skin giveaway
 schedule.scheduleJob({hour: 0, minute: 2}, function(){
 	console.log('searching for Cheetah skin');
-	User.find({ today_trending: { $gt: 1000000}, achievements : { $ne: '54d42ff931c311f51ada227b' }  }).select('name _id').lean(true).sort('-today_trending').limit(1).exec(function (err, users) {
+	User.find({ today_trending: { $gt: 1000}, achievements : { $ne: '54d42ff931c311f51ada227b' }  }).select('name _id').lean(true).sort('-today_trending').limit(1).exec(function (err, users) {
 		var user = users[0];
+		if (!user) return false;
 		achievement_register('54d42ff931c311f51ada227b', user._id);
 		donor_welcome_queue.push({
 			text: '@' + user.name + ' has unlocked a rare skin.',
@@ -4844,24 +3432,24 @@ schedule.scheduleJob({hour: 0, minute: 2}, function(){
 	
 });
 
-schedule.scheduleJob({ hour: 14, minute: 30 }, function(){
-	console.log('Sending out missed private messages');
-	var d_default = new Date();
-	var d_msg = new Date( new Date() - ( 1000 * 60 * 60 * 24 * 2) );
-	var d_user = new Date( new Date() - ( 1000 * 60 * 60 * 24) );
-    User.find({ 
-    	release_channel: 2,
-    	is_email_messages: true,
-    	updated_at: {$lt: d_user}
-    }).select('name email').lean(true).exec(function (err, users) {
+// schedule.scheduleJob({ hour: 14, minute: 30 }, function(){
+// 	console.log('Sending out missed private messages');
+// 	var d_default = new Date();
+// 	var d_msg = new Date( new Date() - ( 1000 * 60 * 60 * 24 * 2) );
+// 	var d_user = new Date( new Date() - ( 1000 * 60 * 60 * 24) );
+//     User.find({ 
+//     	release_channel: 2,
+//     	is_email_messages: true,
+//     	updated_at: {$lt: d_user}
+//     }).select('name email').lean(true).exec(function (err, users) {
     	
-    	var len = users.length;
+//     	var len = users.length;
     	
-    	for (var i = 0; i < len; i++) { //loop through all users
-    		var user = users[i];
-    		helper_email_if_unread(user, d_msg);
+//     	for (var i = 0; i < len; i++) { //loop through all users
+//     		var user = users[i];
+//     		helper_email_if_unread(user, d_msg);
 
-    	}
+//     	}
 
-    });
-});
+//     });
+// });

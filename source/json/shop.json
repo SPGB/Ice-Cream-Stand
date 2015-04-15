@@ -141,39 +141,93 @@
         "type": "hat",
         "int": 2,
         "con": 2,
-        "rarity": "winter",
-        "match-epic": "5481118619e7a1c726d1b3f6"
+        "rarity": "rare"
     },
     "hat_winter": {
         "type": "winter",
         "int": 2,
         "con": 2,
-        "rarity": "winter",
-        "match-epic": "5481119c19e7a1c726d1b3f7"
+        "rarity": "rare"
     },
     "accessory_winter": {
         "type": "accessory",
         "con": 2,
         "str": 2,
-        "rarity": "winter",
-        "match-epic": "5481119c19e7a1c726d1b3f7",
-        "match-epic-collected": 1000
+        "rarity": "rare"
     },
     "coat_canada": {
         "type": "coat",
         "con": 2,
         "str": 2,
-        "rarity": "winter",
-        "match-epic": "5481118619e7a1c726d1b3f6",
-        "match-epic-collected": 1000
+        "rarity": "rare"
     },
     "digital": {
         "type": "skin",
         "match-expertise": "523d5ea90a0d080000000002",
         "cost": 500000000
     },
+    "chocolate": {
+        "type": "skin",
+        "match-expertise": "5238d7ac00770e0000000001",
+        "cost": 9999
+    },
+    "Chocolate bunny": {
+        "type": "skin",
+        "match-badge": "18",
+        "cost": 25000
+    },
     "toy": {
         "type": "skin",
         "note": "Chance to unlock from a Frankenflavour"
+    },
+    "cyber": {
+        "type": "skin",
+        "note": "Chance to unlock from a combo"
+    },
+    "cheetah": {
+        "type": "skin",
+        "note": "Sell the most trending flavours in a day"
+    },
+    "Moose": {
+        "type": "skin",
+        "cost": 5000,
+        "background": "winter"
+    },
+    "Polar Bear": {
+        "type": "skin",
+        "cost": 5000,
+        "background": "winter"
+    },
+    "Cowasaurus": {
+        "type": "skin",
+        "cost": 68000000,
+        "match-item": "grabber_dino"
+    },
+    "Attack on the Castle": {
+        "type": "badge",
+        "badge": 15,
+        "cost": 5000
+    },
+    "shield_steel": {
+        "type": "shield",
+        "con": 3,
+        "rarity": "rare",
+        "cost": 5000
+    },
+    "armor_steel": {
+        "type": "armor",
+        "con": 3,
+        "str": 1,
+        "int": -1,
+        "rarity": "rare",
+        "cost": 15000
+    },
+    "sword_steel": {
+        "type": "armor",
+        "con": -1,
+        "str": 4,
+        "int": -1,
+        "rarity": "rare",
+        "cost": 150000
     }
 }

@@ -1,0 +1,60 @@
+/* common.scss */
+$purple: #7F7DC7;
+$purple-light: #9f9de7;
+$pink: #F9C9D3;
+$blue: #03a9f4;
+$yellow: #ffeb3b;
+$grey: #404040;
+$green: #0da673;
+$red: #BC0000;
+$grey: #999;
+$brown: #9F7C48;
+
+body {
+    background-color: #f1f1f1;
+    color: #222;
+    font-family: "Lucida Grande",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
+}
+.chat_badge {
+    height: 25px;
+    margin-right: 10px;
+    vertical-align: top;
+}
+.chat_window, form {
+    background-color: #fff;
+    margin: 10px auto;
+    max-width: 600px;
+    border-radius: 4px;
+}
+.chat_window > div {
+    border-bottom: 1px solid #f1f1f1;
+    padding: 5px;
+}
+.user_card {
+	width: 150px;
+	font-weight: bold;
+	display: inline-block;
+	color: #404040;
+	text-decoration: none;
+}
+.chat_textbody {
+    display: inline-block;
+    vertical-align: top;
+    width: calc(100% - 150px);
+}
+input {
+	border: none;
+	display: block;
+	width: 100%;
+	padding: 5px;
+	box-sizing: border-box;
+}
+input[type="submit"] {
+    background-color: $green;
+    color: #fff;
+}
