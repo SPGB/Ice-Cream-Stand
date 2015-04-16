@@ -213,7 +213,7 @@ var userSchema = new mongoose.Schema({
 	referal_code: { type: String },
 	display_settings: { type: [Number]},
 	animations_off: { type: Boolean },
-	chat_off: { type: Boolean, default: true },
+	chat_off: { type: Boolean },
 	badge_off: { type: Boolean },
 	chat_squelch: { type: Boolean },
 	release_channel: { type: Number, default: 0 }, 
@@ -538,7 +538,7 @@ function checkAdmin(req, res, next) {
 var donor_welcome_queue = [];
 //var io = require('./io');
 //io.listen(server);
-var io = require('./io').listen(server, cache_trend_id);
+var io = require('./io').listen(server);
 
 /* routes */
 var routes_cow = require('./routes/user');
@@ -3431,25 +3431,3 @@ schedule.scheduleJob({hour: 0, minute: 2}, function(){
 	});
 	
 });
-
-// schedule.scheduleJob({ hour: 14, minute: 30 }, function(){
-// 	console.log('Sending out missed private messages');
-// 	var d_default = new Date();
-// 	var d_msg = new Date( new Date() - ( 1000 * 60 * 60 * 24 * 2) );
-// 	var d_user = new Date( new Date() - ( 1000 * 60 * 60 * 24) );
-//     User.find({ 
-//     	release_channel: 2,
-//     	is_email_messages: true,
-//     	updated_at: {$lt: d_user}
-//     }).select('name email').lean(true).exec(function (err, users) {
-    	
-//     	var len = users.length;
-    	
-//     	for (var i = 0; i < len; i++) { //loop through all users
-//     		var user = users[i];
-//     		helper_email_if_unread(user, d_msg);
-
-//     	}
-
-//     });
-// });

@@ -1,6 +1,7 @@
 var socketio = require('socket.io');
+var cache_trend_id;
 
-module.exports.listen = function(app, cache_trend_id){
+module.exports.listen = function(app){
 	io = socketio.listen(app);
     clients = {};
     var is_default_locked = false;
@@ -13,6 +14,7 @@ module.exports.listen = function(app, cache_trend_id){
 	Message = mongoose.model('Message');
 	PrivateMessage = mongoose.model('PrivateMessage');
 	Chat = mongoose.model('Chat');
+	Trend = mongoose.model('Trend');
 
 	io.set('authorization', function (handshake, callback) {
 		//var ip = handshake.client;
@@ -407,14 +409,14 @@ io.on('connection', function ( socket ) {
   	});
   	socket.on('accumulation', function(msg){
 
-  		User.findOne({ _id: socket.handshake.query.id }).select('highest_accumulation last_icecube_at accumulation_time chapters_unlocked').exec(function (err, user) {
+  		User.findOne({ _id: socket.handshake.query.id }).select('highest_accumulation quests last_icecube_at accumulation_time chapters_unlocked').exec(function (err, user) {
   			if (!user.highest_accumulation || msg.a > user.highest_accumulation) user.highest_accumulation = msg.a;
   			if (!user.accumulation_time || msg.t > user.accumulation_time) user.accumulation_time = msg.t;
   			if (msg.is_first_win) {
   				user.last_icecube_at = new Date();
   			}
 
-  			if (msg.t > 20) {
+  			if (msg.t > 20 && user.quests && user.quests.length > 2) {
 	  			if (!user.chapters_unlocked) user.chapters_unlocked = [];
 	  			var chance_to_unlock = 0.75 - (0.15 * user.chapters_unlocked.length);
 	  			if (chance_to_unlock < 0.05) chance_to_unlock = 0.05;
@@ -695,7 +697,66 @@ io.on('connection', function ( socket ) {
 
 	});
 
-	//TODO move the whole message creation block to the socket layer
+	socket.on('trending', function(msg){ //for pushing updates to a player after they are messaged
+		Trend.findOne({
+				$and: [ {total_sold: {$lt: 75000}}, {total_sold: {$gte: 0}} ]
+			}).lean(true).exec(function (err, trend) {
+			if (trend) {
+				if (cache_trend_id !== trend._id) cache_trend_id = trend.flavour_id;
+				return io.sockets.connected[ socket.id ].emit("trend", { trend: trend });
+			} else {
+				Trend.find({ 
+					total_sold: {$gte: 75000} 
+				}, function (err, trends) {
+					for (var i = 0; i < trends.length; i++) {
+						trends[i].remove();
+					}
+					Flavor.find().select('base_value value name votes').sort('-votes last_trend_at').exec(function (err, flavours) {
+						var bonus = 2.5;
+						var flavour;
+						if (flavours[0].votes >= 10) {
+							flavour = flavours[0];
+							bonus = 2 + (flavours[0].votes * 0.05);
+							if (bonus > 10) bonus = 10;
+						} else {
+							var candidates = [];
+							for (var i = 0; i < flavours.length; i++) {
+								var f = flavours[i];
+								if (f.value / f.base_value <= 0.8) {
+									candidates.push(f);
+								}
+							}
+							flavour = candidates[Math.floor(Math.random() * candidates.length)];
+							if (!flavour) {
+								flavour = flavours[Math.floor(Math.random() * flavours.length)];
+							}
+						}
+						if (!flavour) {
+							return io.sockets.connected[ socket.id ].emit("trend", { });
+						}
+						var t = new Trend({
+							flavour_id: flavour._id,
+							flavour_name: flavour.name,
+							created_at: Date.now(),
+							bonus: bonus,
+							bonus_max: bonus
+						});
+						t.save(function (err, trend) {
+							if (err) return console.log(err);
+							cache_trend_id = trend._id;
+							flavour.value = flavour.base_value;
+							flavour.votes = 0;
+							flavour.last_trend_at = new Date();
+							flavour.save(function (err, f) {
+								return io.sockets.connected[ socket.id ].emit("trend", { trend: trend });
+							});
+						});
+					});
+				});
+			}
+		});
+	});
+
   	socket.on('message', function(msg){ //for pushing updates to a player after they are messaged
 
   		User.findOne({ name: msg.to }).select('socket_id').exec(function (err, user) {  //find the player being messages
@@ -738,11 +799,6 @@ io.on('connection', function ( socket ) {
 		  			io.sockets.connected[ socket.id ].emit("alert", { 'title': 'Error', 'message': 'Invalid Badge' });
 		  			return false;
 		  		}
-		  		if (user.prestige_level === 0 && user.quests.length < 2) {
-		  			io.sockets.connected[ socket.id ].emit("alert", { 'title': 'Error', 'message': 'Please play the game a bit first. Sorry for any interuption.' });
-		  			return false;
-		  		}
-
 		  		if (user.dunce_until) {
 		  			var d = new Date();
 		  			if (new Date(user.dunce_until) < d) {

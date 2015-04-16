@@ -404,14 +404,12 @@ h4 {
     background: none !important;
 }
 .icecream_float, #icecream_float_text {
-    font-size: 24px;
-    left: 0;
-    right: 0;
-    text-align: center;
+    font-size: 32px;
+    left: 100px;
     font-weight: bold;
     position: absolute;
     top: 100px;
-    z-index: 3;
+    z-index: 1001;
      -moz-user-select: none;
     pointer-events: none;
     -webkit-touch-callout: none;
@@ -421,6 +419,7 @@ h4 {
     -ms-user-select: none;
     user-select: none;
     white-space: pre;
+    text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff;
 }
 #icecream_float_text {
     font-size: 32px;
@@ -1949,7 +1948,6 @@ table[x-col="2"] td {
     right: 0;
     text-align: right;
     top: 2px;
-    display: none;
 }
 .expanded > .base_active {
 	display: block;
@@ -2406,12 +2404,18 @@ h3#upgrades_text {
     top: 316px;
 }
 .tut_ice_cube {
-    background-image: url("http://static.icecreamstand.ca/sell_cold_sprite.png");
-    height: 32px;
+    background-image: url("http://static.icecreamstand.ca/scoopling_spritesheet.png");
+    background-size: 450px auto;
+    height: 65px;
     margin: 10px auto;
-    width: 32px;
+    position: absolute;
+    right: 0;
+    top: -18px;
+    width: 90px;
 }
-
+.tut_ice_cube[x-id="1"].active {
+    background-position: -90px top;
+}
 .tutorial_1 {
     left: 40%;
     top: 360px;
@@ -2456,19 +2460,22 @@ h3#upgrades_text {
     width: 130px;
     margin-top: 10px;
 }
+.help_text {
+    color: #666;
+    padding: 20px;
+}
 .quest_default {
-    background-color: #f1f1f1;
-    background-image: url("http://static.icecreamstand.ca/princess_chat.png");
-    background-position: center bottom;
+    background-image: url("http://static.icecreamstand.ca/scoopling_spritesheet.png");
+    background-position: -180px bottom;
     background-repeat: no-repeat;
-    background-size: auto 100px;
-    border-radius: 5px;
+    background-size: auto auto;
     color: #404040;
     font-weight: bold;
     height: 110px;
-    margin-top: 17px;
+    margin: 10px auto;
     padding: 20px 10px;
     text-align: center;
+    width: 180px;
 }
 .quest_star {
     vertical-align: middle;

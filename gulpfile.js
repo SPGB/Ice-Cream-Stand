@@ -8,13 +8,14 @@ var pngcrush = require('imagemin-pngcrush');
 var rename = require("gulp-rename");
 var imageResize = require('gulp-image-resize');
 var cache = require('gulp-cache');
-
+var jswrap = require('gulp-js-wrapper');
+var concat = require('gulp-concat');
 
 var config = require('./config.js');
 var paths = {
   scripts: ['source/js/*.js'],
   css: ['source/css/*.scss'],
-  scripts_public: ['public/js/*.js'],
+  scripts_public: ['public/js/main.js'],
   flavours: ['source/img/flavours/*.png'],
   backgrounds: ['source/img/backgrounds/*.png'],
   addons: ['source/img/addons/*.png'],
@@ -26,12 +27,14 @@ var headers_image = {
   'Cache-Control': 'max-age=315350000, no-transform, public',
   'Content-Type': 'image/png'
 };
+var version = '150';
 
 gulp.task('js', function() {
   // Minify and copy all JavaScript (except vendor scripts)
   return gulp.src(paths.scripts)
     .pipe(jsValidate())
-    .pipe(uglify())
+    .pipe(concat('main.js'))
+    .pipe(jswrap({ }))
     .pipe(gulp.dest('public/js'));
 });
 gulp.task('clear', function() {
@@ -60,7 +63,11 @@ gulp.task('publish_js', ['js'], function() {
 
   return gulp.src(paths.scripts_public)
 
+    .pipe(uglify())
      // gzip, Set Content-Encoding headers and add .gz extension
+    .pipe(rename(function (path) {
+      path.basename  += "_" + version;
+    }))
     .pipe(awspublish.gzip({ ext: '.gz' }))
 
     // publisher will add Content-Length, Content-Type and  headers specified above
