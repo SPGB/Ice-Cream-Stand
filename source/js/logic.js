@@ -20,8 +20,7 @@ var cache_unread_message = false;
 var cache_unread_mention = false;
 var cache_friends = [];
 
-var Icecream = function() {
-	return {
+var Icecream = {
     paginate: function(index) { //pages through the ice cream container
         var len = $('.inner_flavor_container:visible .option_wrapper').length;
         if ( index === null || len < 5 ) { //only show the first 5
@@ -291,20 +290,25 @@ var Icecream = function() {
         }
     },
     update_gold: function() {
-        if (!user_me.is_animation_money || sales_per === 0 || gold >= user_me.gold) {
-            gold = user_me.gold;
-        } else {
-            gold += (cached_worker_total / (50 - user_me.upgrade_machinery * 3)) + ((user_me.gold - gold) / 10);
-        }
-        var new_gold = numberWithCommas( (gold).toFixed( (gold > 1000)? 0 : 2) );
-        $('.gold')[0].textContent = new_gold;
-        if (cached_new_messages === 0 && !cache_unread_mention) {
-            if (cache_unread_message) {
-                $('title')[0].textContent = 'Unread Message Ice Cream Stand';
-            } else if (gold != user_me.gold) {
-                $('title')[0].textContent = '$' + new_gold + ' Ice Cream Stand';
-            }
-        }
+        // user.gold = user_me.gold;
+        // $scope.$apply(function() {
+        //     $scope.gold = user_me.gold;
+        // });
+        //ics.value('gold', user_me.gold);
+        // if (!user_me.is_animation_money || sales_per === 0 || gold >= user_me.gold) {
+        //     gold = user_me.gold;
+        // } else {
+        //     gold += (cached_worker_total / (50 - user_me.upgrade_machinery * 3)) + ((user_me.gold - gold) / 10);
+        // }
+        // var new_gold = numberWithCommas( (gold).toFixed( (gold > 1000)? 0 : 2) );
+        // $('.gold')[0].textContent = new_gold;
+        // if (cached_new_messages === 0 && !cache_unread_mention) {
+        //     if (cache_unread_message) {
+        //         $('title')[0].textContent = 'Unread Message Ice Cream Stand';
+        //     } else if (gold != user_me.gold) {
+        //         $('title')[0].textContent = '$' + new_gold + ' Ice Cream Stand';
+        //     }
+        // }
     },
     process_clicks: function() { //for autopilots
         if (is_cube) return false; //dont process while the ice cube game is in progress
@@ -529,6 +533,7 @@ var Icecream = function() {
         } else {
             $('.chat.main_container').show();
         }
+        return false; //depreciated into angular
         var expanded = $('.chat.main_container .expand').hasClass('active')? 75 : 15;
         $.ajax({
             url: 'chat',
@@ -932,9 +937,8 @@ var Icecream = function() {
 	        }
 	    }
 	    return { name: 'cherries'};
-	},
-	};
-}
+	}
+};
 function update_sell_value(origin) {
     if (origin) console.log('update_sell_value <- ' + origin);
     var total_value = 0;

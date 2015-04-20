@@ -80,8 +80,12 @@ var new_art_addons = ['cherries', 'sprinkles', 'jelly beans', 'peanuts', 'gummy 
 var messages_afk = ['is back in Ice Creamtopia', 'is baaaccckkkk', ' returns', 'joins us mortals', 'makes an appearance', 'has been summoned', 'apparates', 'appears out of thin air', 'emerges from the shadows',
 'is back', 'swoops in', 'dances into view', 'wiggles about', 'pops out of a bush', 'can be sensed nearby', 'jumps out of the hay', 'rolled a natural 20', 'rolled a natural 1'];
 
+var appElement = document.querySelector('[ng-app]');
+var $scope;
+
 $(document).ready(function () {
 
+    $scope = angular.element(appElement).scope();
     lang = $('html').attr('lang');
     canvas_cache_height = $(document).height();
 
@@ -97,8 +101,8 @@ $(document).ready(function () {
             }
         });
     }
-    if (user_start) {
-        me_callback(user_start, 'start');
+    if (user) {
+        me_callback(user, 'start');
     } else {
         main();
     }
@@ -1167,13 +1171,6 @@ $(document).ready(function () {
                     Icecream.sync_cow();
                     alert('<p>You have adopted a new cow. Cows need to be fed hay to be happy, but a happy cow is a happy life and will help make your ice cream better. Drag hay to your cow to make it happy. Click your cow to see stats.</p>', 'You have adopted ' + cow.name);
                 }
-            }, 
-            error: function (xhr, status, error) {
-                $(that).addClass('upgrade_error').append('<div class="unlock_update">Error</div>');
-                setTimeout(function () {
-                        $('.unlock_update').remove();
-                        $('.upgrade_error').removeClass('upgrade_error');
-                }, 1500);
             }
         });
     });
@@ -1198,7 +1195,7 @@ $(document).ready(function () {
     $(document).scroll(function () {
         $('body').attr('x-scroll-down', window.pageYOffset > 400);
     });
-    $('body').on('click', '.message_close, .darkness', function () {
+    $('body').on('click', '.message_close', function () {
         if ($(this).hasClass('update')) return;
         var scr = document.body.scrollTop;
         window.location.hash = ' ';
@@ -1726,7 +1723,7 @@ $(document).ready(function () {
                         alert('<img class="quest_princess" src="' + image_prepend + '/princess_quest.png">Congratulations! Successfully completed the final quest of the main storyline, earning + $1.00 when a flavor trends or there is an add-on event.<br /><br /><b>Now onward to dynamic quests!</b>', 'Quest Complete'); 
                     } else if (id == '52577a6288983d0000000001') {
                         alert('<div class="quest_image_container" x-type="icecream"><img class="quest_princess" src="' + image_prepend + '/flavours/strawberry.png.gz"></div>Congratulations! Successfully completed the quest, in return Joy grants you a workers permit. Bring on the minimum wage!<br /><br /><b>Unlocked Workers</b>', 'Quest Complete'); 
-                        if (user_me.prestige_level == 0) {
+                        if (user_me.prestige_level === 0 || !cow) {
                             Icecream.sync_chat();
                             $.ajax({
                                     url: '/unlock',
@@ -2417,7 +2414,7 @@ $(document).ready(function () {
             type: $(this).attr('method'),
             success: function (j) {
                 if (j.err) return alert(j.err);
-                $('.darkness').click();
+                $('.message_close').click();
                 if (update === 'refresh') {
                     location.reload();
                 }

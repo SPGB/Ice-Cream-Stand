@@ -56,36 +56,18 @@ var sessionStore = session( {
 	saveUninitialized: false
 });
 var cache_trend_id;
-var motivationals = [
-	'Always do your best. What you plant now, you will harvest later.',
-	'You are never too old to set another goal or to dream a new dream.',
-	'If you can dream it, you can do it.',
-	'Be kind whenever possible. It is always possible.',
-	'Even if you fall on your face, you\'re still moving forward.',
-	'In order to succeed, we must first believe that we can.',
-	'By failing to prepare, you are preparing to fail.',
-	'Optimism is the faith that leads to achievement. Nothing can be done without hope and confidence.',
-	'The most certain way to succeed is always to try just one more time.',
-	'What you plant now, you will harvest later.',
-	'Keep your eyes on the stars, and your feet on the ground.',
-	'Don\'t watch the clock; do what it does. Keep going.',
-	'Expect problems and eat them for breakfast.',
-	'Never give up, for that is just the place and time that the tide will turn.',
-	'There is no justice in following unjust laws.'
-];
 
 mongoose.connect('mongodb://localhost:' + config.db.port + '/admin', { auto_reconnect: true, user: config.db.username, pass: config.db.password });
 
 
 // all environments
 app.set('port', 80);
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }));
-app.use(morgan('dev'));
 app.engine('ejs', engine);
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
+app.use( express.static(path.join(__dirname, 'public')) );
+app.use(morgan('dev'));
 app.use(bodyParser());
-//app.use(express.methodOverride());
 app.use(cookieParser);
 app.use(sessionStore);
 app.use(passport.initialize());
@@ -593,7 +575,7 @@ app.get('/donate', function(req, res){
 	res.redirect('/#!donate');
 });
 
-app.get('/flavors', function(req, res){	
+app.get('/flavors', function(req, res){	//DEPRECIATING
 	var show_mine = Boolean(req.param('show_mine', false) );
 	User.findOne({ _id: req.session.user_id }).select('upgrade_flavor' + ((show_mine)? ' flavors' : '') ).lean(true).exec(function (err, user) {
 		if (err || !user) return res.send('[{}]');
@@ -610,7 +592,7 @@ app.get('/flavors', function(req, res){
 
 	});
 });
-app.get('/toppings', function(req, res){
+app.get('/toppings', function(req, res){ //DEPRECIATING
 	try {
 	if (!req.xhr) return res.redirect('/');
 	User.findOne({ _id: req.session.user_id }).select('upgrade_addon').lean(true).exec(function (err, user) {
@@ -622,6 +604,19 @@ app.get('/toppings', function(req, res){
 	} catch (err) {
 		res.send(500, err);
 	}
+});
+app.get('/addons.json', function(req, res){
+	var upgrade_addon = (req.query.u)? req.query.u : 0;
+	Topping.find().sort('cost').limit((upgrade_addon + 1) * 3).lean(true).exec(function (err, toppings) {
+		res.send( toppings );
+	});
+});
+app.get('/flavors.json', function(req, res){	
+
+	Flavor.find().lean(true).exec(function (err, flavors) {
+		res.send( flavors );
+	});
+
 });
 app.get('/combos', function(req, res){
 	if (!req.xhr) return res.redirect('/');
@@ -1226,7 +1221,7 @@ app.post('/shop/item', function(req, res){
 app.post('/unlock', function(req, res){
 	var post = req.body;
 	var ret = null;
-	if (post.type === 'base') {
+	if (post.type === 'base' || post.type === 'flavour') {
 		Flavor.findOne({ _id : post.id }, function (err, flavor) {
 			if (err || !flavor) return res.send('{"error":"invalid flavor"}');
 			User.findOne({ _id: req.session.user_id }, function (err, user) {
@@ -2681,7 +2676,24 @@ app.get('/chat', function(req, res){
 		});
 	});
 });
+app.get('/chat.json', function(req, res){
+	var len = 15;  // second parameter is default
+	User.findOne({_id: req.session.user_id}).select('room is_mod is_admin').lean(true).exec(function (err, user) {
+		var query = { room: 'default'};
+		if (user && user.room) query.room = user.room;
 
+		//cap on chat for non-admin/non-mods
+		if ( len > 100 && 
+			(!user || (!user.is_mod && !user.is_admin))
+		) {
+			len = 100;
+		}
+
+		Chat.find(query).sort({$natural:-1}).limit(len).lean(true).exec(function (err, messages) {
+			res.send(messages);
+		});
+	});
+});
 app.post('/friend/new', function(req, res){
 	if (!req.body.friend || req.body.friend.length < 2) return res.json({err: 'Invalid friend'});
 	User.findOne({ _id: req.session.user_id }).select('_id friends name').exec(function (err, u) {

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="<%= (typeof lang == 'undefined')? 'en' : lang %>">
+<html lang="<%= (typeof lang == 'undefined')? 'en' : lang %>" ng-app="ics">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
@@ -12,6 +12,36 @@
 		<meta name="description" content="Incremental multiplayer clicker game, create an ice cream stand and combine flavours and add-ons. Build an army of workers and raise cows." />
 		<link rel="icon" type="image/png" href="http://static.icecreamstand.ca/favicon.png" />
 		<title>Ice Cream Stand - Clicker Game</title>
+		<script type="text/javascript" src="http://icecreamstand.ca/bower_components/angular/angular.js"></script>
+		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="http://icecreamstand.ca/socket.io/socket.io.js"></script>
+		<link rel="stylesheet" href="https://s3.amazonaws.com/icecreamstand.com/common.css.gz?patch=149" />
+		
+		<script type="text/javascript">
+			var user = <%- (typeof user != 'undefined')? JSON.stringify(user) : 'null' %>;
+			var user_start = user; //legacy
+			var channel = (user)? user.release_channel : 0;
+
+			switch(channel) {
+				case 2: 
+					load_script('https://s3.amazonaws.com/icecreamstand.com/main_150.js.gz?cache=' + Math.random());
+					break; 
+				case 1:
+					load_script('https://s3.amazonaws.com/icecreamstand.com/controllers.js.gz');
+					load_script('https://s3.amazonaws.com/icecreamstand.com/main_149.js.gz');
+					break; 
+				default:
+					load_script('https://s3.amazonaws.com/icecreamstand.com/controllers.js.gz');
+					load_script('https://s3.amazonaws.com/icecreamstand.com/main_149.js.gz');
+			}
+			function load_script(url) {
+				return false;
+				console.log('loading script: ' + url);
+				var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true; script.src = url;
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+			}
+		</script>
+		<script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_150.js.gz"></script>
 	</head>
 	<body x-scroll-down="false">
 	<div id="fb-root"></div>
@@ -24,14 +54,7 @@
 		  fjs.parentNode.insertBefore(js, fjs);
 		}(document, 'script', 'facebook-jssdk'));
 	</script>
-	<link rel="stylesheet" href="https://s3.amazonaws.com/icecreamstand.com/common.css.gz?patch=149" />
-	<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
-	<script type="text/javascript" src="http://static.icecreamstand.ca/jquery.easing.1.3.js"></script>
-	<script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main<%= (typeof release_channel != 'undefined')? release_channel : 0 %>.js.gz?patch=149"></script>
-	<script src="http://icecreamstand.ca/socket.io/socket.io.js"></script>
-	<script type="text/javascript">
-		var user_start = <%- (typeof user != 'undefined')? JSON.stringify(user) : 'null' %>;
-	</script>
+	
 	<canvas id="canvas_main" x-resize="true" style="width: 100%; position: fixed; height: 100%;"></canvas>
 	<div class="section-side">
 		<canvas id="canvas_sales" width="400" height="400"></canvas>
@@ -52,7 +75,7 @@
 		</div>
 		<div class="section-main-inner">
 			
-			<div class="highscores main_container">
+			<div class="highscores main_container" ng-controller="highscores">
 					<h4><span class="lang">Highscores</span>
 						<span class="container_controls">
 							<div class="refresh_highscores flavor_tab lang">Refresh</div>
@@ -80,7 +103,7 @@
 					</div>
 					<ol></ol>
 			</div>
-			<div class="flavor main_container">  
+			<div class="flavor main_container" ng-controller="flavour">  
 				<h4><span class="lang">Ice Cream</span>
 						<span class="container_controls">
 							<div class="flavor_tab" x-id="main_franken" id="frankenflavour_tab" style="display:none;"><span class="lang">Frankenflavour</span></div>
@@ -95,14 +118,14 @@
 					<div id="main_addon" class="inner_flavor_container"></div> 
 					<div id="main_combo" class="inner_flavor_container"></div> 
 					<div id="main_cone" class="inner_flavor_container"></div> 
-			</div><div class="quests main_container half_size">
+			</div><div class="quests main_container half_size" ng-controller="quests">
 					<h4><span class="lang">Quests</span>
 					<span class="container_controls">
 						<a class="expand"><span class="lang">Expand</span></a>
 					</span></h4>
 					<div class="quest_list"></div>
 				</div><div class="trending_and_events main_container half_size hidden">
-					<div class="event">
+					<div class="event" ng-controller="events">
 						<h4><span class="lang">Events</span></h4>
 						<div class="event_container">
 							<span id="event_name"></span>
@@ -110,7 +133,7 @@
 						</div>
 					</div>
 
-					<div class="trending">
+					<div class="trending" ng-controller="trends">
 						<h4><span class="lang">Trends</span><span id="trend_bonus" class="money_icon is_white"></span></h4>
 						<div class="trending_container">
 							<div class="trending_info">
@@ -123,8 +146,8 @@
 						</div>
 					</div>
 
-			</div><div class="chat main_container">
-					<h4><span class="lang">Chat</span>
+			</div><div class="chat main_container" ng-controller="chat">
+					<h4><span class="lang">Chat ({{messages.length}})</span>
 					<span class="container_controls">
 						<div class="chat_rooms"><span class="current_room">...</span> <i class="fa fa-sort-desc"></i></div>
 						<a href="chat" class="chat_popout"><i class="fa fa-expand"></i><span class="lang">Popout</span></a>
@@ -132,6 +155,11 @@
 					</span></h4>
 					<div class="chat_container_main">
 						<div id="chat_window">
+							<div class="chat" ng-repeat="message in messages | limitTo: 15" x-id="{{message._id}}">
+								<span class="user_card" x-user="{{message.user}}">
+									<img ng-src="http://static.icecreamstand.ca/badges/{{message.badge}}.png" class="chat_badge" /> {{message.user}}
+								</span><span class="chat_textbody">{{message.text}}</span>
+							</div>
 						</div>
 						<form id="new_message" method="POST" action="chat">
 							<div id="typing"></div>
@@ -146,15 +174,15 @@
 						<a class="lang" href="http://www.reddit.com/r/icecreamstand/" target="_blank">Reddit</a>
 						<a class="lang" href="https://facebook.com/icecreamstand" target="_blank">Facebook</a>
 						<a class="lang" href="http://icecreamstand.ca/privacy-policy" target="_blank">Privacy Policy</a>
-						<div class="fb-like" data-href="https://facebook.com/icecreamstand" data-layout="standard" data-action="like" data-show-faces="false" data-share="true"></div>
+						<span id="version_info"></span>
 					</p>
-					<span id="version_info"></span>
 				</span>
+				<div class="fb-like" data-href="https://facebook.com/icecreamstand" data-layout="standard" data-action="like" data-show-faces="false" data-share="true"></div>
 				<div class="footer_cows">
 				</div>
 		</div>
 	</div>
-	<div class="section-side" id="upgrades">
+	<div class="section-side" id="upgrades" ng-controller="upgrades as upgrades">
 			<div class="section_inner">
 				<div id="upgrades_tabs">
 				<div class="tab active lang" id="flavors">Flavour</div><div class="tab lang" id="toppings">Add-on</div><div class="tab locked lang" id="employees">Worker</div><div class="tab lang" id="cones">Cone</div><div class="tab lang" id="upgrades">Upgrade</div>
@@ -248,60 +276,40 @@
 						<button class="lang">Unlock</button>
 					</div>
 				</div>
-				<div class="flavors_inner"></div>
-				<div class="toppings_inner" style="display: none;"></div>
+				<div class="flavors_inner">
+					<div ng-repeat="flavour in flavours_locked | orderBy:'cost' | limitTo:3" class="unlockable" x-cost="{{flavour.cost}}" x-id="{{flavour._id}}" x-new="true" x-type="base">
+							<img ng-src="{{flavour.image}}" class="tooltip" />
+						<div class="unlock_text">{{flavour.name}}<span class="cost">{{flavour.cost | number:0}}</span>
+						</div>
+						<button ng-click="upgrades.purchase('flavour', flavour)">Unlock</button>
+					</div>
+				</div>
+				<div class="toppings_inner" style="display: none;">
+					<div ng-repeat="addon in addons_locked | orderBy:'cost' | limitTo:3" class="unlockable" x-id="{{addon._id}}" x-type="addon" x-new-art="true">
+						<div class="unlock_art_wrapper tooltip">
+							<img ng-src="{{addon.image}}" />
+						</div>
+						<div class="unlock_text">{{addon.name}} <span class="cost">{{addon.cost | number:0}}</span></div>
+						<button ng-click="upgrades.purchase('addon', addon)">Unlock</button>
+					</div>
+				</div>
 				<div class="cones_inner" style="display: none;">
-					<div x-type="cone" x-id="baby" class="unlockable" x-cost="1000">
-						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="baby"><img x-src="http://static.icecreamstand.ca/cones/thumb/baby.png.gz" /></div><div class="unlock_text"><span class="lang">Baby</span>
-						<span class="cost">1,000</span>
-						</div><div class="sale_level"></div><button class="lang">Unlock</button>
-					</div>
-					<div x-type="cone" x-id="waffle" class="unlockable" x-cost="100000">
-						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="waffle"><img x-src="http://static.icecreamstand.ca/cones/thumb/waffle.png.gz" /></div><div class="unlock_text"><span class="lang">Waffle</span>
-						<span class="cost">100,000</span>
-						</div><div class="sale_level"></div><button class="lang">Unlock</button>
-					</div>
-					<div x-type="cone" x-id="chocolate" class="unlockable" x-cost="50000000">
-						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="chocolate"><img x-src="http://static.icecreamstand.ca/cones/thumb/chocolate.png.gz" /></div><div class="unlock_text"><span class="lang">Chocolate Dipped</span>
-						<span class="cost">50,000,000</span>
-						<span class="requirement">Requires 25%P</span>
-						</div><div class="sale_level"></div><button class="lang">Unlock</button>
-					</div>
-					<div x-type="cone" x-id="whitechocolate" class="unlockable" x-cost="1000000000">
-						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="whitechocolate"><img x-src="http://static.icecreamstand.ca/cones/thumb/whitechocolate.png.gz" /></div><div class="unlock_text"><span class="lang">White Chocolate</span>
-						<span class="cost">1,000,000,000</span>
-						<span class="requirement">Requires 75%P</span>
-						</div><div class="sale_level"></div><button class="lang">Unlock</button>
-					</div>
-					<div x-type="cone" x-id="sugar" class="unlockable"  x-cost="5000000000">
-						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="sugar"><img x-src="http://static.icecreamstand.ca/cones/thumb/sugar.png.gz" /></div><div class="unlock_text"><span class="lang">Sugar</span>
-						<span class="cost">5,000,000,000</span>
-						<span class="requirement">Requires 150%P</span>
-						</div><div class="sale_level"></div><button class="lang">Unlock</button>
-					</div>
-					<div x-type="cone" x-id="sprinkle" class="unlockable"  x-cost="20000000000">
-						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="sprinkle"><img x-src="http://static.icecreamstand.ca/cones/thumb/sprinkle.png.gz" /></div><div class="unlock_text"><span class="lang">Sprinkle</span>
-						<span class="cost">20,000,000,000</span>
-						<span class="requirement">Requires 200%P</span>
-						</div><div class="sale_level"></div><button class="lang">Unlock</button>
-					</div>
-					<div x-type="cone" x-id="mintycat" class="unlockable" x-cost="200000000000">
-						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="mintycat"><img x-src="http://static.icecreamstand.ca/cones/thumb/mintycat.png.gz" /></div><div class="unlock_text"><span class="lang">Minty Cat</span>
-						<span class="cost">200,000,000,000</span>
-						<span class="requirement">Requires 300%P</span>
-						</div><div class="sale_level"></div><button class="lang">Unlock</button>
-					</div>
-					<div x-type="cone" x-id="doublechocolate" class="unlockable" x-cost="500000000000">
-						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="doublechocolate"><img x-src="http://static.icecreamstand.ca/cones/thumb/doublechocolate.png.gz" /></div><div class="unlock_text"><span class="lang">Double Chocolate</span>
-						<span class="cost">500,000,000,000</span>
-						<span class="requirement">Requires 399%P</span>
-						</div><div class="sale_level"></div><button class="lang">Unlock</button>
+					<div ng-repeat="cone in cones | limitTo:3" x-type="cone" x-id="{{cone.name}}" class="unlockable" x-cost="{{cone.cost}}">
+						<div style="display: inline-block;" class="option_wrapper tooltip" x-type="cone" x-id="{{cone.name}}">
+							<img x-src="http://static.icecreamstand.ca/cones/thumb/{{cone.name}}.png.gz" />
+						</div><div class="unlock_text"><span class="lang">{{cone.name}}</span>
+						<span class="cost">{{cone.cost | number}}</span>
+						</div><div class="sale_level"></div><button class="lang" ng-click="upgrades.purchase('cone', cone)">Unlock</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="gold">0</div>
-		<div class="gold_sales tooltip lang" x-type="ipm">Income per Minute <span class="money_icon"></span><div class="buff_container"></div></div>
+		<div class="money_floater" ng-controller="money">
+			<div class="gold" >{{gold | number:0}}</div>
+			<div class="gold_sales tooltip lang" x-type="ipm">Income per Minute <span class="money_icon"></span>
+				<div class="buff_container"></div>
+			</div>
+		</div>
 		<div class="floating_footer">
 		<div class="login">
 			<span id="name" class="user_card"></span>

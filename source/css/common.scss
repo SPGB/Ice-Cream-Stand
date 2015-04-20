@@ -435,22 +435,23 @@ h4 {
     line-height: 30px;
     margin-left: 75px;
     padding: 5px 0;
-    right: auto;
+    right: 0;
+    left: -50px;
     text-align: center;
     width: 40px;
     z-index: 7;
 }
 .cow_float.float_success {
     background-color: $green;
-    color: #fff;
+    color: #404040;
 }
 .cow_float.float_hay {
     background-color: $yellow;
-    color: #111;
+    color: #404040;
 }
 .cow_float.float_failure {
     background-color: $red;
-    color: #fff;
+    color: #404040;
 }
 .gold_sales {
     font-size: 14px;
@@ -813,7 +814,7 @@ user:hover, .user_card:hover {
     float: right;
 }
 .darkness {
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.75);
     bottom: 0;
     left: 0;
     position: fixed;

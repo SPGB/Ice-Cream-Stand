@@ -110,8 +110,8 @@ function first_time_init() {
 
 
     setInterval(function () { Icecream.canvas_icecream_sales()}, 100);
-    setInterval(function () { Icecream.canvas_icecream_drop(); }, 50);
-    interval_gold = setInterval(function () { Icecream.update_gold()}, 500);
+    setInterval(function () { Icecream.canvas_icecream_drop(); }, 100);
+    //interval_gold = setInterval(function () { Icecream.update_gold()}, 500);
     setInterval(function () { 
         if (is_deep_sleep) return;
         //Icecream.sync_messages();
@@ -152,7 +152,7 @@ function main_flavours(update_type, callback) {
         type: 'GET',
         dataType: 'JSON',
         success: function (j) {
-            $('#upgrades .flavors_inner').text('');
+            //$('#upgrades .flavors_inner').text('');
             if (true || update_type === 'sort_flavour') { 
                 $('#main_base .option_wrapper').remove();
             }
@@ -160,21 +160,25 @@ function main_flavours(update_type, callback) {
                     var my_flavors = user_me.flavors.length;
                     var flav_len = flavors.length;
                     for (var i = my_flavors - 1; i >= 0; i--) {
-                        var flavor = user_me.flavors[i];
+                        var flavor =  user_me.flavors[i];
                         for (var j = 0; j < flav_len; j++) {
                             if (flavors[j]._id === flavor) { flavor = flavors[j]; break; }
                         }
-                        var f_name = flavor.name.replace(/\W+/g, '');
-                        if ($('#main_base .option#' + f_name).length === 0) {
-                            var src_attr = (i < 5)? 'src' : 'x-src'; 
-                            $('#main_base').prepend('<div class="option_wrapper' + ((flavor.value === 0.10)? ' outofstock' : '') + '" style="display: none;" x-new="true"><img ' + src_attr + '="' + image_prepend + '/flavours/thumb/' + f_name+ '.png.gz" draggable="true" id="' + f_name + '" ' + ' x-id="' + flavor._id + '" class="option tooltip" x-base-value="' + flavor.base_value + '" x-value="' + flavor.value + '" x-type="base" /></div>');
+                        if (flavor && flavor.name) {
+                            var f_name = flavor.name.replace(/\W+/g, '');
+                            if ($('#main_base .option#' + f_name).length === 0) {
+                                var src_attr = (i < 5)? 'src' : 'x-src'; 
+                                $('#main_base').prepend('<div class="option_wrapper' + ((flavor.value === 0.10)? ' outofstock' : '') + '" style="display: none;" x-new="true"><img ' + src_attr + '="' + image_prepend + '/flavours/thumb/' + f_name+ '.png.gz" draggable="true" id="' + f_name + '" ' + ' x-id="' + flavor._id + '" class="option tooltip" x-base-value="' + flavor.base_value + '" x-value="' + flavor.value + '" x-type="base" /></div>');
+                            }
                         }
                     }
+
                     for (var j = 0; j < flav_len; j++) {
                         var flavor = flavors[j];  
                         if (user_me.flavors.indexOf(flavor._id) === -1) {
                             var f_name = flavor.name.replace(/\W+/g, '');
-                            $('#upgrades .flavors_inner').append('<div class="unlockable" id="' + flavor.name + '" x-cost="' + flavor.cost + '" x-id="' + flavor._id + '" x-new="true" x-type="base"><img src="https://s3.amazonaws.com/icecreamstand.com/flavours/thumb/' + f_name + '.png.gz" class="tooltip" /><div class="unlock_text">' + __(flavor.name) + ' <span class="cost">' + numberWithCommas(flavor.cost) + '</span></div><button>Unlock</button></div>');
+                            flavor.image = 'https://s3.amazonaws.com/icecreamstand.com/flavours/thumb/' + f_name + '.png.gz';
+                            flavor.cost_formatted = numberWithCommas(flavor.cost);
                         }
                     }
 
@@ -217,6 +221,7 @@ function main_flavours(update_type, callback) {
                         }
                     }
                     
+                    
                     Icecream.paginate(cached_page);
 
                     if (update_type && update_type === 'sort_flavour') { 
@@ -245,7 +250,7 @@ function main_toppings(update_type, callback) {
         dataType: 'JSON',
         success: function (j) {
             toppings = j; //.sort(function(a, b){ if(a.name < b.name) return -1; if(a.name > b.name) return 1; return 0; });
-            $('#upgrades .toppings_inner').text('');
+            //$('#upgrades .toppings_inner').text('');
             if (true || update_type === 'sort_addon') { 
                 $('#main_addon .option_wrapper').remove();
             }
@@ -253,19 +258,22 @@ function main_toppings(update_type, callback) {
             for (var i = top_len -1; i >= 0; i--) {
                 var topping = Icecream.get_addon(user_me.toppings[i]);
                 var is_new = new_art_addons.indexOf(topping.name) > -1;
-                if ($('.option[x-id="' + topping._id + '"]').length == 0) {
+                if ($('.option[x-id="' + topping._id + '"]').length === 0) {
                     var topping_name = topping.name.replace(/\s+/g, '');
                     var url = (is_new)? image_prepend + '/addons/thumb/' + topping_name + '.png.gz' : image_prepend + '/toppings/' + topping_name + '_thumb.png'; 
                     $('.flavor div#main_addon').prepend('<div class="option_wrapper" x-new-art="' + is_new + '"><img src="' + url + '" id="' + topping.name + '" x-id="' + topping._id + '" class="option tooltip" x-value="' + topping.value + '" x-type="addon" /></div>');
                 }
             }
+            // window.unlocked_addons = [];
             for (var i = 0; i < toppings.length; i++) {
                 var topping = toppings[i];  
                 if (user_me.toppings.indexOf(topping._id) === -1) { //locked
                     var is_new = new_art_addons.indexOf(topping.name) > -1;
                     var topping_name = topping.name.replace(/\s+/g, '');
                     var url = (is_new)? image_prepend + '/addons/thumb/' + topping_name + '.png.gz' : image_prepend + '/toppings/' + topping_name + '_thumb.png'; 
-                    $('#upgrades .toppings_inner').append('<div class="unlockable" id="' + topping.name + '" x-cost="' + topping.cost + '" x-id="' + topping._id + '" x-type="addon" x-new-art="' + is_new + '"><div class="unlock_art_wrapper tooltip"><img src="' + url + '" /></div><div class="unlock_text">' + __(topping.name) + ' <span class="cost">' + numberWithCommas(topping.cost) + '</span></div><button>' + __('Unlock') + '</button></div>');
+                    topping.image = url;
+                    topping.cost_formatted = numberWithCommas(topping.cost);
+                    //$('#upgrades .toppings_inner').append('<div class="unlockable" id="' + topping.name + '" x-cost="' + topping.cost + '" x-id="' + topping._id + '" x-type="addon" x-new-art="' + is_new + '"><div class="unlock_art_wrapper tooltip"><img src="' + url + '" /></div><div class="unlock_text">' + __(topping.name) + ' <span class="cost">' + numberWithCommas(topping.cost) + '</span></div><button>' + __('Unlock') + '</button></div>');
                 }
             }
 
@@ -279,8 +287,6 @@ function main_toppings(update_type, callback) {
                 elems.slice(i, i+15).wrapAll("<div class='page_wrap' x-page='" + Math.floor(i / 15) + "' style='display:none;'></div>");
             }
 
-            if ($('#main_addon .base_active').length === 0) $('#main_addon').prepend('<div class="base_active"></div>');
-
             Icecream.update_worker_fx('first time');
             if (!is_deep_sleep &&  cached_machinery !== user_me.upgrade_machinery) {
                 clearInterval(interval_employees);
@@ -293,7 +299,6 @@ function main_toppings(update_type, callback) {
                 $('.flavor .option[x-id="' + user_me.last_addon + '"]').eq(0).click();
                 if (user_me.last_addon == 'undefined') $('#main_addon .option').eq(0).click();
             }
-            if ($('#upgrades .toppings_inner').text().length == 0) {
                 if (user_me.upgrade_addon  < 23) {
                     var src = $('#unlock_addon img').attr('x-src');
                     if (src) {
@@ -318,7 +323,6 @@ function main_toppings(update_type, callback) {
                 } else {
                     $('#upgrades .toppings_inner').html('<h3>' + __('Every add-on unlocked') + '</h3>');
                 }
-            }
             if (callback && typeof callback === 'function') {
                 callback();
             }

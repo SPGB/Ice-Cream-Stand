@@ -93,7 +93,9 @@ function sell_icecream(amount, workers) {
         }
         var net_gold = parseFloat(sales_per * (cached_worker_total) );
         user_me.gold += parseFloat(sales_per * cached_worker_total);
-
+        $scope.$apply(function() {
+            $scope.gold = user_me.gold;
+        });
         console.log('worker sales (' + amount + '), backlog: '  + cache_worker_sales_to_send);
         socket.emit('sell/worker', {
             g: user_me.gold,
@@ -522,6 +524,12 @@ function __(input) {
     return resp;
 }
 function load_message(msg) {
+    if ($scope && $scope.messages) {
+        $scope.messages.push(msg);
+        console.log('handling new message in angular');
+        return false;
+    }
+    //return false;
     if (user_me.chat_off) return false;
     if (!msg.user) { return console.log('No user attached to this message'); }
     if ($('.chat[x-id="' + msg._id + '"]').length > 0) { return console.log('Message already loaded'); }
