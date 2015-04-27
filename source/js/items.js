@@ -118,9 +118,9 @@ function silo_handleDrop(e) {
         if (item == 'hay') {
             $(this).append('<div class="icecream_float cow_float float_hay">+1</div>');
             $('.cow_float').animate({ top: -50 }, 1000, function () { $(this).remove(); });
-            user_me.silo_hay++;
-            if (user_me.silo_hay > 175 + (25 * user_me.upgrade_silo_hay)) user_me.silo_hay = 175 + (25 * user_me.upgrade_silo_hay);
-            $('.silo_bar').css('height', user_me.silo_hay / (175 + (25 * user_me.upgrade_silo_hay)) / 0.01 );
+            user.silo_hay++;
+            if (user.silo_hay > 175 + (25 * user.upgrade_silo_hay)) user.silo_hay = 175 + (25 * user.upgrade_silo_hay);
+            $('.silo_bar').css('height', user.silo_hay / (175 + (25 * user.upgrade_silo_hay)) / 0.01 );
             item_handle_remove( e );
             Icecream.sync_cow();
         } else if (item != 'rock') {
@@ -132,7 +132,7 @@ function silo_handleDrop(e) {
             var sell_value = 100;
             $(this).append('<div class="icecream_float cow_float float_hay">$' + sell_value + '</div>');
             $('.cow_float').animate({ top: -50 }, 1000, function () { $(this).remove(); });
-            user_me.gold += sell_value;
+            user.gold += sell_value;
             socket.emit('item/sell', { value: sell_value });
             item_handle_remove( e );
         }
@@ -175,8 +175,8 @@ function cow_handleDrop(e) {
                 $(this).remove();
             });
             socket.emit('epic');
-            user_me.epic_collected += 10;
-            $('.user_epic_collected').text(user_me.epic_collected);
+            user.epic_collected += 10;
+            $('.user_epic_collected').text(user.epic_collected);
         } else if (item == 'candycane') {
             $(this).append('<div class="icecream_float cow_float"><img src="https://s3.amazonaws.com/icecreamstand.com/event/collectable_candycane.png" /></div>');
             $('.cow_float').animate({
@@ -185,8 +185,8 @@ function cow_handleDrop(e) {
                 $(this).remove();
             });
             socket.emit('epic');
-            user_me.epic_collected += 10;
-            $('.user_epic_collected').text(user_me.epic_collected);
+            user.epic_collected += 10;
+            $('.user_epic_collected').text(user.epic_collected);
         } else if (item) {
             if (!cow.items) cow.items = [];
             if (cow.items.length >= 12) {

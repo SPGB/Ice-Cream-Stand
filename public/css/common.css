@@ -1,11 +1,12 @@
-@charset "UTF-8";
 /* common.scss */
 html {
   height: 100%; }
 
 body {
   background-attachment: fixed;
-  background-position: left calc(100% - 50px);
+  background-color: #ACDAFF;
+  background-image: url("http://static.icecreamstand.ca/bg_day.png");
+  background-position: left bottom;
   background-repeat: repeat-x;
   color: #222;
   font-size: 14px;
@@ -15,79 +16,7 @@ body {
   padding: 0;
   text-align: center;
   -webkit-font-smoothing: antialiased;
-  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004);
-  background-image: url("http://static.icecreamstand.ca/bg_day.png");
-  background-color: #ACDAFF; }
-
-body[x-epic="aoc"][x-scroll-down="false"] .section-side {
-  opacity: 0 !important; }
-
-.background_hill {
-  background-image: url(http://static.icecreamstand.ca/backgrounds/foreground_aoc_day.png.gz);
-  background-position: left top;
-  background-repeat: no-repeat;
-  background-size: 100% 150px;
-  height: auto;
-  bottom: 0;
-  top: 650px; }
-
-/* backgrounds */
-body[x-background="winter"] {
-  background-image: url(https://s3.amazonaws.com/icecreamstand.com/backgrounds/winter.png.gz);
-  background-color: #acdbff; }
-
-body[x-background="winter"].night {
-  background-image: url(https://s3.amazonaws.com/icecreamstand.com/backgrounds/winter_night.png.gz);
-  background-color: #2252ac; }
-
-body.night {
-  background-image: url(https://s3.amazonaws.com/icecreamstand.com/bg_night.png);
-  background-color: #122C5C; }
-
-body.night[x-background="attack on the castle"] {
-  background-image: url("http://static.icecreamstand.ca/backgrounds/aoc_night_c.png.gz");
-  background-color: #13172b; }
-  body.night[x-background="attack on the castle"] .aoc_log {
-    background-color: #222; }
-  body.night[x-background="attack on the castle"] .background_hill:after {
-    background-color: #13172b; }
-
-body[x-background="attack on the castle"] {
-  background-image: url("http://static.icecreamstand.ca/backgrounds/aoc_day_c.png.gz");
-  background-position: left top;
-  background-color: #102b28;
-  background-size: auto 768px; }
-
-body[x-background="retro"] .section-main {
-  background-image: url("http://static.icecreamstand.ca/background_kenny8_front.png"), url("http://static.icecreamstand.ca/background_wood.png"); }
-
-body[x-background="retro"] .background_hill {
-  background-image: url("background_kenny8_front.png"); }
-
-body.night[x-background="retro"] .background_hill {
-  background-image: url("background_kenny8_front.png"); }
-
-body[x-background="retro"] {
-  background-image: url("http://static.icecreamstand.ca/backgrounds/retro.png.gz");
-  background-color: #acdbff; }
-
-body.night[x-background="retro"] {
-  background-image: url("http://static.icecreamstand.ca/backgrounds/retro_night.png.gz");
-  background-color: #251d38; }
-
-body[x-background="fallen"] {
-  background-position: left top;
-  background-image: url("http://static.icecreamstand.ca/backgrounds/fallen.png.gz");
-  background-color: #000001; }
-
-/* end backgorunds */
-canvas {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none; }
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.004); }
 
 textarea {
   font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
@@ -107,29 +36,13 @@ img {
   -ms-user-select: none;
   user-select: none; }
 
-body[x-scroll-down="true"] h1 {
-  position: static; }
-  body[x-scroll-down="true"] h1 .sub_header {
-    display: none; }
-
-body:not([x-epic]) h1 {
-  position: absolute;
-  top: 0; }
-
 h1 {
-  color: #222;
+  color: #7F7DC7;
   display: block;
-  font-size: 24px;
-  left: 25%;
+  font-size: 42px;
   margin: 0 auto;
   padding: 0;
-  position: absolute;
-  right: 25%;
-  text-align: center;
-  top: 0px;
-  line-height: 30px;
-  letter-spacing: 1px;
-  text-transform: uppercase; }
+  text-align: center; }
 
 h1 img {
   height: 80px;
@@ -178,10 +91,9 @@ progress[value]#happiness[x-full="true"]::-moz-progress-bar {
   background-color: #0da673; }
 
 .fb_iframe_widget {
-  left: 0;
+  left: 10px;
   position: absolute;
-  bottom: -35px;
-  padding: 5px; }
+  bottom: -25px; }
 
 .new_msg_badge {
   height: 20px;
@@ -211,39 +123,37 @@ progress[value]#happiness[x-full="true"]::-moz-progress-bar {
   top: 0;
   left: 0;
   bottom: auto;
-  z-index: 2;
-  transition: opacity 0.25s ease 0s;
-  opacity: 1; }
+  z-index: 2; }
 
 .shop_leftend {
-  background-image: url("http://static.icecreamstand.ca/shop_leftend3.png");
+  background-image: url("https://s3.amazonaws.com/icecreamstand.com/shop_leftend5.png");
   background-repeat: no-repeat;
   background-size: contain;
-  height: 136px;
-  left: -54px;
+  height: 145px;
+  left: -37px;
   position: absolute;
   top: 0;
   width: 64px; }
 
 .shop_rightend {
-  background-image: url("http://static.icecreamstand.ca/shop_rightend3.png");
+  background-image: url("https://s3.amazonaws.com/icecreamstand.com/shop_rightend5.png");
   background-repeat: no-repeat;
   background-size: contain;
-  height: 136px;
+  height: 145px;
   position: absolute;
-  right: -54px;
+  right: -37px;
   top: 0;
   width: 64px; }
 
 .section-main {
-  background-color: #9F7C48;
-  background-image: url("http://static.icecreamstand.ca/backgrounds/foreground_aoc_day.png.gz"), url("http://static.icecreamstand.ca/background_wood.png");
+  background-color: #cdbc9a;
+  background-image: url("http://static.icecreamstand.ca/foreground2_bottom.png"), url("http://static.icecreamstand.ca/background_wood.png");
   background-position: center bottom, left top;
   background-repeat: no-repeat, repeat;
   background-size: 100% auto, 150px auto;
   display: inline-block;
   min-height: calc(100% - 100px);
-  margin-top: 10px;
+  margin-top: 5px;
   padding-bottom: 150px;
   position: relative;
   text-align: left;
@@ -251,8 +161,7 @@ progress[value]#happiness[x-full="true"]::-moz-progress-bar {
   width: 50%;
   min-width: 495px;
   position: relative;
-  z-index: 4;
-  box-shadow: 0 0 2px #000; }
+  z-index: 2; }
 
 .section-main-inner {
   padding: 10px 10px 0; }
@@ -289,26 +198,11 @@ h4 {
   position: absolute;
   width: 100%; }
 
-#name > i.fa {
-  padding-right: 5px; }
-
-.chat_rooms[x-unread="true"]:before {
-  color: #fff;
-  content: "!";
-  margin-right: 10px; }
-
-.chat_room_option {
-  padding: 10px;
-  margin: -5px; }
-
-.chat_room_option.active {
-  text-decoration: underline; }
-
 .icecream {
   background-image: url("http://static.icecreamstand.ca/cones/default.png.gz");
-  background-position: center 228px;
+  background-position: center bottom;
   background-repeat: no-repeat;
-  background-size: auto;
+  background-size: 200px auto;
   display: none;
   height: 485px;
   margin: 0 auto;
@@ -316,9 +210,6 @@ h4 {
   position: relative;
   width: 225px;
   z-index: 2; }
-
-.icecream[x-cone="default"] {
-  background-position: center 261px; }
 
 .icecream #topping {
   position: absolute;
@@ -342,32 +233,8 @@ h4 {
   background-position: 5px top;
   background-size: auto 245px;
   height: 229px;
-  top: 95px;
+  top: 98px;
   width: 228px; }
-
-.chat_rooms .hidden {
-  background-color: #5c59b8;
-  position: absolute;
-  width: 100%;
-  padding: 5px;
-  left: 0;
-  top: 26px;
-  box-sizing: border-box;
-  z-index: 2;
-  text-align: left; }
-
-.chat_rooms:hover .hidden {
-  display: block; }
-
-.chat_room_option:hover {
-  background-color: #7F7DC7; }
-
-.chat_rooms i {
-  vertical-align: top;
-  margin-top: -4px; }
-
-.hidden {
-  display: none; }
 
 #topping[x-addon="bacon"] {
   margin-left: -2px;
@@ -386,12 +253,14 @@ h4 {
   background: none !important; }
 
 .icecream_float, #icecream_float_text {
-  font-size: 32px;
-  left: 100px;
+  font-size: 24px;
+  left: 0;
+  right: 0;
+  text-align: center;
   font-weight: bold;
   position: absolute;
   top: 100px;
-  z-index: 1001;
+  z-index: 3;
   -moz-user-select: none;
   pointer-events: none;
   -webkit-touch-callout: none;
@@ -400,8 +269,7 @@ h4 {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  white-space: pre;
-  text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff; }
+  white-space: pre; }
 
 #icecream_float_text {
   font-size: 32px; }
@@ -409,31 +277,30 @@ h4 {
 .cow_float {
   background-color: #fff;
   border-radius: 25px;
-  color: #9f9de7;
+  color: #7F7DC7;
   display: inline-block;
-  font-size: 16px;
+  font-size: 24px;
   font-weight: bold;
-  height: 30px;
-  line-height: 30px;
+  height: 16px;
+  line-height: 12px;
   margin-left: 75px;
-  padding: 5px 0;
-  right: 0;
-  left: -50px;
+  padding: 10px;
+  right: auto;
   text-align: center;
-  width: 40px;
+  -ms-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  transform: rotate(90deg);
+  width: 16px;
   z-index: 7; }
 
 .cow_float.float_success {
   background-color: #0da673;
-  color: #404040; }
-
-.cow_float.float_hay {
-  background-color: #ffeb3b;
-  color: #404040; }
+  color: #fff; }
 
 .cow_float.float_failure {
   background-color: #BC0000;
-  color: #404040; }
+  color: #fff; }
 
 .gold_sales {
   font-size: 14px;
@@ -446,8 +313,8 @@ h4 {
   z-index: 3; }
 
 .nav_triangle {
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
+  border-left: 5px solid rgba(0, 0, 0, 0);
+  border-right: 5px solid rgba(0, 0, 0, 0);
   border-top: 10px solid #999;
   cursor: pointer;
   position: absolute;
@@ -460,8 +327,8 @@ h4 {
 
 .name_tri_up {
   border-bottom: 10px solid #F1F1F1;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
+  border-left: 5px solid rgba(0, 0, 0, 0);
+  border-right: 5px solid rgba(0, 0, 0, 0);
   display: inline-block;
   margin: 0 3px 0 0; }
 
@@ -495,7 +362,7 @@ h4 {
 .money_icon.infocube_money:before {
   height: 25px;
   left: -21px;
-  top: 5px;
+  top: 0px;
   width: 25px; }
 
 .gold:before {
@@ -518,7 +385,7 @@ h4 {
 
 .floating_footer {
   position: fixed;
-  z-index: 4;
+  z-index: 3;
   bottom: 10px;
   left: 0;
   padding-left: 10px;
@@ -534,7 +401,7 @@ h4 {
   padding-top: 25px 0 0; }
 
 .friends_counter {
-  background-color: #7F7DC7;
+  background-color: #9f9de7;
   border-radius: 2px 0 0 2px;
   color: #FEFFED;
   display: inline-block;
@@ -542,16 +409,13 @@ h4 {
   transition: background 0.5s;
   margin-left: 10px; }
 
-.search_form {
-  display: inline-block; }
-
 .friends_add {
   background-color: #7F7DC7;
   border-radius: 0 2px 2px 0;
   color: #FEFFED;
   cursor: pointer;
   display: inline-block;
-  padding: 5px 10px; }
+  padding: 5px; }
 
 .friends_counter > span {
   cursor: default; }
@@ -570,75 +434,32 @@ h4 {
   display: block; }
 
 .friends_counter > div {
-  background-color: #fff;
-  border-radius: 4px;
-  bottom: 10px;
-  color: #222;
+  background-color: #7F7DC7;
+  border-radius: 2px;
+  box-shadow: 0px 1px 4px -1px #444;
+  bottom: 13px;
   display: none;
   margin-bottom: 20px;
   margin-left: -65px;
-  padding: 0 10px;
   position: absolute;
   text-align: left;
   width: 200px;
+  padding: 5px;
   z-index: 2; }
 
-.friends_list_title {
-  background-color: #7f7dc7;
-  color: #fff;
-  font-weight: bold;
-  margin: 10px -10px 0;
-  padding: 10px; }
-
-.friends_list_holder .friends_list_title:nth-child(1) {
-  margin-top: 0;
-  border-radius: 4px 4px 0 0; }
-
 .friends_counter .triangle-down {
-  border-top: 15px solid #5c59b8;
-  border-width: 15px 30px;
+  border-top: 15px solid #7f7dc7;
   bottom: -15px;
-  left: 53px;
-  opacity: 0.1; }
+  left: 46px;
+  padding-left: 20px;
+  padding-right: 20px; }
 
 .friends_counter user {
-  color: #222;
+  color: #fff;
   display: block;
   position: relative;
-  text-transform: capitalize; }
-
-.mention_suggestion_box {
-  background-color: #fff;
-  left: 40px;
-  padding: 10px;
-  position: absolute;
-  z-index: 2;
-  width: 300px; }
-
-.mention_suggestion {
-  cursor: pointer;
-  margin-bottom: 5px; }
-
-.mention_suggestion_box .mention_suggestion.active {
-  background-color: #f1f1f1; }
-
-.mention_suggestion_box .mention_suggestion.active:after {
-  content: 'Autocomplete with TAB';
-  font-size: 12px;
-  color: #888;
-  float: right;
-  margin-left: 10px; }
-
-.friends_list_title {
-  font-weight: bold;
-  margin-top: 20px; }
-
-.friends_list_title > small {
-  cursor: pointer;
-  float: right; }
-
-.friends_list_offline[x-state="hidden"] {
-  display: none; }
+  text-transform: capitalize;
+  padding: 2px; }
 
 user, .user_card {
   cursor: pointer;
@@ -648,13 +469,13 @@ user, .user_card {
 user:hover, .user_card:hover {
   color: #7F7DC7; }
 
+.friends_counter user:hover {
+  background-color: #404040; }
+
 .friend_options {
   position: absolute;
   right: 0;
   top: 0; }
-
-.friends_list_online, .friends_list_away, .friends_list_offline {
-  padding: 10px 0; }
 
 .friend_message, .friend_poke, .friend_delete, .friend_reply {
   background-position: center center;
@@ -697,7 +518,7 @@ user:hover, .user_card:hover {
   padding: 10px; }
 
 .login > span#name {
-  background-color: #7F7DC7;
+  background-color: #9f9de7;
   border-radius: 2px;
   color: #fff;
   cursor: pointer;
@@ -716,26 +537,24 @@ user:hover, .user_card:hover {
 .login div .triangle-down {
   left: 5px;
   border-width: 20px;
-  bottom: 5px;
-  z-index: -1; }
+  bottom: 5px; }
 
 .login div a {
   color: #fff;
   padding: 10px;
-  background-color: #7F7DC7;
-  border-bottom: 1px solid #9f9de7;
+  background-color: #9f9de7;
   font-weight: bold; }
 
 .login div a:first-child {
-  border-radius: 4px 4px 0 0;
-  background-color: #5c59b8; }
+  border-radius: 2px 2px 0 0;
+  background-color: #7F7DC7; }
 
-.login div a:nth-child(9) {
-  border-bottom: medium none;
-  border-radius: 0 0 4px 4px; }
+.login div a:nth-child(6) {
+  border-radius: 0 0 2px 2px; }
 
 .login div a:hover {
-  background-color: #5c59b8; }
+  box-shadow: 0px 1px 4px -1px #444;
+  color: #fff; }
 
 .login a {
   display: block;
@@ -789,14 +608,11 @@ user:hover, .user_card:hover {
   padding: 10px 5px;
   color: #222; }
 
-.footer a:hover {
-  background-color: #bbb; }
-
 .send_feedback {
   float: right; }
 
 .darkness {
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: rgba(0, 0, 0, 0.4);
   bottom: 0;
   left: 0;
   position: fixed;
@@ -906,6 +722,7 @@ user:hover, .user_card:hover {
   background-image: url(http://static.icecreamstand.ca/background_icons2.png);
   cursor: pointer;
   transition: background 0.5s;
+  border-radius: 2px;
   overflow: hidden;
   background-size: 30px 1px; }
 
@@ -930,9 +747,6 @@ user:hover, .user_card:hover {
   animation-iteration-count: infinite;
   color: #fff;
   text-shadow: -1px 0 rgba(0, 0, 0, 0.5), 0 1px rgba(0, 0, 0, 0.5), 1px 0 rgba(0, 0, 0, 0.5), 0 -1px rgba(0, 0, 0, 0.5); }
-
-.current_flavor.tooltip[x-combo="true"] {
-  text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff; }
 
 @-webkit-keyframes worker_float {
   0% {
@@ -1062,19 +876,20 @@ iframe.facebook {
   font-size: 20px; }
 
 .message_close, #message_read {
+  background-color: #7F7DC7;
   border-radius: 2px;
-  box-shadow: 0px 1px 4px -1px #444;
   color: #ffffff;
   cursor: pointer;
   font-size: 20px;
   font-weight: bold;
   line-height: 10px;
-  padding: 5px;
+  padding: 10px;
   position: absolute;
   right: 5px;
-  text-align: center;
   top: 5px;
-  z-index: 2; }
+  width: 10px;
+  z-index: 2;
+  box-shadow: 0px 1px 4px -1px #444; }
 
 .message_close:hover, .over {
   box-shadow: 0px 2px 6px 0 #444; }
@@ -1136,25 +951,27 @@ iframe.facebook {
   opacity: 1;
   z-index: 9; }
 
+.quest_princess {
+  float: left;
+  background-color: #F1F1F1;
+  height: 200px;
+  margin: -10px;
+  margin-right: 20px; }
+
 .quest_image_container[x-type="icecream"] {
-  background-color: #f1f1f1;
-  background-image: url("http://static.icecreamstand.ca/cones/default.png.gz"), url("http://static.icecreamstand.ca/background_icons2.png");
-  background-position: center 75px;
-  background-repeat: no-repeat, repeat;
-  background-size: auto 100px, 30px auto;
+  background-image: url("http://static.icecreamstand.ca/cones/default.png.gz");
+  background-position: center bottom;
+  background-repeat: no-repeat;
+  background-size: auto 100px;
   float: left;
   height: 190px;
-  margin: -10px 10px -10px -10px;
-  padding: 10px; }
+  margin-right: 20px; }
 
 .quest_image_container[x-type="icecream"] img {
   display: inline-block;
   float: none;
-  height: 100px;
-  width: auto; }
-
-.quest_princess {
-  float: left; }
+  height: 110px;
+  width: 100px; }
 
 .button[x-text="Ok"] {
   background-color: #0da673;
@@ -1296,17 +1113,14 @@ iframe.facebook {
   margin-left: 2px;
   margin-top: 10px;
   text-align: center;
-  background-color: #999;
-  background-image: url("http://static.icecreamstand.ca/background_tile.png");
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-color: #0da673;
   width: 21%;
   box-shadow: 0 2px 0 #097752;
   border-radius: 2px;
   transition: background 0.25s ease 0s; }
 
 .unlockable button:hover, .unlockable .button:hover {
-  background-color: #999; }
+  background-color: #097752; }
 
 .money_float {
   width: 30px;
@@ -1360,8 +1174,8 @@ input {
   width: 200px; }
 
 .unlock_update:after {
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
+  border-left: 10px solid rgba(0, 0, 0, 0);
+  border-right: 10px solid rgba(0, 0, 0, 0);
   border-top: 10px solid #7F7DC7;
   bottom: -10px;
   content: "V";
@@ -1460,7 +1274,7 @@ input {
 
 .flavor div#main_base, .flavor div#main_addon, .flavor div#main_combo, .flavor div#main_cone {
   height: 110px;
-  margin: 5px auto 0;
+  margin: 5px auto;
   overflow: hidden;
   width: 540px;
   position: relative;
@@ -1469,9 +1283,8 @@ input {
 
 #main_cone .option {
   display: table;
-  margin: 10px auto 0;
-  max-height: 200px;
-  width: 66px; }
+  margin: 0 auto;
+  width: auto; }
 
 .expanded {
   height: auto !important; }
@@ -1489,9 +1302,10 @@ input {
 
 .gravatar {
   background-color: #999;
-  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+  border-radius: 50px;
   display: table;
-  height: 190px;
+  height: 100px;
   margin-left: auto;
   margin-right: auto; }
 
@@ -1749,13 +1563,14 @@ table[x-col="2"] td {
 
 .user_icecream_holder {
   background-image: url("http://static.icecreamstand.ca/background_icons2.png");
-  border-radius: 4px; }
+  border-radius: 4px;
+  margin: 0 20px; }
 
 .user_icecream {
   background-position: center 10px, center 60px;
   background-repeat: no-repeat;
   background-size: auto 100px, 90px auto;
-  height: 190px; }
+  height: 132px; }
 
 .user_card_name {
   font-weight: bold;
@@ -1896,8 +1711,10 @@ table[x-col="2"] td {
   font-size: 14px;
   text-align: center;
   text-transform: capitalize;
-  padding-top: 10px;
-  display: none; }
+  padding-top: 10px; }
+
+.trend_title:after {
+  content: ' is Trending!'; }
 
 .upgrades div, .employees div {
   width: 576px;
@@ -1913,6 +1730,9 @@ table[x-col="2"] td {
   min-height: 50px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
   position: relative; }
+
+.flavor.main_container {
+  overflow: hidden; }
 
 .page_wrap {
   height: 350px;
@@ -1956,23 +1776,19 @@ table[x-col="2"] td {
 
 .trending_img.active {
   cursor: pointer;
-  height: 82px;
+  height: 75px;
   vertical-align: middle;
-  width: auto; }
+  width: 75px; }
 
-#trend_bonus {
-  float: right;
+#trend_time > #trend_bonus {
+  float: left;
   font-weight: bold;
-  margin-right: 10px; }
-
-#trend_time #trend_bonus {
-  float: left; }
+  margin-bottom: 10px; }
 
 #event_name {
   display: inline-block;
   font-size: 14px;
-  color: #666;
-  min-width: 120px;
+  min-width: 150px;
   text-align: center;
   font-style: italic;
   margin: 0 -10px; }
@@ -1988,7 +1804,7 @@ table[x-col="2"] td {
   left: 0;
   right: 0;
   top: 0;
-  bottom: 10px; }
+  bottom: 20px; }
 
 .base_active {
   background-color: #ccc;
@@ -2001,9 +1817,6 @@ table[x-col="2"] td {
   right: 0;
   text-align: right;
   top: 2px; }
-
-.expanded > .base_active {
-  display: block; }
 
 #upgrades .trending_img {
   height: 35px; }
@@ -2031,7 +1844,7 @@ table[x-col="2"] td {
   right: 50px;
   text-align: center;
   text-transform: capitalize;
-  top: -2px;
+  top: 2px;
   z-index: 1;
   display: none; }
 
@@ -2041,12 +1854,9 @@ table[x-col="2"] td {
 .trending #trend_time {
   font-size: 14px;
   position: absolute;
-  left: 80px;
+  right: 15px;
   text-align: right;
-  top: 5px; }
-
-.trending > h4 span {
-  text-transform: capitalize; }
+  top: 10px; }
 
 .event #trend_time {
   bottom: -30px;
@@ -2082,10 +1892,8 @@ h3#upgrades_text {
   z-index: 3; }
 
 #upgrades h3 {
-  color: #888;
-  display: inline-block;
-  font-size: 14px;
-  text-align: center; }
+  text-align: center;
+  display: inline-block; }
 
 .hovercard, .tutorial {
   position: fixed;
@@ -2093,20 +1901,17 @@ h3#upgrades_text {
   padding: 15px;
   min-width: 250px;
   max-width: 350px;
-  height: auto;
+  height: 140px;
   margin-top: -150px;
   margin-left: -50px;
   box-shadow: 0px 1px 4px -1px #444;
   border-radius: 2px;
   text-align: left;
-  z-index: 5;
+  z-index: 3;
   font-size: 14px; }
 
 .hovercard {
   pointer-events: none; }
-
-.hovercard.auto_height {
-  height: auto; }
 
 .hovercard[x-new-art="true"] .hover_title, .hovercard[x-new-art="true"] p {
   padding-right: 30px; }
@@ -2169,7 +1974,7 @@ h3#upgrades_text {
 .triangle-down {
   border-left: 15px solid transparent;
   border-right: 15px solid transparent;
-  border-top: 15px solid #7F7DC7;
+  border-top: 15px solid #9f9de7;
   position: absolute;
   bottom: -15px;
   left: 60px; }
@@ -2180,20 +1985,14 @@ h3#upgrades_text {
 .hovercard > .triangle-up {
   border-bottom: 15px solid #0286c2; }
 
-.expand, .chat_rooms {
+.expand {
   color: #fff;
   cursor: pointer;
   display: inline-block;
   font-size: 12px;
   height: calc(100% - 16px);
   line-height: 12px;
-  padding: 8px;
-  position: relative; }
-
-.chat_rooms {
-  width: 125px;
-  text-align: right;
-  text-transform: capitalize; }
+  padding: 8px; }
 
 .tab {
   -moz-user-select: none;
@@ -2210,10 +2009,11 @@ h3#upgrades_text {
   letter-spacing: 1px;
   margin-top: 0px;
   vertical-align: top;
-  transition: background 0.25s ease-in 0s; }
+  transition: all 0.25s ease-in 0s; }
 
-.tab:hover, .flavor_tab:hover, .expand:hover, .chat_rooms:hover {
-  background-color: #5c59b8; }
+.tab:hover, .flavor_tab:hover, .expand:hover, .friend_gold:hover {
+  box-shadow: 0px 1px 4px -1px #444;
+  z-index: 2; }
 
 .tab.active:hover, .flavor_tab.active:hover {
   cursor: default;
@@ -2232,8 +2032,7 @@ h3#upgrades_text {
   position: static;
   top: -24px;
   width: 100%;
-  z-index: -1;
-  overflow: hidden; }
+  z-index: -1; }
 
 .icecream_particle {
   background-position: center top, 5px 37px;
@@ -2298,7 +2097,7 @@ h3#upgrades_text {
     top: 80%;
     opacity: 0; } }
 
-.icecream #topping[x-addon="moon"], .icecream #topping[x-addon="calculator"] {
+.icecream #topping[x-addon="moon"] {
   -webkit-animation-name: addon_moon;
   -webkit-animation-duration: 4s;
   -webkit-animation-iteration-count: infinite;
@@ -2382,6 +2181,7 @@ h3#upgrades_text {
   text-align: left; }
 
 .login_pitch > img {
+  background-color: #fff;
   display: inline-block;
   float: right;
   height: 100px; }
@@ -2457,60 +2257,32 @@ h3#upgrades_text {
   width: 320px; }
 
 .tutorial {
-  position: fixed;
-  box-shadow: 0 0 10px #222; }
-
-.tutorial_shadow {
-  position: fixed;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  z-index: 4;
-  background-color: rgba(0, 0, 0, 0.25); }
+  position: fixed; }
 
 .tutorial_0 {
-  left: 21%;
+  left: 18%;
   top: 316px; }
 
 .tut_ice_cube {
-  background-image: url("http://static.icecreamstand.ca/scoopling_spritesheet.png");
-  background-size: 450px auto;
-  height: 65px;
+  background-image: url("http://static.icecreamstand.ca/sell_cold_sprite.png");
+  height: 32px;
   margin: 10px auto;
-  position: absolute;
-  right: 0;
-  top: -18px;
-  width: 90px; }
-
-.tut_ice_cube[x-id="1"].active {
-  background-position: -90px top; }
+  width: 32px; }
 
 .tutorial_1 {
   left: 40%;
   top: 360px; }
 
 .tutorial_2 {
-  left: 28%;
-  top: 400px;
-  height: 160px; }
-
-.tutorial_4 {
   right: 25%;
   top: 275px;
   padding-bottom: 40px; }
 
-.tutorial_3, .tutorial_5, .tutorial_6 {
-  height: 200px;
+.tutorial_3 {
   left: 50%;
-  margin-left: -187px;
-  margin-top: 50px;
-  position: absolute; }
-
-.tutorial_5, .tutorial_6 {
-  position: fixed;
-  margin-top: -100px;
-  top: 50%; }
+  height: 150px;
+  position: absolute;
+  margin-left: -187px; }
 
 .tutorial > h2 {
   background-color: #7F7DC7;
@@ -2519,33 +2291,32 @@ h3#upgrades_text {
   padding: 15px; }
 
 .button.next_tutorial {
+  background-color: #0da673;
+  box-shadow: 0 2px 0 #097752;
   margin: 20px auto;
   padding: 10px;
   text-align: center; }
 
-.tutorial_5 .button.next_tutorial, .tutorial_6 .button.next_tutorial {
+.tutorial_3 .button.next_tutorial {
   display: inline-block;
   margin: 10px;
   vertical-align: middle;
   width: 130px;
   margin-top: 10px; }
 
-.help_text {
-  color: #666;
-  padding: 20px; }
-
 .quest_default {
-  background-image: url("http://static.icecreamstand.ca/scoopling_spritesheet.png");
-  background-position: -180px bottom;
+  background-color: #f1f1f1;
+  background-image: url("http://static.icecreamstand.ca/princess_chat.png");
+  background-position: center bottom;
   background-repeat: no-repeat;
-  background-size: auto auto;
+  background-size: auto 100px;
+  border-radius: 5px;
   color: #404040;
   font-weight: bold;
   height: 110px;
-  margin: 10px auto;
+  margin-top: 17px;
   padding: 20px 10px;
-  text-align: center;
-  width: 180px; }
+  text-align: center; }
 
 .quest_star {
   vertical-align: middle;
@@ -2960,9 +2731,6 @@ h3#upgrades_text {
   cursor: pointer;
   display: inline-block; }
 
-.filter_page:hover {
-  background-color: #7F7DC7; }
-
 .filter_box {
   max-width: 530px;
   margin: 0 auto;
@@ -2976,8 +2744,8 @@ h3#upgrades_text {
 
 .expertise_level {
   position: absolute;
-  top: 0px;
-  left: 0px;
+  bottom: 0px;
+  left: 5px;
   padding: 2px 5px;
   font-weight: bold; }
 
@@ -3014,7 +2782,7 @@ h3#upgrades_text {
   margin-bottom: 10px;
   border-radius: 5px;
   margin: 0 -10px;
-  max-height: 900px; }
+  max-height: 600px; }
 
 #chat_window .chat {
   font-size: 12px;
@@ -3035,21 +2803,6 @@ h3#upgrades_text {
 
 .button_green:hover {
   background-color: #097752; }
-
-.button_red {
-  background-color: #BC0000;
-  box-shadow: 0 2px 0 #890000; }
-
-.button_red:hover {
-  background-color: #890000; }
-
-.button_grey {
-  cursor: default;
-  background-color: #666;
-  box-shadow: 0 2px 0 #4d4d4d; }
-
-.button_grey:hover {
-  background-color: #4d4d4d; }
 
 .chat_container_main {
   width: 100%;
@@ -3094,7 +2847,7 @@ h3#upgrades_text {
 .chat input[type="text"] {
   width: calc(100% - 116px); }
 
-.chat > .user_card {
+#chat_window .user_card {
   display: inline-block;
   font-weight: bold;
   width: 120px;
@@ -3107,10 +2860,6 @@ h3#upgrades_text {
   word-wrap: break-word;
   padding-top: 4px;
   width: calc(100% - 120px); }
-
-.chat_textbody > .user_card {
-  text-decoration: underline;
-  display: inline-block; }
 
 #chat_window time {
   display: none;
@@ -3126,10 +2875,6 @@ h3#upgrades_text {
   color: #5c59b8;
   font-weight: bold; }
 
-.chat.chat_mod {
-  color: #097752;
-  font-weight: bold; }
-
 .main_container.half_size {
   display: inline-block;
   min-height: 200px;
@@ -3138,9 +2883,6 @@ h3#upgrades_text {
 
 .quests.main_container.half_size, .trending.main_container.half_size {
   margin-right: 10px; }
-
-.flavor.main_container {
-  overflow: hidden; }
 
 .container_controls {
   position: absolute;
@@ -3154,7 +2896,7 @@ h3#upgrades_text {
   border-radius: 2px;
   bottom: 50px;
   left: 10px;
-  right: 20px;
+  min-width: 200px;
   padding: 10px;
   position: absolute;
   text-align: left; }
@@ -3254,19 +2996,19 @@ h3#upgrades_text {
   right: 10px; }
 
 #canvas_sales {
-  width: 400px;
+  width: 100%;
   margin-top: 50px;
-  height: 400px;
+  height: 175px;
   position: absolute;
-  z-index: 1000;
-  left: 50%;
-  margin-left: -200px; }
+  z-index: 2;
+  left: 0; }
 
 #canvas_main {
   left: 0; }
 
 .alert {
-  background-color: #BC0000;
+  background-color: #9f9de7;
+  border-radius: 5px;
   color: #FFFFFF;
   display: inline-block;
   font-size: 16px;
@@ -3329,17 +3071,6 @@ h3#upgrades_text {
 .last_prestige {
   font-size: 12px !important; }
 
-.cow_card_stat {
-  width: 96px;
-  display: inline-block; }
-
-.cow_readopt {
-  width: calc(100% - 120px);
-  margin-top: 0 !important; }
-
-.p_adopt {
-  margin-top: 0; }
-
 .trending_and_events.main_container {
   background-color: transparent !important;
   box-shadow: none;
@@ -3356,8 +3087,8 @@ h3#upgrades_text {
 
 #trend_sold_outer {
   background-color: #aaa;
-  bottom: -10px;
-  height: 10px;
+  bottom: -20px;
+  height: 17px;
   left: 0;
   overflow: hidden;
   position: absolute;
@@ -3377,7 +3108,7 @@ h3#upgrades_text {
   background-position: right 0;
   background-repeat: repeat-y;
   background-size: 50px auto;
-  height: 10px;
+  height: 17px;
   position: absolute;
   transition: width 1s ease 0s; }
 
@@ -3398,20 +3129,16 @@ h3#upgrades_text {
   vertical-align: middle;
   transition: background 0.5s ease 0s; }
 
-.friends_button_container:hover, .friends_add:hover, .friends_counter:hover {
-  background-color: #5c59b8;
-  color: #9f9de7; }
+.friends_button_container:hover .friends_button {
+  background-color: #9f9de7; }
 
 .friends_button_container {
   background-color: #7F7DC7;
-  color: #fff;
   display: inline-block;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-left: 1px solid #9f9de7;
-  border-right: 1px solid #9f9de7; }
+  padding: 5px;
+  cursor: pointer; }
 
-.friends_list_offline {
+.friends_list_offline, .friends_list_online {
   max-height: 250px;
   overflow-y: scroll;
   padding-bottom: 5px;
@@ -3474,7 +3201,7 @@ h3#upgrades_text {
   background-position: left 5px;
   background-repeat: no-repeat;
   background-size: 75px auto;
-  min-height: 144px;
+  min-height: 152px;
   padding-left: 85px;
   font-size: 14px; }
 
@@ -3492,9 +3219,10 @@ message-next {
   float: right; }
 
 .vote_box > img {
-  height: 80px;
+  height: 50px;
   left: 0;
   position: absolute;
+  width: 50px;
   z-index: 1; }
 
 .vote_box > b {
@@ -3507,34 +3235,31 @@ message-next {
   position: absolute;
   right: 15px;
   text-align: center;
-  bottom: 15px;
+  top: 7px;
   z-index: 2; }
 
 .vote_container {
-  bottom: 0;
-  top: 0;
-  right: 0;
-  background-color: #ddd;
+  bottom: -3px;
+  height: 50px;
+  overflow: hidden;
   position: absolute;
+  right: 0;
   text-align: right;
-  width: calc(100% - 75px);
-  overflow: hidden; }
+  width: calc(100% - 75px); }
 
 .vote_box {
   display: inline-block;
-  height: 82px;
+  height: 50px;
   position: relative;
-  width: 75px;
+  width: 50px;
   text-align: center;
+  margin-right: 5px;
   cursor: pointer;
-  bottom: 0px;
-  transition: bottom 0.2s ease 0s;
-  background-image: url("http://static.icecreamstand.ca/cones/thumb/default.png.gz");
-  background-position: 0 43px;
-  background-repeat: no-repeat; }
+  bottom: -15px;
+  transition: bottom 0.2s ease 0s; }
 
 .vote_box:hover {
-  bottom: -10px; }
+  bottom: -5px; }
 
 .user_card_friend {
   float: right;
@@ -3547,7 +3272,7 @@ message-next {
   height: 150px;
   position: absolute;
   z-index: 2;
-  left: 76%;
+  right: 5%;
   width: 248px;
   cursor: pointer; }
 
@@ -3555,14 +3280,13 @@ message-next {
   background-image: none; }
 
 .cow_card_cow {
-  left: auto;
   right: 120px !important;
   bottom: 0; }
 
 .cow_background {
-  bottom: -20px !important;
+  bottom: 10px !important;
   right: auto !important;
-  left: 0;
+  left: -10px;
   transform: scale(0.5);
   -webkit-transform: scale(0.5);
   -ie-transform: scale(0.5);
@@ -3570,16 +3294,7 @@ message-next {
   z-index: 1; }
 
 .cow_background[x-num="1"] {
-  margin-left: 100px; }
-
-.cow_background[x-num="2"] {
-  margin-left: 200px; }
-
-.cow_background[x-num="3"] {
-  margin-left: 300px; }
-
-.cow_background[x-num="4"] {
-  margin-left: 400px; }
+  left: 10px !important; }
 
 .cow_inventory {
   background-color: #fff;
@@ -3617,11 +3332,6 @@ message-next {
   top: 0;
   width: 80px;
   z-index: -1; }
-
-.inline_item {
-  border-bottom: 1px solid #7F7DC7;
-  display: inline-block;
-  font-weight: bold; }
 
 .cow_stats {
   background-color: #acdaff;
@@ -3676,59 +3386,18 @@ message-next {
   margin-bottom: 10px;
   padding: 10px; }
 
-.chapter_badge {
-  bottom: 20px;
-  height: 30px;
-  left: 50%;
-  margin-left: -15px;
-  position: absolute;
-  width: 30px;
-  z-index: 3; }
-
 body.night {
+  background-image: url(https://s3.amazonaws.com/icecreamstand.com/bg_night.png);
+  background-color: #122C5C;
   color: #ddd; }
-  body.night .quest_default {
-    opacity: 0.5; }
-  body.night .mention_suggestion_box {
-    background-color: #111; }
-  body.night .mention_suggestion_box .mention_suggestion.active {
-    background-color: #333; }
-  body.night .thread_msg, body.night .thread_user {
-    background-color: #333; }
-  body.night .thread_msg[x-align="left"]:before {
-    border-right: 10px solid #333; }
-  body.night .thread_msg[x-align="right"]:before {
-    border-left: 10px solid #333; }
   body.night .expertise_bar_inner, body.night .expertise_ball {
     background-color: #f49bae; }
-  body.night .lore_view_chapter {
-    background-color: #222; }
-  body.night .lore_bubble, body.night .thread_reply > textarea, body.night .new_message_respond {
-    background-color: #222; }
-  body.night .new_message .triangle-down {
-    border-top: 15px solid #222; }
-  body.night .lore_view_chapter:hover .lore_bubble {
-    background-color: #5c59b8; }
-  body.night .cow_stats {
-    background-image: url("http://static.icecreamstand.ca/backgrounds/aoc_night_c.png.gz"); }
-  body.night .cow_inventory:before {
-    background-color: #222; }
-  body.night .cow_inventory {
-    background-color: #404040; }
-  body.night .background_hill {
-    background-image: url(http://static.icecreamstand.ca/backgrounds/foreground_aoc_night.png.gz); }
-  body.night .sub_header {
-    color: #fff; }
   body.night .login div .triangle-down {
     display: none; }
   body.night .chat_container_main input {
-    background-color: #111;
-    color: #fff; }
+    background-color: #888; }
   body.night h4, body.night .tab, body.night .login > span#name, body.night .friends_counter, body.night .friends_button_container, body.night .friends_add, body.night .login div a {
     background-color: #45439b; }
-  body.night .inline-message {
-    background-color: #404040;
-    color: #fff; }
   body.night .shop_top {
     background-image: url("http://static.icecreamstand.ca/shap_background5f_night.png"); }
   body.night .shop_leftend {
@@ -3750,7 +3419,7 @@ body.night {
   body.night .flavor_tab.active, body.night .expand.active {
     background-color: #333 !important; }
   body.night .section-main {
-    background-image: url("http://static.icecreamstand.ca/backgrounds/foreground_aoc_night.png.gz"), url("http://static.icecreamstand.ca/background_wood_night.png"); }
+    background-image: url("http://static.icecreamstand.ca/foreground_night.png"), url("http://static.icecreamstand.ca/background_wood_night.png"); }
   body.night .chat.admin {
     color: #aaa8f2; }
   body.night .new_message {
@@ -3760,7 +3429,7 @@ body.night {
   body.night .section-main, body.night .hovercard, body.night .tutorial {
     background-color: #333; }
   body.night .main_container {
-    background-color: #222; }
+    background-color: #333; }
   body.night .event, body.night .trending {
     background-color: #333; }
   body.night #trend_sold_outer {
@@ -3787,13 +3456,11 @@ body.night {
   body.night .gold:before, body.night .current_value:before, body.night .unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before, body.night .money_icon:before {
     background-image: url(http://static.icecreamstand.ca/coins_night.svg); }
   body.night .footer, body.night #new_message {
-    background-color: #222; }
+    background-color: #333; }
   body.night #chat_window .chat {
     border-color: #333; }
   body.night .sell_value {
     color: #000; }
-  body.night .fb_iframe_widget {
-    background-color: #666; }
 
 .cow_level_bar {
   background-color: rgba(255, 255, 255, 0.75);
@@ -3843,41 +3510,27 @@ body.night {
 .cow_card_experience > span {
   background-color: #03a9f4; }
 
-.inventory_slot {
+.inventory_thumb {
   background-image: url("http://static.icecreamstand.ca/background_icons2.png");
   background-size: 30px 1px;
-  width: 50px;
   height: 50px;
-  overflow: hidden; }
-
-.inventory_thumb {
-  display: table;
-  max-height: 50px;
-  margin: 0 auto;
-  vertical-align: middle;
-  width: auto; }
+  width: 50px;
+  vertical-align: middle; }
 
 .inventory_thumb.thumb_wide {
   background-image: url("http://static.icecreamstand.ca/bg_day.png");
   background-position: right bottom;
   background-size: auto 400px;
   height: 100px;
-  max-height: 100px;
   width: auto;
-  max-width: 175px !important;
   padding: 10px; }
 
 .inventory_thumb.thumb_wide {
-  background: none repeat scroll 0 0 transparent !important;
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
   display: block;
   height: auto;
   margin: 10px auto;
   width: 175px; }
-
-.shop_table .inventory_thumb {
-  background-color: #ddd;
-  background-image: url("http://static.icecreamstand.ca/background_icons2.png");
-  max-width: 100px; }
 
 .skin_td {
   background-image: url("http://static.icecreamstand.ca/bg_day.png");
@@ -3902,10 +3555,7 @@ body.night {
 .rarity {
   color: #777;
   font-weight: bold;
-  position: absolute;
-  right: 20px;
-  top: 50px;
-  text-transform: capitalize; }
+  float: right; }
 
 .rarity[x-rarity="uncommon"] {
   color: #7F7DC7; }
@@ -3999,13 +3649,13 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
   cursor: pointer; }
 
 .type_item[x-type="hay"] {
-  background-image: url('https://s3.amazonaws.com/icecreamstand.com/items/hay_0.png'); }
+  background-image: url('https://s3.amazonaws.com/icecreamstand.com/hay.png'); }
 
 .type_item[x-type="hay"][x-variance="2"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hay_1.png"); }
+  background-image: url("https://s3.amazonaws.com/icecreamstand.com/hay2.png"); }
 
 .type_item[x-type="hay"][x-variance="3"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hay_2.png"); }
+  background-image: url("https://s3.amazonaws.com/icecreamstand.com/hay3.png"); }
 
 .type_item[x-type="amulet_basic"] {
   background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/amulet_basic.png"); }
@@ -4148,110 +3798,8 @@ body.winter .type_item[x-type="rock"][x-variance="1"] {
 .type_item[x-type="pet_blair"] {
   background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/pet_blair.png"); }
 
-.type_item[x-type="pet_shiba"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/pet_shiba.png"); }
-
-.type_item[x-type="coat_fauxfur"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/coat_fauxfur.png"); }
-
-.type_item[x-type="boots_fauxfur"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/boots_fauxfur.png"); }
-
 .type_item[x-type="mask_cthulhu"] {
   background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/mask_cthulhu.png"); }
-
-.type_item[x-type="sword_steel"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/sword_steel.png"); }
-
-.type_item[x-type="shield_steel"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/shield_steel.png"); }
-
-.type_item[x-type="armor_steel"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/armor_steel.png"); }
-
-.type_item[x-type="grabber_dino"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/grabber_dino.png"); }
-
-.type_item[x-type="hat_wolf"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hat_wolf.png"); }
-
-.type_item[x-type="dress_lace"] {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/dress_lace.png"); }
-
-.cow_attachment[x-type="dress_lace"] {
-  background-size: auto 100px;
-  height: 111px;
-  left: 69px;
-  top: 18px;
-  width: 124px; }
-
-body[x-rand="true"] .cow_attachment[x-type="dress_lace"] {
-  background-position: right top; }
-
-body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
-  float: right; }
-
-.cow_attachment[x-type="boots_fauxfur"] {
-  background-size: auto 25px;
-  height: 24px;
-  left: 69px;
-  top: 123px;
-  width: 147px;
-  z-index: 100; }
-
-.cow_attachment[x-type="coat_fauxfur"] {
-  background-size: 176px 119px;
-  height: 119px;
-  left: 51px;
-  top: -24px;
-  width: 176px; }
-
-.cow_attachment[x-type="pet_shiba"] {
-  background-size: auto 80px;
-  height: 100px;
-  left: 120px;
-  top: -27px;
-  width: 92px;
-  z-index: 100; }
-
-.cow_attachment[x-type="hat_wolf"] {
-  background-size: auto 100px;
-  height: 100px;
-  left: 3px;
-  top: -24px;
-  width: 92px;
-  z-index: 5; }
-
-.cow_attachment[x-type="grabber_dino"] {
-  background-size: 73px 50px;
-  height: 50px;
-  left: -7px;
-  top: 29px;
-  width: 73px;
-  z-index: 5; }
-
-.cow_attachment[x-type="sword_steel"] {
-  background-size: 64px 33px;
-  height: 33px;
-  left: 13px;
-  top: 32px;
-  width: 64px;
-  z-index: 5; }
-
-.cow_attachment[x-type="armor_steel"] {
-  background-size: 212px 107px;
-  height: 107px;
-  left: 6px;
-  top: -1px;
-  width: 212px; }
-
-.cow_attachment[x-type="shield_steel"] {
-  background-size: 55px 60px;
-  height: 60px;
-  left: 134px;
-  top: 15px;
-  width: 55px;
-  z-index: 5; }
 
 .cow_attachment[x-type="mask_cthulhu"] {
   background-size: auto 100px;
@@ -4321,18 +3869,15 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   width: 240px; }
 
 .cow_attachment[x-type="accessory_marotte"] {
-  background-size: 82px 50px;
-  left: -22px;
-  top: 25px;
-  width: 82px;
-  z-index: -1; }
+  left: -9px;
+  top: 38px;
+  width: 100px; }
 
 .cow_attachment[x-type="hat_jester"] {
-  background-size: 75px 50px;
-  height: 50px;
-  left: -16px;
-  top: -24px;
-  width: 75px; }
+  background-size: auto 60px;
+  height: 60px;
+  top: -21px;
+  width: 64px; }
 
 .cow_attachment[x-type="skirt_grass"] {
   background-size: 98px 150px;
@@ -4452,8 +3997,8 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   background-repeat: no-repeat;
   background-position: center bottom;
   background-size: contain;
-  height: 100px;
-  width: 60px; }
+  height: 75px;
+  width: 50px; }
 
 .item:after {
   background-color: rgba(0, 0, 0, 0.25);
@@ -4516,12 +4061,9 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   color: #fff;
   margin-top: -120px;
   padding: 10px;
-  position: absolute;
+  position: fixed;
   width: 300px;
   z-index: 3; }
-
-.franken_selector[x-franken="franken_right"] {
-  right: 0; }
 
 .franken_close {
   margin: 0 -10px -10px;
@@ -4654,9 +4196,6 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   margin-top: -20px;
   position: absolute; }
 
-.chat_count {
-  float: right; }
-
 .is_typing {
   display: inline-block;
   margin-right: 10px; }
@@ -4673,14 +4212,14 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   width: 96%; }
 
 .shop {
-  background-image: url("https://s3.amazonaws.com/icecreamstand.com/cart_shop.png");
+  background-image: url("http://static.icecreamstand.ca/cart_shop.png");
   background-size: 100% auto;
   bottom: 35px;
-  height: 141px;
-  left: 15%;
+  height: 100px;
+  left: 10%;
   position: absolute;
   z-index: 2;
-  width: 150px;
+  width: 100px;
   cursor: pointer; }
 
 .shop_table {
@@ -4722,12 +4261,12 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   background-image: url("http://static.icecreamstand.ca/shap_background5f.png");
   background-repeat: repeat-x;
   background-size: 15.41% 100px;
-  height: 100px;
-  margin: 0 10px; }
+  height: 110px;
+  margin: 0 27px; }
 
 .background_hill {
-  height: 150px;
-  top: auto;
+  height: 152px;
+  top: auto !important;
   bottom: 0;
   position: fixed;
   right: 0;
@@ -4778,8 +4317,7 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   cursor: pointer; }
 
 .time_left {
-  float: right;
-  font-size: 12px; }
+  float: left; }
 
 .cow_skin {
   background-color: #7f7dc7;
@@ -4799,26 +4337,8 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
 .cow_skin[x-id="toy"] {
   background-image: url("http://static.icecreamstand.ca/skins/toy.png"), url("http://static.icecreamstand.ca/background_icons2.png"); }
 
-.cow_skin[x-id="cyber"] {
-  background-image: url("http://static.icecreamstand.ca/skins/cyber.png"), url("http://static.icecreamstand.ca/background_icons2.png"); }
-
-.cow_skin[x-id="cheetah"] {
-  background-image: url("http://static.icecreamstand.ca/skins/cheetah.png"), url("http://static.icecreamstand.ca/background_icons2.png"); }
-
 .cow_skin[x-id="digital"] {
   background-image: url("http://static.icecreamstand.ca/skins/digital.png"), url("http://static.icecreamstand.ca/background_icons2.png"); }
-
-.cow_skin[x-id="chocolate"] {
-  background-image: url("http://static.icecreamstand.ca/skins/chocolate.png"), url("http://static.icecreamstand.ca/background_icons2.png"); }
-
-.cow_skin[x-id="cowasaurus"] {
-  background-image: url("http://static.icecreamstand.ca/skins/cowasaurus.png"), url("http://static.icecreamstand.ca/background_icons2.png"); }
-
-.cow_skin[x-id="dalek"] {
-  background-image: url("http://static.icecreamstand.ca/skins/dalek.png"), url("http://static.icecreamstand.ca/background_icons2.png"); }
-
-.cow_skin[x-id="chocolatebunny"] {
-  background-image: url("http://static.icecreamstand.ca/skins/chocolatebunny.png"), url("http://static.icecreamstand.ca/background_icons2.png"); }
 
 .cow_skin[x-id="default"] {
   background-image: url("http://static.icecreamstand.ca/skins/default.png"), url("http://static.icecreamstand.ca/background_icons2.png"); }
@@ -4834,31 +4354,8 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
 .cow_body[x-skin="toy"] {
   background-image: url("http://static.icecreamstand.ca/skins/toy.png"); }
 
-.cow_body[x-skin="cheetah"] {
-  background-image: url("http://static.icecreamstand.ca/skins/cheetah.png"); }
-
-.cow_body[x-skin="Chocolate bunny"] {
-  background-image: url("http://static.icecreamstand.ca/skins/chocolatebunny.png");
-  background-size: auto 175px;
-  height: 175px;
-  margin-left: 18px;
-  margin-top: -31px; }
-
-.cow_body[x-skin="cyber"] {
-  background-image: url("http://static.icecreamstand.ca/skins/cyber.png"); }
-
 .cow_body[x-skin="digital"] {
   background-image: url("http://static.icecreamstand.ca/skins/digital.png"); }
-
-.cow_body[x-skin="Cowasaurus"] {
-  background-image: url("http://static.icecreamstand.ca/skins/cowasaurus.png"); }
-
-.cow_body[x-skin="dalek"] {
-  background-image: url("http://static.icecreamstand.ca/skins/dalek.png");
-  margin-left: 11px; }
-
-.cow_body[x-skin="chocolate"] {
-  background-image: url("http://static.icecreamstand.ca/skins/chocolate.png"); }
 
 .cow_body[x-skin="Polar Bear"] {
   background-image: url("http://static.icecreamstand.ca/skins/polarbear.png");
@@ -4881,225 +4378,6 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   height: 150px;
   position: absolute;
   width: 250px; }
-
-.lore > .lore_glow {
-  background-image: url("http://static.icecreamstand.ca/lore_glow.png");
-  background-repeat: no-repeat;
-  background-size: 150px 162px;
-  height: 162px;
-  left: -20px;
-  position: absolute;
-  top: -40px;
-  transform-origin: 75px 79px 0;
-  width: 150px;
-  z-index: -1; }
-
-.lore {
-  bottom: 0;
-  cursor: pointer;
-  left: 3%;
-  margin-bottom: 100px;
-  position: absolute;
-  z-index: 3; }
-
-.lore > .lore_book {
-  background-image: url("http://static.icecreamstand.ca/lore_noglow.png");
-  background-repeat: no-repeat;
-  background-size: 100% auto;
-  content: " ";
-  height: 100px;
-  left: 2px;
-  position: absolute;
-  top: -10px;
-  width: 100px; }
-
-.lore[x-chapters="0"] {
-  display: none; }
-
-.lore:hover > .lore_glow {
-  -moz-animation: 12s linear 0s normal none infinite running lore_rotate;
-  -webkit-animation: 12s linear 0s normal none infinite running lore_rotate;
-  animation: 12s linear 0s normal none infinite running lore_rotate; }
-
-.lore_float {
-  -moz-animation: 6s ease 0s normal none infinite running lore_float;
-  -webkit-animation: 6s ease 0s normal none infinite running lore_float;
-  animation: 6s ease 0s normal none infinite running lore_float; }
-
-@-webkit-keyframes lore_rotate {
-  0% {
-    transform: rotate(0deg); }
-
-  100% {
-    transform: rotate(360deg); } }
-
-@-moz-keyframes lore_rotate {
-  0% {
-    transform: rotate(0deg); }
-
-  100% {
-    transform: rotate(360deg); } }
-
-@keyframes lore_rotate {
-  0% {
-    transform: rotate(0deg); }
-
-  100% {
-    transform: rotate(360deg); } }
-
-@-webkit-keyframes lore_float {
-  0% {
-    bottom: 40px; }
-
-  50% {
-    bottom: 80px; }
-
-  100% {
-    bottom: 40px; } }
-
-@-moz-keyframes lore_float {
-  0% {
-    bottom: 40px; }
-
-  50% {
-    bottom: 80px; }
-
-  100% {
-    bottom: 40px; } }
-
-@keyframes lore_float {
-  0% {
-    bottom: 40px; }
-
-  50% {
-    bottom: 80px; }
-
-  100% {
-    bottom: 40px; } }
-
-.lore_view_chapter {
-  background-color: #f1f1f1;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: inline-block;
-  font-size: 16px;
-  height: 200px;
-  margin-bottom: 10px;
-  margin-right: 3%;
-  padding: 20px;
-  vertical-align: top;
-  width: 30%;
-  position: relative;
-  overflow: hidden; }
-
-.lore_view_chapter b {
-  display: block;
-  font-size: 16px;
-  margin-bottom: 10px;
-  text-align: center; }
-
-.lore_bubble {
-  background-color: #f1f1f1;
-  border-radius: 20px;
-  height: 20px;
-  left: 50%;
-  position: absolute;
-  transition: all 0.25s ease 0s;
-  width: 20px;
-  z-index: 1; }
-
-.lore_chap_pback.button {
-  float: left; }
-
-.lore_chap_pnext.button {
-  float: right; }
-
-.lore_chap_pnext[x-is-max="true"], .lore_chap_pback[x-page="-6"] {
-  display: none; }
-
-.lore_chapter_controls {
-  margin-top: 20px;
-  text-align: center; }
-
-.lore_inner {
-  position: relative;
-  z-index: 2; }
-
-.lore_view_chapter:hover .lore_bubble {
-  background-color: #9f9de7;
-  border-radius: 200px;
-  height: 300px;
-  left: -50px;
-  top: -65px;
-  width: 300px; }
-
-.lore_in_title {
-  left: -115px;
-  position: absolute;
-  top: -71px;
-  z-index: 2; }
-
-.lore_pback.button {
-  float: left; }
-
-.lore_pnext.button {
-  float: right; }
-
-.lore_pback[x-page="-1"], .lore_pnext[x-is-max="true"] {
-  display: none; }
-
-.lore_pback.button, .lore_pnext.button {
-  padding: 10px 20px; }
-
-.lore_page_controls {
-  bottom: 0;
-  display: table;
-  margin: 20px auto;
-  max-width: 960px;
-  position: absolute;
-  text-align: center;
-  width: 100%; }
-
-.fullscreen.message {
-  bottom: 20px;
-  box-sizing: border-box;
-  left: 20px;
-  margin-left: 0;
-  margin-top: 0;
-  right: 20px;
-  top: 20px !important;
-  width: auto; }
-
-.message.fullscreen > #description {
-  margin: 10px auto;
-  max-width: 960px; }
-
-.white_overlay {
-  background-color: rgba(255, 255, 255, 0.75);
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  position: fixed;
-  z-index: 100; }
-
-.white_overlay strong {
-  position: fixed;
-  left: 0;
-  right: 0;
-  text-align: center;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #7F7DC7;
-  font-size: 42px; }
-
-.white_overlay i {
-  position: fixed;
-  right: 20px;
-  top: 20px;
-  font-size: 60px;
-  color: #404040;
-  cursor: pointer; }
 
 .winter {
   background-image: url("http://static.icecreamstand.ca/bg_snow_day.png"); }
@@ -5127,67 +4405,7 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
 .winter.night {
   background-image: url("http://static.icecreamstand.ca/bg_snow_night.png"); }
   .winter.night .section-main {
-    background-image: url("http://static.icecreamstand.ca/foreground_snow_night.png"), url("http://static.icecreamstand.ca/background_wood_night.png"); }
-
-.aoc_recruit_buttons .button {
-  box-sizing: border-box;
-  display: inline-block;
-  font-size: 12px;
-  margin-left: 1.5%;
-  margin-right: 1.5%;
-  text-align: center;
-  width: 30%; }
-
-.aoc_recruit_buttons {
-  margin-top: 40px; }
-
-body[x-epic="aoc"] .background_hill:after {
-  background-color: #102b28;
-  bottom: 0;
-  content: " ";
-  left: 0;
-  position: absolute;
-  right: 0;
-  top: 150px; }
-body[x-epic="aoc"] .aoc_log {
-  background-color: #f1f1f1;
-  margin-bottom: 20px;
-  padding: 10px; }
-body[x-epic="aoc"] .fort_options .button {
-  display: inline-block;
-  margin-bottom: 10px;
-  margin-left: 10px;
-  margin-top: -5px;
-  float: right; }
-body[x-epic="aoc"] .epic_aoc_invite {
-  background-color: #aaa;
-  color: #fff;
-  display: block;
-  margin: 10px -10px -30px;
-  padding: 10px;
-  text-align: center; }
-body[x-epic="aoc"] .aoc_dynamic td img {
-  height: 25px;
-  margin-right: 10px;
-  vertical-align: sub; }
-body[x-epic="aoc"] .epic_aoc_invite input {
-  background-color: #fff;
-  margin: 0; }
-body[x-epic="aoc"] .epic_aoc_invite span {
-  background-color: #0da673;
-  font-weight: bold;
-  padding: 5px 10px;
-  cursor: pointer; }
-body[x-epic="aoc"] .epic_aoc_invite span:hover {
-  background-color: #097752; }
-body[x-epic="aoc"] .aoc_forts {
-  border-bottom: 1px solid #f1f1f1;
-  margin-bottom: 20px; }
-body[x-epic="aoc"] .aoc_log_msg > small {
-  float: right; }
-body[x-epic="aoc"] .aoc_log {
-  height: 170px;
-  overflow-y: scroll; }
+    background-image: url("http://static.icecreamstand.ca/foreground_snow_night.png"), url("http://static.icecreamstand.ca/background_wood.png"); }
 
 .event_img {
   position: absolute;
@@ -5257,33 +4475,16 @@ body[x-epic="aoc"] .aoc_log {
   animation-timing-function: linear; }
 
 .buff {
-  background-color: #7F7DC7;
-  display: inline-block;
-  height: 30px;
+  position: fixed;
   top: 10px;
-  width: 30px;
-  background-size: 30px 30px;
-  margin-left: 10px;
-  border: 1px solid #888;
-  border-radius: 2px; }
-
-.buff[x-id="firstwin"] {
-  background-image: url("http://static.icecreamstand.ca/buff/daily.png"); }
-
-.buff[x-id="event"] {
-  background-image: url("http://static.icecreamstand.ca/buff/event.png"); }
-
-.buff[x-id="combo"] {
-  background-image: url("http://static.icecreamstand.ca/buff/combo.png"); }
-
-.buff[x-id="trend"] {
-  background-image: url("http://static.icecreamstand.ca/buff/trend.png"); }
-
-.buff[x-id="deep sleep"] {
-  background-image: url("http://static.icecreamstand.ca/buff/deepsleep.png"); }
+  left: 10px;
+  background-color: #7F7DC7;
+  font-size: 10px;
+  color: #fff;
+  padding: 2px; }
 
 .cube_infobar {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: bold;
   left: -20px;
   position: absolute;
@@ -5292,16 +4493,11 @@ body[x-epic="aoc"] .aoc_log {
   text-align: center; }
 
 .infocube_time {
+  color: #7F7DC7;
   float: left; }
 
-.infocube_money {
-  color: #7F7DC7;
-  text-shadow: 1px 1px 1px #fff;
-  font-size: 32px;
-  display: inline-block;
-  margin-top: -10px; }
-
 .infocube_multiplier {
+  font-weight: normal;
   float: right; }
 
 #main_addon .option_wrapper[x-new-art="true"], .unlockable[x-type="addon"][x-new-art="true"] .unlock_art_wrapper {
@@ -5344,296 +4540,63 @@ body[x-epic="aoc"] .aoc_log {
   margin-bottom: 20px;
   padding: 10px; }
 
-.mobile_menu {
-  display: none;
-  color: #fff;
-  cursor: pointer;
-  position: absolute;
-  right: 10px;
-  top: 37px;
-  transition: color 0.25s ease 0s; }
-
-.mobile_menu.active {
-  color: #7F7DC7; }
-
-.mailbox_list {
-  display: inline-block;
-  width: 200px; }
-
-.mailbox_thread {
-  display: inline-block;
-  width: calc(100% - 200px);
-  vertical-align: top;
-  padding-left: 20px;
-  padding-right: 20px;
-  box-sizing: border-box;
-  position: relative; }
-
-.message.extended {
-  margin-left: -480px;
-  width: 960px; }
-
-.thread_user {
-  background-color: #f1f1f1;
-  margin-bottom: 5px;
-  padding: 5px;
-  cursor: pointer;
-  position: relative; }
-
-.thread_user.thread_active {
-  background-color: #7F7DC7;
-  color: #fff; }
-
-.thread_msg {
-  background-color: #f1f1f1;
-  display: table;
-  margin-bottom: 10px;
-  max-width: 75%;
-  padding: 10px;
-  position: relative;
-  clear: both; }
-
-.thread_reply > input {
-  display: block;
-  width: 100%; }
-
-.thread_reply > textarea {
-  background-color: #ddd;
-  display: block;
-  min-width: 400px;
-  padding: 10px; }
-
-.thread_user > img {
-  height: 20px;
-  position: absolute;
-  right: 10px;
-  top: 5px;
-  width: 20px; }
-
-.thread_msg[x-align="right"] {
-  float: right; }
-
-.thread_msg[x-align="left"]:before {
-  border-bottom: 10px solid transparent;
-  border-right: 10px solid #f1f1f1;
-  border-top: 10px solid transparent;
-  content: "";
-  position: absolute;
-  left: -10px; }
-
-.thread_msg[x-align="right"]:before {
-  border-bottom: 10px solid transparent;
-  border-left: 10px solid #f1f1f1;
-  border-top: 10px solid transparent;
-  content: "";
-  position: absolute;
-  right: -10px; }
-
-.thread_controls {
-  position: absolute;
-  right: 10px;
-  cursor: pointer;
-  z-index: 2; }
-
-.thread_controls_down {
-  position: absolute;
-  right: 10px;
-  cursor: pointer;
-  top: 75px;
-  display: none; }
-
-.thread_controls > i, .thread_controls_down > i {
-  margin-left: 10px; }
-
-.thread_user[x-read="false"], .thread_msg[x-read="false"] {
-  font-weight: bold; }
-
-.mailbox_thread[x-docked="true"] {
-  height: 400px;
-  overflow-y: scroll; }
-
-.mailbox_thread[x-docked="true"] .thread_msg {
-  display: block !important; }
-
-.chat_popout {
-  color: #fff;
-  font-size: 12px;
-  padding: 0 5px; }
-
-.chat_popout i {
-  margin-right: 5px; }
-
-.silo {
-  background-image: url("http://static.icecreamstand.ca/silo_back.png");
-  height: 200px;
-  width: 106px;
-  display: block;
-  position: absolute;
-  height: 200px;
-  z-index: 2;
-  right: 10px;
-  bottom: 40px;
-  cursor: pointer; }
-
-.silo_bar {
-  background-image: url("http://static.icecreamstand.ca/silo_bar.png");
-  background-repeat: no-repeat;
-  background-position: left bottom;
-  position: absolute;
-  bottom: 39px;
-  right: 24px;
-  width: 20px;
-  padding-bottom: 4px; }
-
-.button.button_facebook {
-  background-color: #3b5998;
-  display: inline-block;
-  margin-bottom: 20px; }
-
-.background_option {
-  background-color: #f1f1f1;
-  display: inline-block;
-  height: 50px;
-  margin-right: 5px;
-  width: 50px;
-  background-size: auto 100%;
-  cursor: pointer; }
-
-.background_option.active {
-  box-shadow: 0 0 0 2px #7F7DC7 inset; }
-
-.background_option[x-value="default"] {
-  background-image: url("http://static.icecreamstand.ca/backgrounds/default.png.gz"); }
-
-.background_option[x-value="retro"] {
-  background-image: url("http://static.icecreamstand.ca/backgrounds/retro.png.gz"); }
-
-.background_option[x-value="fallen"] {
-  background-image: url("http://static.icecreamstand.ca/backgrounds/fallen.png.gz"); }
-
-.background_option[x-value="winter"] {
-  background-image: url("http://static.icecreamstand.ca/backgrounds/winter.png.gz"); }
-
-.background_option[x-value="attack on the castle"] {
-  background-image: url("http://static.icecreamstand.ca/backgrounds/aoc_day_c.png.gz"); }
-
-.party_icon {
-  height: 20px;
-  width: auto; }
-
-.easter_hunt {
-  cursor: pointer;
-  vertical-align: middle;
-  -webkit-animation: spin 4s ease infinite;
-  -moz-animation: spin 4s ease infinite;
-  animation: spin 4s ease infinite;
-  display: inline-block; }
-
-.easter_hunt > img {
-  background: none repeat scroll 0 0 transparent !important;
-  height: 25px !important;
-  width: 20px !important; }
-
-@-moz-keyframes spin {
-  0% {
-    -moz-transform: rotate(-20deg); }
-
-  50% {
-    -moz-transform: rotate(20deg); }
-
-  100% {
-    -moz-transform: rotate(-20deg); } }
-
-@-webkit-keyframes spin {
-  0% {
-    -webkit-transform: rotate(-20deg); }
-
-  50% {
-    -webkit-transform: rotate(20deg); }
-
-  100% {
-    -webkit-transform: rotate(-20deg); } }
-
-@keyframes spin {
-  0% {
-    transform: rotate(-20deg); }
-
-  50% {
-    transform: rotate(20deg); }
-
-  100% {
-    transform: rotate(-20deg); } }
-
 /* RESPONSIVE */
 @media all and (min-width: 1921px) {
   body {
     background-image: url("http://static.icecreamstand.ca/bg_day_wide.png"); }
+
   body.night {
     background-image: url("http://static.icecreamstand.ca/bg_night_wide.png"); }
-  body[x-epic="aoc"] {
-    background-size: 100% 768px; } }
+ }
 
 @media all and (max-width: 1370px) {
   #upgrades.section-side {
-    top: 100px; }
-  body[x-epic="aoc"] .background_hill {
-    top: auto;
-    bottom: 0px;
-    height: 100px;
-    background-size: 100% 100px; }
-  body[x-epic="aoc"] {
-    background-size: 100% auto; } }
+    position: absolute; }
+ }
 
 @media all and (max-width: 1240px) {
   .outofstock:before {
     width: 75px;
     height: 75px; }
+
+  h1 {
+    font-size: 40px; }
+
   .tab {
     font-size: 10px; }
-  body[x-epic="aoc"] {
-    background-size: auto; } }
+ }
 
 @media all and (max-width: 768px) {
-  .mobile_menu {
-    display: block; }
-  .icecream_flavour[x-new="true"] {
-    margin-top: -60px; }
-  .icecream {
-    padding-top: 0; }
-  .sell_value {
-    top: 290px; }
-  #upgrades.section-side {
-    top: 0;
-    background-color: #fff;
-    z-index: 10; }
-  #upgrades.section-side:not(.active) {
-    display: none; }
-  .shop_top {
-    margin: 0; }
+
   .section-side {
     position: relative;
     height: 500px;
     width: 100%; }
+
   .section-main {
     width: 100%;
     min-width: 100%; }
+
   .flavor div#main_base, .flavor div#main_addon, .flavor div#main_combo {
-    width: 100%;
+    width: 435px;
     height: 90px; }
-  .option_wrapper {
-    height: 90px;
-    width: 90px; }
+
   .base_active {
-    height: 35px; }
+    height: 22px; }
+
   .shop_rightend, .shop_leftend {
     display: none; }
+
   h1 {
     font-size: 35px; }
+
   .message {
     margin-left: 0;
     left: 10px;
     right: 10px;
     width: auto; }
+
   .quest_list > .quest:first-child > .quest_body {
     padding-left: 0;
-    background: none; } }
+    background: none; }
+ }

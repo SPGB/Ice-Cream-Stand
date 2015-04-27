@@ -1,3 +1,6 @@
+socket = io('http://icecreamstand.ca', { query: "id=" + user._id + '&name=' + user.name  });
+bind_sockets();
+
 function bind_sockets() {
     socket.on('trend', function(msg){
         console.log(msg);
@@ -27,40 +30,6 @@ function bind_sockets() {
             }
             $('#trend_left')[0].textContent = numberWithCommas(75000 - j.total_sold) + ' left';
             $('#trend_sold_inner').css('width', ((j.total_sold / 75000.00) * 100) + '%');
-    });
-    socket.on('chat message', function(msg){
-        if (msg.add_badge && msg.add_badge_id == user_me._id) {
-            user_me.badges.push(msg.add_badge);
-            main();
-        } 
-        if (msg.dunce && msg.dunce == user_me.name) {
-            main('dunce', function () {
-                Icecream.first_time_dunce();
-            });
-        }
-        if (msg.party && (msg.party == '?' || msg.party == user_me.name)) {
-            if (msg.party == '?') {
-                user_me.party_until = null;
-                return;
-            }
-            main('party', function () {
-                Icecream.first_time_party();
-            });
-        }
-        if (msg.sync && msg.sync == user_me._id) {
-            window.location.reload(true);
-        }
-        if (msg.room) {
-            console.log('message for room: ' + msg.room);
-            if (msg.room && msg.room != user_me.room) {
-                if (!cached_rooms[msg.room]) cached_rooms[msg.room] = 0;
-                cached_rooms[msg.room]++;
-                $('.chat_room_option[x-id="' + msg.room + '"] > .chat_count')[0].textContent = cached_rooms[msg.room];
-                $('.chat_rooms').attr('x-unread', true);
-                return false;
-            }
-        }
-        load_message(msg);
     });
     socket.on('cow', function(msg){
         console.log(msg);
@@ -97,20 +66,20 @@ function bind_sockets() {
     });
     socket.on('update', function(msg){
         if (msg.gold) {
-            user_me.gold = parseFloat(msg.gold);
+            user.gold = parseFloat(msg.gold);
         }
         if (msg.ifr) {
             main('flavor');
         }
         if (msg.chapter) {
             toast('You have unlocked <b>' + msg.chapter + '</b>', 'Lore Chapter Unlocked!');
-            if (!user_me.chapters_unlocked) user_me.chapters_unlocked = [];
-            user_me.chapters_unlocked.push(msg.chapter);
-            $('.lore').attr('x-chapters', user_me.chapters_unlocked.length);
+            if (!user.chapters_unlocked) user.chapters_unlocked = [];
+            user.chapters_unlocked.push(msg.chapter);
+            $('.lore').attr('x-chapters', user.chapters_unlocked.length);
         }
         if (msg.epic) {
-            user_me.epic_collected = msg.epic;
-            $('.user_epic_collected')[0].textContent = user_me.epic_collected;
+            user.epic_collected = msg.epic;
+            $('.user_epic_collected')[0].textContent = user.epic_collected;
         }
         if (msg.fort) {
             $('.aoc_dynamic[x-id="' + msg.fort + '"] .fort_options span')[0].textContent = numberWithCommas(msg.fort_health);
@@ -143,7 +112,7 @@ function bind_sockets() {
             $('#trend_sold_inner').css('width', ((msg.trend / 75000.00) * 100) + '%');
         }
         if (msg.expertise && msg.expertise_position) {
-            user_me.flavors_sold[msg.expertise_position] = msg.expertise;
+            user.flavors_sold[msg.expertise_position] = msg.expertise;
         }
     });
     socket.on('alert', function(msg){
@@ -157,33 +126,6 @@ function bind_sockets() {
             toast(msg.error, 'Error');
         }
         alert(msg.message, msg.title);
-    });
-    socket.on('join', function(msg){
-        var friend = Icecream.get_friend(msg._id);
-        if (friend) {
-            var cur_time = new Date();
-            var last_seen = new Date(friend.updated_at);
-            console.log('online -' + friend.name + ' (' + (cur_time - last_seen)  + ')');
-            if (friend.is_away && user_me.is_friend_notify && cur_time - last_seen > 60000) {
-                load_message({ _id: Math.random() + 'online', user: ':', badge: '1', text: '@' + friend.name + ' has come online', is_system: true });
-            }
-            friend.is_away = false;
-            friend_list_add(friend.name, 2);
-            $('.friends_counter span#count')[0].textContent = $('.friends_list_online > user, .friends_list_away > user').length + '/' + $('.friends_counter span#count').attr('x-length');
-        }
-    });
-    socket.on('sleep', function(msg){
-        var friend = Icecream.get_friend(msg._id);
-        if (friend) {
-            var cur_time = new Date();
-            var last_seen = new Date(friend.updated_at);
-            if (user_me.is_friend_notify && friend.is_away && !msg.sleep  && cur_time - last_seen > 600000) {
-                load_message({ _id: Math.random() + 'afk', user: ':', badge: '1', text: '@' + friend.name + ' ' + messages_afk[Math.floor( Math.random() * messages_afk.length )], is_system: true });
-            }
-            friend.is_away = msg.sleep;
-            friend.updated_at = cur_time;
-            friend_list_add(friend.name, friend.is_away? 1 : 2);
-        }
     });
     socket.on('leave', function(msg){
         var friend = Icecream.get_friend(msg._id);
@@ -206,7 +148,4 @@ function bind_sockets() {
                 $('#typing').append('<span class="is_typing" x-id="' + msg._id + '">' + msg.name + ' is typing.</span>');
         }
     });
-
-    if (!user_me.room) user_me.room = 'default';
-    change_room(user_me.room);
 }

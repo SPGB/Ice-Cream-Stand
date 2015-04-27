@@ -39,10 +39,10 @@ function epic_load() { //set up the frame of the epic
         '<div class="epic_aoc_invite"><input type="text" placeholder="Player"><span>Recruit a player to the attack</span></div></p><div class="epic_progress_container">' +
         '</div></div>');
     $('body').on('click', '.aoc_attack', function() {
-        if (user_me.epic_collected == 0) return alert('You have no power to attack with.', 'Error');
+        if (user.epic_collected == 0) return alert('You have no power to attack with.', 'Error');
         var d = new Date();
-        var delta = (d - new Date(user_me.epic_last_attack)) / 60000;
-        if (user_me.epic_last_attack && delta < 10) {
+        var delta = (d - new Date(user.epic_last_attack)) / 60000;
+        if (user.epic_last_attack && delta < 10) {
             return alert('You can not attack again so soon, please wait ' + (10 - delta).toFixed(1) + ' minutes.', 'Error');
         }
         var is_chained = false;
@@ -52,10 +52,10 @@ function epic_load() { //set up the frame of the epic
             if (delta < 2) is_chained = true;
         }
         var max_attack = parseInt( $('.aoc_max_attack').text() );
-        user_me.epic_last_attack = new Date();
-        user_me.epic_collected -= max_attack;
-        if (user_me.epic_collected < 0) user_me.epic_collected = 0;
-        $('.user_epic_collected')[0].textContent = user_me.epic_collected;
+        user.epic_last_attack = new Date();
+        user.epic_collected -= max_attack;
+        if (user.epic_collected < 0) user.epic_collected = 0;
+        $('.user_epic_collected')[0].textContent = user.epic_collected;
         socket.emit('epic/aoc/attack', { is_chained: is_chained });
         epic_attack_buttons();
     });
@@ -64,27 +64,27 @@ function epic_load() { //set up the frame of the epic
         if (!user) return alert('No user selected', 'Error');
 
         var d = new Date();
-        var delta = (d - new Date(user_me.epic_last_recruit)) / 60000;
-        if (user_me.epic_last_recruit && delta < 10) {
+        var delta = (d - new Date(user.epic_last_recruit)) / 60000;
+        if (user.epic_last_recruit && delta < 10) {
             return alert('You can not recruit again so soon, please wait ' + (10 - delta).toFixed(1) + ' minutes.', 'Error');
         }
         
-        user_me.epic_last_recruit = new Date();
+        user.epic_last_recruit = new Date();
         socket.emit('epic/aoc/invite', { user: user });
         $('.epic_aoc_invite input').val('');
         
-        user_me.epic_last_recruit = new Date();
+        user.epic_last_recruit = new Date();
     });
     epic_update();
 }
 function epic_update() { //load in the details
-    if (user_me.is_mod || user_me.is_admin) {
+    if (user.is_mod || user.is_admin) {
         $('.epic_desc').html('<strong>Overview</strong><br>You are on the council in Ice Cream Standopia. <b>The citizens have gone mad and are revolting!</b> Or so the ice that has grown around the forts and castle tells you. Buy knights to protect your forts and castles!');
     } else {
        $('.epic_desc').text('Buy weapons to increase the strength of your attacks. Attack up to once every 10 minutes, with up to 200 power. Attack within 2 minutes of another player to get a 50% bonus to your attack.'); 
     }
     $('.aoc_upgrades').html('<strong>Upgrades</strong><br>' +
-        '<small>Your power: <span class="user_epic_collected">' + user_me.epic_collected + '</span>. Maximum attack power: <span class="aoc_max_attack"></span></small>' +
+        '<small>Your power: <span class="user_epic_collected">' + user.epic_collected + '</span>. Maximum attack power: <span class="aoc_max_attack"></span></small>' +
         '<table class="weapon_upgrades" x-col="2">' +
         '<tr><td>Ice Cream balls</td><td><div class="button button_green aoc_upgrade" x-power="1">+1 power $100,000</div></td></tr>' +
         '<tr><td>Ice Cream arrows</td><td><div class="button button_green aoc_upgrade" x-power="5">+5 power $450,000</div></td></tr>' +
@@ -94,27 +94,27 @@ function epic_update() { //load in the details
     $('body').on('click', '.aoc_upgrade', function() {
         var cost = { 1: 100000, 5: 450000, 10: 875000 };
         var power = $(this).attr('x-power');
-        if (user_me.gold < cost[power]) return alert('Not enough money to purchase this upgrade', 'error');
-        user_me.gold -= cost[power];
+        if (user.gold < cost[power]) return alert('Not enough money to purchase this upgrade', 'error');
+        user.gold -= cost[power];
         gold -= cost[power];
         socket.emit('epic/aoc/upgrade', { power: power });
     });
     $('body').on('click', '.aoc_upgrade_knight', function() {
         var d = new Date();
-        var delta =  new Date(user_me.epic_last_attack) - d; //last_attack is the future date
+        var delta =  new Date(user.epic_last_attack) - d; //last_attack is the future date
         if (delta > 0) {
             return alert('You can not Repair again so soon, please wait ' + (delta / 60000).toFixed(1) + ' minutes.', 'Error');
         }
         var fort_id = $(this).closest('.aoc_dynamic').attr('x-id');
         var cost = 100000;
-        if (user_me.gold < cost) return alert('Not enough money to purchase this upgrade', 'error');
-        user_me.gold -= cost;
+        if (user.gold < cost) return alert('Not enough money to purchase this upgrade', 'error');
+        user.gold -= cost;
         gold -= cost;
 
         var cooldown  = 0.5 + (1 / ((0.0002 * cache_civvie_attack) + 1)); //minutes to wait
-        user_me.epic_last_attack = new Date( new Date().getTime() + (cooldown * 60000) ); //that number of minutes in the future
+        user.epic_last_attack = new Date( new Date().getTime() + (cooldown * 60000) ); //that number of minutes in the future
         console.log('upgrading fort ' + fort_id + ', cooldown: ' + cooldown);
-        console.log(user_me.epic_last_attack);
+        console.log(user.epic_last_attack);
         socket.emit('epic/aoc/knight', { fort: fort_id, health: $(this).attr('x-health') });
         epic_attack_buttons();
     });
@@ -122,7 +122,7 @@ function epic_update() { //load in the details
     //dynamic content below
     $.ajax({
         url: '/epics',
-        data: { id: user_me.epic_id },
+        data: { id: user.epic_id },
         dataType: 'json',
         success: function (epics) {
             var civvies = 0;
@@ -137,7 +137,7 @@ function epic_update() { //load in the details
                     $('.aoc_max_attack')[0].textContent = 200 + (fort.total / 100);
                 }
             }
-            if (user_me.is_mod || user_me.is_admin) {
+            if (user.is_mod || user.is_admin) {
                 var knight_health = 2 + (civvies * 1.5);
                 $('.fort_options').each(function () {
                     $(this).append('<div class="button button_green aoc_upgrade_knight" x-health="' + knight_health + '">Hire Knight - $10,000,000 +' + knight_health + 'hp</div>');
@@ -183,18 +183,18 @@ function epic_interval() { //update each forts power
 function epic_attack_buttons() {
     var d = new Date();
     var delta = (epic_last_attack)? (d - epic_last_attack) / 60000 : 0;
-    var delta_locked = (user_me.epic_last_attack)? (d - new Date(user_me.epic_last_attack)) / 60000 : 0;
+    var delta_locked = (user.epic_last_attack)? (d - new Date(user.epic_last_attack)) / 60000 : 0;
     console.log('epic/aoc: locked for ' + delta_locked);
-    if (user_me.epic_last_attack && delta_locked < 10) {
+    if (user.epic_last_attack && delta_locked < 10) {
         if ($('.aoc_attack')[0]) $('.aoc_attack')[0].textContent = 'Unlocks in ' + (10 - delta_locked).toFixed(1) + ' minutes';
     } else if (epic_last_attack && delta < 5) {
         if ($('.aoc_attack')[0]) $('.aoc_attack')[0].textContent = 'Attack (x1.5)';
     } else {
         if ($('.aoc_attack')[0]) $('.aoc_attack')[0].textContent = 'Attack';
     }
-    if (user_me.is_admin || user_me.is_mod) {
+    if (user.is_admin || user.is_mod) {
 
-        var delta =  new Date(user_me.epic_last_attack) - d; //last_attack is the future date
+        var delta =  new Date(user.epic_last_attack) - d; //last_attack is the future date
         if (delta > 0) {
             $('.aoc_upgrade_knight')[0].textContent = 'Please wait ' + (delta / 60000).toFixed(1) + ' minutes.';
         } else {

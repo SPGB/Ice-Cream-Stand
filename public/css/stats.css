@@ -1,0 +1,52 @@
+body {
+  background-color: #404040;
+  color: #f1f1f1;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
+
+body.failure {
+  background-color: #BC0000; }
+
+section {
+  display: table;
+  max-width: 768px;
+  margin: 20px auto; }
+
+h1 {
+  font-size: 160px;
+  margin: 0;
+  text-align: center; }
+
+.msg_user {
+  background-color: #222;
+  margin-right: 10px; }
+
+.header_sub {
+  text-align: center;
+  margin-bottom: 50px;
+  font-weight: bold; }
+
+#accounts, #min, #max {
+  font-weight: normal; }
+
+.chat {
+  background-color: #555;
+  padding: 10px; }
+
+.msg {
+  padding: 5px; }
+
+.msg:nth-child(2n) {
+  background-color: #404040; }
+
+.ping_good {
+  color: #0da673; }
+
+.ping_avg {
+  color: #9F9DE7; }
+
+.ping_bad {
+  color: #BC0000; }
+
+.response_time {
+  margin-top: 20px;
+  padding-left: 10px; }

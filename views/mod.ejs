@@ -1,4 +1,28 @@
-<% layout('layout') -%>
+<!doctype html>
+<html lang="<%= (typeof lang != 'undefined')? lang : 'en' %>">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> 
+		<meta property="fb:app_id" content="1421033384776672" />
+		<meta property="og:url" content="http://icecreamstand.ca" />
+		<meta property="og:image" content="http://icecreamstand.ca/img/thumb.png" />
+		<meta property="og:title" content="Ice Cream Stand">
+		<meta property="og:description" content="Free Browser game where you sell delicious delicious ice cream. Open up a stand, buy workers, unlock flavors.">
+		<meta property="og:type" content="website" />
+		<meta name="description" content="Ice Cream Stand, an incremental browser game in a global economy. Open up an ice cream stand and sell ice cream. Unlock flavors, upgrades, workers and more!" />
+		<link rel="icon" type="image/png" href="http://icecreamstand.ca/img/favicon.png" />
+		<title><%= (typeof title != 'undefined')? title + ' - ' : '' %> Ice Cream Stand</title>
+	</head>
+	<body>
+	<link rel="stylesheet" href="https://s3.amazonaws.com/icecreamstand.com/common.css.gz" />
+	<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	
+	<a href="http://icecreamstand.ca/" class="subpage_logo">
+		<img src="http://static.icecreamstand.ca/icslogo_small.png" srcset="http://static.icecreamstand.ca/icslogo.png 2x">
+	</a>
+	<div style="text-align: left; margin: 20px auto; display: block; max-width: 960px; background-color: #fff; padding: 20px; padding-bottom: 60px;">
+	
+	<% if (typeof alert != 'undefined')	{ %> <div class="alert"><%= alert %></div> <% } %>
 <style>
 			body {
 				background-position: left bottom;
@@ -136,3 +160,6 @@
 	Badge: <input name="chapter[badge_id]" type="number"><br>
 	SAVE: <input type="submit"><br>
 </form>
+	</div>
+	</body>
+</html>

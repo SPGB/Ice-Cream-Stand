@@ -983,6 +983,7 @@ user:hover, .user_card:hover {
     background-color: rgba(0, 0, 0, 0.2);
     background-image: url("http://static.icecreamstand.ca/outofstock.png");
     background-size: 100% auto;
+    background-position: -4px 17px;
     content: "";
     height: 100px;
     pointer-events: none;
@@ -1056,7 +1057,7 @@ iframe.facebook {
     left: 50%;
     margin-left: -310px;
     position: fixed;
-    top: 50px;
+    top: -500px;
     width: 600px;
     max-width: 100%;
     padding: 10px;
@@ -1390,9 +1391,11 @@ input {
 .option {
     max-height: 100px;
 }
-.option[x-type="addon"], .unlockable[x-type="addon"] img  {
+#main_addon .option_wrapper, .unlockable[x-type="addon"] img  {
     background-image: url("http://static.icecreamstand.ca/toppings/jar.png"), url("http://static.icecreamstand.ca/background_icons2.png");
     background-size: 100% auto, 30px 1px;
+    background-position: left top;
+    background-repeat: no-repeat, repeat;
 }
 .option.drag, .option_wrapper:hover {
     @include drop-shadow();
@@ -1799,7 +1802,6 @@ table[x-col="2"] td {
     border-radius: 5px;
     display: inline-block;
     vertical-align: top;
-    margin-right: 3px;
 }
 .badge_inner {
     background-color: $purple;
@@ -1893,8 +1895,8 @@ table[x-col="2"] td {
     background-color: $yellow;
 }
 .trending_img {
-    background-color: #afe4ff;
-    background-image: url("http://static.icecreamstand.ca/cones/thumb/default.png.gz"), url("http://static.icecreamstand.ca/background_icons2.png");
+    background-color: rgba(0, 0, 0, 0.25);
+    background-image: url("http://static.icecreamstand.ca/cones/thumb/default.png.gz");
     background-position: center 48px;
     background-repeat: no-repeat, repeat;
     background-size: auto 100px, 30px 1px;
@@ -2761,7 +2763,7 @@ h3#upgrades_text {
 }
 .expertise_number {
     bottom: -31px;
-    right: 1px;
+    right: 5px;
     letter-spacing: -1px;
     font-size: 18px;
     font-weight: bold;
@@ -2769,14 +2771,7 @@ h3#upgrades_text {
     text-align: center;
     white-space: pre;
     z-index: 3;
-}
-.expertise_number:before {
-    content: '-';
-    font-weight: normal;
-}
-.expertise_number:after {
-    content: '°';
-    font-weight: normal;
+    opacity: 0.5;
 }
 .expertise_hover {
     font-size: 16px;
@@ -2817,12 +2812,10 @@ h3#upgrades_text {
     display: inline-block;
     cursor: pointer;
     text-align: center;
-    height: 20px;
     width: 50px;
     width: 100px;
-}
-.filter_prev {
-    float: left;
+    position: relative;
+    z-index: 2;
 }
 .filter_next {
     float: right;
@@ -2846,8 +2839,11 @@ h3#upgrades_text {
     max-width: 530px;
     margin: 0 auto;
     padding: 10px;
-    text-align: center;
-    background-color: #f1f1f1;
+}
+.filter_box > .button.inactive {
+    background-color: #888;
+    box-shadow: 0 2px 0 #404040;
+    cursor: default;
 }
 .filter_page.active {
     color: $purple;
@@ -2893,7 +2889,10 @@ h3#upgrades_text {
     margin-bottom: 10px;
     border-radius: 5px;
     margin: 0 -10px;
-    max-height: 900px;
+}
+#chat_window.chat_active {
+    height: 550px;
+    overflow-y: scroll;
 }
 #chat_window .chat {
     font-size: 12px;
@@ -2901,6 +2900,9 @@ h3#upgrades_text {
     padding: 5px 10px;
     border-bottom: 1px solid #f1f1f1;
     min-height: 25px;
+}
+.chat.announcement {
+    font-weight: bold;
 }
 .chat_container_main input { 
     display: inline-block;
@@ -3229,6 +3231,9 @@ h3#upgrades_text {
     width: calc(50% - 5px);
 }
 .trending_container {
+    background-image: url("http://static.icecreamstand.ca/bg_day.png");
+    background-position: right bottom;
+    background-size: 1000px auto;
     display: block;
     height: 92px;
     margin: -10px;
@@ -3392,13 +3397,12 @@ message-next {
 }
 .vote_container {
     bottom: 0;
-    top: 0;
-    right: 0;
-    background-color: #ddd;
-    position: absolute;
-    text-align: right;
-    width: calc(100% - 75px);
     overflow: hidden;
+    position: absolute;
+    right: 0;
+    text-align: right;
+    top: 0;
+    width: calc(100% - 75px);
 }
 .vote_box {
     display: inline-block;
@@ -3566,9 +3570,22 @@ message-next {
     z-index: 3;
 }
 body.night {
-    color: #ddd;
+    color: #f1f1f1;
     .quest_default {
         opacity: 0.5;
+    }   
+    .filter {
+        background-color: #111;
+    }
+    .vote_container {
+        background-color: #222;
+    }
+    .button.complete_quest {
+        background-color: #111;
+        box-shadow: 0 2px 0 #000;
+    }
+    .page_button {
+        background-color: #222;
     }
     .mention_suggestion_box {
         background-color: #111;
@@ -3657,7 +3674,7 @@ body.night {
         background-color: #333;
     }
     .flavor_tab.active, .expand.active {
-        background-color: #333 !important;
+        background-color: #222 !important;
     }
     .section-main {
         background-image: url("http://static.icecreamstand.ca/backgrounds/foreground_aoc_night.png.gz"), url("http://static.icecreamstand.ca/background_wood_night.png");
@@ -3678,7 +3695,7 @@ body.night {
         background-color: #222;
     }
     .event, .trending {
-        background-color: #333;
+        background-color: #222;
     }
     #trend_sold_outer {
         background-color: darken($grey, 20%);
@@ -3696,8 +3713,8 @@ body.night {
         background-color: #444 !important;
     }
     .expertise_bar_outer {
-        background-color: #333;
-        border-color: #333;
+        background-color: #222;
+        border-color: #222;
     }
     .expertise_ball {
         border-color: $grey;
@@ -4610,12 +4627,12 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
     background-image: url("https://s3.amazonaws.com/icecreamstand.com/cart_shop.png");
     background-size: 100% auto;
     bottom: 35px;
-    height: 141px;
+    cursor: pointer;
+    height: 117px;
     left: 15%;
     position: absolute;
+    width: 125px;
     z-index: 2;
-    width: 150px;
-    cursor: pointer;
 }
 .shop_table {
     width: 100%;
@@ -4827,6 +4844,10 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
     transform-origin: 75px 79px 0;
     width: 150px;
     z-index: -1;
+    display: none;
+}
+.lore:hover > .lore_glow {
+    display: block;
 }
 .lore {
     bottom: 0;
@@ -5219,13 +5240,36 @@ body[x-epic="aoc"] {
     right: -20px;
     white-space: pre-line;
     text-align: center;
+    top: 25px;
 }
-.infocube_time {
-    float: left;
+.cube_collect.button {
+    background-color: #ffeb3b;
+    border-radius: 4px;
+    box-shadow: 0 2px 0 #f9a825;
+    display: inline-block;
+    height: 27px;
+    line-height: 37px;
+    min-width: 130px;
+    padding: 5px 20px;
+    position: relative;
+    text-align: right;
+    z-index: 100;
+}
+.cube_collect.button:hover {
+    background-color: #f9a825;
+}
+.cube_collect.button::before {
+    color: #f9a825;
+    content: "COLLECT";
+    font-size: 16px;
+    left: 5px;
+    opacity: 0.5;
+    position: absolute;
+    top: 0;
 }
 .infocube_money {
-    color: $purple;
-    text-shadow: 1px 1px 1px #fff;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
     font-size: 32px;
     display: inline-block;
     margin-top: -10px;
@@ -5468,6 +5512,68 @@ body[x-epic="aoc"] {
     50% { transform: rotate(20deg); }
     100% { transform: rotate(-20deg); }
 }
+.page_button_container {
+    display: inline-block;
+    left: 0;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    padding: 0 150px;
+}
+.page_button {
+    background-color: #ddd;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 0 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+    border: 2px solid #ddd;
+    box-sizing: border-box;
+}
+.page_button:hover {
+    border: 2px solid #404040;
+}
+.page_button.active {
+    border: 2px solid $purple;
+    font-weight: bold;
+}
+.filter {
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    right: 10px;
+    text-align: right;
+}
+.filter .filter_dropdown {
+    display: none;
+    position: absolute;
+    right: -5px;
+    width: 100px;
+}
+.filter:hover .filter_dropdown {
+    display: block;
+    padding: 5px;
+}
+.filter_option {
+    background-color: #f1f1f1;
+    padding: 5px;
+    cursor: pointer;
+}
+.filter_opption:hover {
+    background-color: #ccc;
+}
+.filter_flavour_options span, .filter_addon_options > span {
+    display: block;
+    cursor: pointer;
+}
+#main_addon .option {
+    margin-left: 10px;
+    margin-top: 20px;
+    width: 80px;
+}
+
+
 /* RESPONSIVE */
 
 @media all and (min-width : 1921px) {

@@ -10,7 +10,6 @@
  */
  
 var express = require('express.io'),
-	engine = require('ejs-locals'),
   	routes = require('./routes'),
   	http = require('http'),
   	https = require('https'),
@@ -62,7 +61,7 @@ mongoose.connect('mongodb://localhost:' + config.db.port + '/admin', { auto_reco
 
 // all environments
 app.set('port', 80);
-app.engine('ejs', engine);
+//app.engine('ejs', engine);
 app.set('view engine', 'ejs');
 app.set('views', __dirname + '/views');
 app.use( express.static(path.join(__dirname, 'public')) );
@@ -606,8 +605,7 @@ app.get('/toppings', function(req, res){ //DEPRECIATING
 	}
 });
 app.get('/addons.json', function(req, res){
-	var upgrade_addon = (req.query.u)? req.query.u : 0;
-	Topping.find().sort('cost').limit((upgrade_addon + 1) * 3).lean(true).exec(function (err, toppings) {
+	Topping.find().sort('cost').limit().lean(true).exec(function (err, toppings) {
 		res.send( toppings );
 	});
 });
@@ -618,8 +616,14 @@ app.get('/flavors.json', function(req, res){
 	});
 
 });
-app.get('/combos', function(req, res){
-	if (!req.xhr) return res.redirect('/');
+app.get('/combos.json', function(req, res){
+	User.findOne({ _id: req.session.user_id }).select('combos').lean(true).exec(function (err, user) {
+		Combo.find({ _id: {$in: user.combos} }).lean(true).exec(function (err, combos) {  
+			res.send( combos );
+		});
+	});
+});
+app.get('/combos', function(req, res){ //depreciated
 	User.findOne({ _id: req.session.user_id }).select('combos').lean(true).exec(function (err, user) {
 		Combo.find({ _id: {$in: user.combos} }).lean(true).exec(function (err, combos) {  
 			res.send( combos );
@@ -2677,7 +2681,7 @@ app.get('/chat', function(req, res){
 	});
 });
 app.get('/chat.json', function(req, res){
-	var len = 15;  // second parameter is default
+	var len = (req.query.c)? parseInt(req.query.c) : 15;  // second parameter is default
 	User.findOne({_id: req.session.user_id}).select('room is_mod is_admin').lean(true).exec(function (err, user) {
 		var query = { room: 'default'};
 		if (user && user.room) query.room = user.room;

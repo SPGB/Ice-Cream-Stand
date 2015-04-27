@@ -11,7 +11,7 @@
 		<meta property="og:type" content="website" />
 		<meta name="description" content="Incremental multiplayer clicker game, create an ice cream stand and combine flavours and add-ons. Build an army of workers and raise cows." />
 		<link rel="icon" type="image/png" href="http://static.icecreamstand.ca/favicon.png" />
-		<title>Ice Cream Stand - Clicker Game</title>
+		<title>Ice Cream Stand</title>
 		<script type="text/javascript" src="http://icecreamstand.ca/bower_components/angular/angular.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script src="http://icecreamstand.ca/socket.io/socket.io.js"></script>
@@ -20,28 +20,10 @@
 		<script type="text/javascript">
 			var user = <%- (typeof user != 'undefined')? JSON.stringify(user) : 'null' %>;
 			var user_start = user; //legacy
-			var channel = (user)? user.release_channel : 0;
-
-			switch(channel) {
-				case 2: 
-					load_script('https://s3.amazonaws.com/icecreamstand.com/main_150.js.gz?cache=' + Math.random());
-					break; 
-				case 1:
-					load_script('https://s3.amazonaws.com/icecreamstand.com/controllers.js.gz');
-					load_script('https://s3.amazonaws.com/icecreamstand.com/main_149.js.gz');
-					break; 
-				default:
-					load_script('https://s3.amazonaws.com/icecreamstand.com/controllers.js.gz');
-					load_script('https://s3.amazonaws.com/icecreamstand.com/main_149.js.gz');
-			}
-			function load_script(url) {
-				return false;
-				console.log('loading script: ' + url);
-				var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true; script.src = url;
-				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
-			}
 		</script>
-		<script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_150.js.gz"></script>
+		<% if (user.release_channel == 2) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_150.js.gz"></script>
+		<% } else if (user.release_channel == 1) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_149.js.gz"></script>
+		<% } else { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_149.js.gz"></script><% } %>
 	</head>
 	<body x-scroll-down="false">
 	<div id="fb-root"></div>
@@ -103,21 +85,88 @@
 					</div>
 					<ol></ol>
 			</div>
-			<div class="flavor main_container" ng-controller="flavour">  
+			<div class="flavor main_container" ng-controller="flavourController">  
 				<h4><span class="lang">Ice Cream</span>
 						<span class="container_controls">
 							<div class="flavor_tab" x-id="main_franken" id="frankenflavour_tab" style="display:none;"><span class="lang">Frankenflavour</span></div>
 							<div class="flavor_tab active" x-id="main_base"><span class="lang">Flavour</span></div>
 							<div class="flavor_tab" x-id="main_addon"><span class="lang">Add-on</span></div>
 							<div class="flavor_tab" x-id="main_cone"><span class="lang">Cone</span></div>
-							<div class="flavor_tab" x-id="main_combo"><span class="lang">Combo</span></div>
+							<div class="flavor_tab" x-id="main_combo" ng-click="load_combos()"><span class="lang">Combo</span></div>
 							<a class="expand"><span class="lang">Expand</span></a>
 						</span>
 				</h4>
-					<div id="main_base" class="inner_flavor_container"></div>
-					<div id="main_addon" class="inner_flavor_container"></div> 
-					<div id="main_combo" class="inner_flavor_container"></div> 
-					<div id="main_cone" class="inner_flavor_container"></div> 
+				<div class="filter">
+					<i class="fa fa-sort"></i> Sort
+				</div>
+					<div id="main_base" class="inner_flavor_container">
+						<div ng-repeat="flavour in flavours_unlocked | startFrom:0 | limitTo:5" class="option_wrapper" x-new="true">
+							<img ng-src="http://static.icecreamstand.ca/flavours/thumb/{{flavour.name | img_sanitize}}.png.gz" draggable="true" x-id="{{flavour._id}}" class="option tooltip" x-base-value="{{flavour.base_value}}" x-value="{{flavour.value}}" x-type="base" />
+						</div>
+						<div ng-repeat="flavour in flavours_unlocked | startFrom:currentPage*pageSize + 5 | limitTo:pageSize + 5" class="option_wrapper" x-new="true">
+							<img ng-src="http://static.icecreamstand.ca/flavours/thumb/{{flavour.name | img_sanitize}}.png.gz" draggable="true" x-id="{{flavour._id}}" class="option tooltip" x-base-value="{{flavour.base_value}}" x-value="{{flavour.value}}" x-type="base" />
+						</div>
+						<div class="filter_box" ng-show="flavours_unlocked.length > 20">
+							<div ng-click="update_page(currentPage-1)" class="filter_prev button" ng-class="{ 'inactive': currentPage === 0 }">
+								<i class="fa fa-arrow-left"></i> BACK
+							</div>
+							<div class="page_button_container">
+								<div class="page_button" ng-repeat="i in pages_flavour() track by $index" ng-click="update_page($index)" ng-class="{ 'active': currentPage == $index }">
+									{{$index}}
+								</div>
+							</div>
+							<div ng-click="update_page(currentPage+1)" class="filter_next button" ng-class="{ 'inactive': (currentPage + 1)*pageSize + 5 >= flavours_unlocked.length  }">
+								NEXT <i class="fa fa-arrow-right"></i>
+							</div>
+						</div>
+					</div>
+					<div id="main_addon" class="inner_flavor_container">
+					<div ng-repeat="addon in addons_unlocked | startFrom:0 | limitTo:5" class="option_wrapper" x-new="true">
+							<img ng-src="http://static.icecreamstand.ca/addons/thumb/{{addon.name | img_sanitize}}.png.gz" draggable="true" x-id="{{addon._id}}" class="option tooltip" x-base-value="{{addon.base_value}}" x-value="{{addon.value}}" x-type="addon" />
+						</div>
+						<div ng-repeat="addon in addons_unlocked | startFrom:currentPage*pageSize + 5 | limitTo:pageSize + 5" class="option_wrapper" x-new="true">
+							<img ng-src="http://static.icecreamstand.ca/addons/thumb/{{addon.name | img_sanitize}}.png.gz" draggable="true" x-id="{{addon._id}}" class="option tooltip" x-base-value="{{addon.base_value}}" x-value="{{addon.value}}" x-type="addon" />
+						</div>
+						<div class="filter_box" ng-show="addons_unlocked.length > 20">
+							<div ng-click="update_page(currentPage-1)" class="filter_prev button" ng-class="{ 'inactive': currentPage === 0 }">
+								<i class="fa fa-arrow-left"></i> BACK
+							</div>
+							<div class="page_button_container">
+								<div class="page_button" ng-repeat="i in pages_addons() track by $index" ng-click="update_page($index)" ng-class="{ 'active': currentPage == $index }">
+									{{$index}}
+								</div>
+							</div>
+							<div ng-click="update_page(currentPage+1)" class="filter_next button" ng-class="{ 'inactive': (currentPage + 1)*pageSize + 5 >= addons_unlocked.length  }">
+								NEXT <i class="fa fa-arrow-right"></i>
+							</div>
+						</div>
+					</div> 
+					<div id="main_combo" class="inner_flavor_container">
+						<div class="option_wrapper" ng-repeat="combo in combos | startFrom:currentPage*pageSize + 5 | limitTo:pageSize + 5">
+							<div class="combo_option tooltip option" x-type="combo" x-id="{{combo._id}}" x-addon="{{combo.topping_id}}" x-flavor="{{combo.flavor_id}}" x-franken="{{combo.franken_id}}" x-value="{{combo.value}}" x-name="{{combo.name}}" draggable="true" style="background-image:url(http://static.icecreamstand.ca/addons/thumb/{{combo.addon_name | img_sanitize}}.png.gz), url(http://static.icecreamstand.ca/flavours/thumb/{{combo.flavour_name | img_sanitize}}.png.gz)">
+								{{combo.name}}
+								<!-- <div ng-show="combo.franken_name" class="combo_split" style="background-image: url('http://static.icecreamstand.ca/flavours/thumb/{{ combo.franken_name | img_sanitize}}.png.gz')"></div> -->
+							</div>
+						</div>
+						<div class="filter_box" ng-show="combos.length > 20">
+							<div ng-click="update_page(currentPage-1)" class="filter_prev button" ng-class="{ 'inactive': currentPage === 0 }">
+								<i class="fa fa-arrow-left"></i> BACK
+							</div>
+							<div class="page_button_container">
+								<div class="page_button" ng-repeat="i in pages_combos() track by $index" ng-click="update_page($index)" ng-class="{ 'active': currentPage == $index }">
+									{{$index}}
+								</div>
+							</div>
+							<div ng-click="update_page(currentPage+1)" class="filter_next button" ng-class="{ 'inactive': (currentPage + 1)*pageSize + 5 >= combos.length  }">
+								NEXT <i class="fa fa-arrow-right"></i>
+							</div>
+						</div>
+					</div> 
+					<div id="main_cone" class="inner_flavor_container">	
+						<div ng-repeat="cone in cones_unlocked" class="option_wrapper tooltip" x-type="cone" draggable="true">
+							<img x-src="http://static.icecreamstand.ca/cones/thumb/{{cone}}.png.gz" x-type="cone" class="option" x-id="{{cone}}" />
+						</div>
+					</div> 
 			</div><div class="quests main_container half_size" ng-controller="quests">
 					<h4><span class="lang">Quests</span>
 					<span class="container_controls">
@@ -147,24 +196,43 @@
 					</div>
 
 			</div><div class="chat main_container" ng-controller="chat">
-					<h4><span class="lang">Chat ({{messages.length}})</span>
+					<h4><span class="lang">Chat {{messages.length}}</span>
 					<span class="container_controls">
-						<div class="chat_rooms"><span class="current_room">...</span> <i class="fa fa-sort-desc"></i></div>
+						<div class="chat_rooms"><span class="current_room">{{room_current}}</span> <i class="fa fa-sort-desc"></i>
+						<div class="hidden">
+							<div ng-repeat="room in rooms" class="chat_room_option" ng-click="change_room(room)" x-id="{{room}}">
+								{{room}}<span class="chat_count">{{cached_rooms[room]}}</span>
+							</div>
+						</div></div>
 						<a href="chat" class="chat_popout"><i class="fa fa-expand"></i><span class="lang">Popout</span></a>
-						<a class="expand"><span class="lang">Expand</span></a>
+						<a class="expand" ng-click="message_expand()" ng-class="{ 'active' : is_expanded }"><span class="lang">{{is_expanded? 'Hide' : 'Expand' }}</span></a>
 					</span></h4>
 					<div class="chat_container_main">
-						<div id="chat_window">
-							<div class="chat" ng-repeat="message in messages | limitTo: 15" x-id="{{message._id}}">
+						<div id="chat_window" ng-class="{ 'chat_active': is_expanded }">
+							<div class="chat announcement">
+								<span class="user_card" x-user="sam">
+									<img ng-src="http://static.icecreamstand.ca/badges/1.png" class="chat_badge" /> Sam
+								</span><span class="chat_textbody">
+									<i class="fa fa-thumb-tack"></i> ACCOUNCEMENT Please expect a couple bugs here and there while I make significant changes to the code for patch 1.50. Apologies for any inconvenience.
+								</span>
+							</div>
+
+							<div class="chat" ng-repeat="message in messages | startFrom: messages.length - message_count" x-id="{{message._id}}">
 								<span class="user_card" x-user="{{message.user}}">
 									<img ng-src="http://static.icecreamstand.ca/badges/{{message.badge}}.png" class="chat_badge" /> {{message.user}}
-								</span><span class="chat_textbody">{{message.text}}</span>
+								</span><span class="chat_textbody" ng-bind-html="message.text | chat_sanitize"></span>
+								<time class="chat_time">{{message.created_at}}</time>
 							</div>
 						</div>
-						<form id="new_message" method="POST" action="chat">
+						<form novalidate  id="new_message" method="POST">
 							<div id="typing"></div>
-							<div class="badge_selector"><div class="badge_inner"><b class="lang">Badges</b> <span class="triangle-down"></span></div></div><input type="text" name="text" maxlength="240" placeholder="What would you like to say" autocomplete="off">
-							<input type="submit" class="button button_green" value="Send">
+							<div class="badge_selector">
+								<div class="badge_inner">
+									<b class="lang">Badges</b><span class="triangle-down"></span>
+								</div>
+							</div>
+							<input ng-model="message.text" type="text" name="text" maxlength="240" placeholder="What would you like to say" autocomplete="off">
+							<input type="submit" class="button button_green" value="Send" ng-click="message_send(message)">
 						</form>
 					</div>
 				</div>
@@ -269,12 +337,7 @@
 						<img x-src="http://static.icecreamstand.ca/research_thumb.png" class="tooltip" />
 						<div class="unlock_text"><span class="lang">Flavor Research</span><span class="cost">500</span></div>
 						<button class="lang">Unlock</button>
-					</div>
-					<div x-type="research_addon" id="unlock_addon" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/addon_thumb.png" class="tooltip" />
-						<div class="unlock_text"><span class="lang">Add-on Research</span><span class="cost">50</span></div>
-						<button class="lang">Unlock</button>
-					</div>
+					</div>					
 				</div>
 				<div class="flavors_inner">
 					<div ng-repeat="flavour in flavours_locked | orderBy:'cost' | limitTo:3" class="unlockable" x-cost="{{flavour.cost}}" x-id="{{flavour._id}}" x-new="true" x-type="base">
@@ -282,6 +345,9 @@
 						<div class="unlock_text">{{flavour.name}}<span class="cost">{{flavour.cost | number:0}}</span>
 						</div>
 						<button ng-click="upgrades.purchase('flavour', flavour)">Unlock</button>
+					</div>
+					<div ng-show="flavours_locked.length === 0">
+						<p class="empty">All flavours unlocked</p>
 					</div>
 				</div>
 				<div class="toppings_inner" style="display: none;">
@@ -291,6 +357,9 @@
 						</div>
 						<div class="unlock_text">{{addon.name}} <span class="cost">{{addon.cost | number:0}}</span></div>
 						<button ng-click="upgrades.purchase('addon', addon)">Unlock</button>
+					</div>
+					<div ng-show="addons_locked.length === 0">
+						<p class="empty">All add-ons unlocked</p>
 					</div>
 				</div>
 				<div class="cones_inner" style="display: none;">

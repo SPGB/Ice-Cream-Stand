@@ -86,8 +86,8 @@ function cow_hay(is_from_cube) {
         variance = (Math.random() < 0.1)? 2 :1;
     }
     if (type == 'hay') {
-       // if (user_me.epic_id && Math.random() < 0.25) {
-       //      type = (user_me.epic_id == '5481119c19e7a1c726d1b3f7')? 'snowflake' : 'candycane';
+       // if (user.epic_id && Math.random() < 0.25) {
+       //      type = (user.epic_id == '5481119c19e7a1c726d1b3f7')? 'snowflake' : 'candycane';
        //  } 
     }
     var item_chance = (Math.random() + cow.magic_find);
@@ -99,23 +99,23 @@ function cow_hay(is_from_cube) {
         'dress_lace/1/1/1/uncommon'];
         var rare_drops = ['hat_afro/0/2/0/rare', 'hat_crown/2/0/1/rare', 'tutu_pink/1/0/1/rare'];
 
-        if (user_me.last_flavor == '523a1948750f2c0000000002' && user_me.last_addon == '525baaf765c3460000000007') {
+        if (user.last_flavor == '523a1948750f2c0000000002' && user.last_addon == '525baaf765c3460000000007') {
             uncommon_drops.push('hat_rainbow afro/1/2/1/uncommon');
         }
-        if (user_me.last_flavor == '524dd6ce8c8b720000000002' && user_me.last_frankenflavour == '52390634971a180000000003') {
+        if (user.last_flavor == '524dd6ce8c8b720000000002' && user.last_frankenflavour == '52390634971a180000000003') {
             uncommon_drops.push('wings_bat/1/0/1/uncommon');
         }
-        if (user_me.last_flavor === '523901fba4cc590000000007' && user_me.last_addon == '525bab2165c3460000000009') {
+        if (user.last_flavor === '523901fba4cc590000000007' && user.last_addon == '525bab2165c3460000000009') {
             rare_drops.push('hat_astronaut/2/0/2/rare');
             rare_drops.push('suit_astronaut/2/0/2/rare');
         }
-        if (user_me.is_night && user_me.last_flavor == '524dd72e8c8b720000000005' && user_me.last_addon == '525bab2165c3460000000009' && user_me.last_frankenflavour == '5238fd44523fdc0000000004') {
+        if (user.is_night && user.last_flavor == '524dd72e8c8b720000000005' && user.last_addon == '525bab2165c3460000000009' && user.last_frankenflavour == '5238fd44523fdc0000000004') {
             rare_drops.push('suit_batcow/2/1/1/rare');
         }
-        if (user_me.last_addon == '523d5c51fbdef6f047000025') {
+        if (user.last_addon == '523d5c51fbdef6f047000025') {
             rare_drops.push('hat_golden afro/3/0/0/rare/Fnm04');
         }
-        if (user_me.last_flavor == '524d0e141320310000000005' && user_me.last_frankenflavour == '523d5e603095960000000001' && user_me.last_addon == '523d5727fbdef6f04700000c' && Math.random() < 0.2) {
+        if (user.last_flavor == '524d0e141320310000000005' && user.last_frankenflavour == '523d5e603095960000000001' && user.last_addon == '523d5727fbdef6f04700000c' && Math.random() < 0.2) {
             rare_drops.push('pet_blair/2/2/2/rare/Creeperkitty');
         }
         if (cow && cow.items && cow.items.length > 3 && cow.items[0].indexOf('pet_blair') === 0 && 
@@ -126,7 +126,7 @@ function cow_hay(is_from_cube) {
             rare_drops.push('coat_fauxfur/3/0/1/rare/Animefandk/doge (3)');
             rare_drops.push('boots_fauxfur/0/3/1/rare/Animefandk/doge (3)');
         }
-        if (user_me.last_flavor == '525baa7865c3460000000006' && user_me.last_frankenflavour == '523903de9e47060000000002' && user_me.last_addon == '523d5dbf171d3e0000000005') {
+        if (user.last_flavor == '525baa7865c3460000000006' && user.last_frankenflavour == '523903de9e47060000000002' && user.last_addon == '523d5dbf171d3e0000000005') {
             rare_drops.push('mask_cthulhu/2/2/1/rare/Grakmarr');
         }
         if (new Date().getHours() < 2) { //12am to 1am
@@ -134,9 +134,9 @@ function cow_hay(is_from_cube) {
         }
 
         //dino grabber
-        var is_top_15expertise = (user_me.flavors_sold.length > 4);
-        for (var i = 0; i < user_me.flavors_sold.length; i++) {
-            var sold = user_me.flavors_sold[i];
+        var is_top_15expertise = (user.flavors_sold.length > 4);
+        for (var i = 0; i < user.flavors_sold.length; i++) {
+            var sold = user.flavors_sold[i];
             if (sold < 6076015) is_top_15expertise = false;
             if (i == 4) break;
         }
@@ -145,7 +145,7 @@ function cow_hay(is_from_cube) {
             rare_drops.push('grabber_dino/-1/3.5/0/rare');
         }
 
-        if (is_from_cube && user_me.last_addon == '523d5abafbdef6f047000020' && user_me.last_flavor == '524d0d1e1320310000000004') {
+        if (is_from_cube && user.last_addon == '523d5abafbdef6f047000020' && user.last_flavor == '524d0d1e1320310000000004') {
             rare_drops.push('hat_mercow/2/2/-1/rare');
             rare_drops.push('accessory_mercow/2/-1/2/rare');
             rare_drops.push('tail_mercow/-1/2/2/rare');
