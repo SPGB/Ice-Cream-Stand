@@ -98,6 +98,13 @@ module.exports = (function() {
 			});
 		});
 	});
+	router.get('/:name/friends', function(req, res){
+		User.findOne({ name: req.params.name }).select('friends').lean(true).exec(function (err, user) {
+			User.find({ _id: { $in: user.friends} }).select('name updated_at').lean(true).exec(function (err, users) {
+				res.send( users );
+			});
+		});
+	});
 	router.get('/:name/cow/:item', checkAdmin, function(req, res){
 		User.findOne({ name: req.params.name }).lean(true).exec(function (err, user) {
 			Cow.findOne({ user_id: user._id }).exec(function (err, cow) {

@@ -1,5 +1,22 @@
 var socketio = require('socket.io');
 var cache_trend_id;
+var motivationals = [
+	'Always do your best. What you plant now, you will harvest later.',
+	'You are never too old to set another goal or to dream a new dream.',
+	'If you can dream it, you can do it.',
+	'Be kind whenever possible. It is always possible.',
+	'Even if you fall on your face, you\'re still moving forward.',
+	'In order to succeed, we must first believe that we can.',
+	'By failing to prepare, you are preparing to fail.',
+	'Optimism is the faith that leads to achievement. Nothing can be done without hope and confidence.',
+	'The most certain way to succeed is always to try just one more time.',
+	'What you plant now, you will harvest later.',
+	'Keep your eyes on the stars, and your feet on the ground.',
+	'Don\'t watch the clock; do what it does. Keep going.',
+	'Expect problems and eat them for breakfast.',
+	'Never give up, for that is just the place and time that the tide will turn.',
+	'There is no justice in following unjust laws.'
+];
 
 module.exports.listen = function(app){
 	io = socketio.listen(app);
@@ -409,17 +426,32 @@ io.on('connection', function ( socket ) {
   	});
   	socket.on('accumulation', function(msg){
 
-  		User.findOne({ _id: socket.handshake.query.id }).select('highest_accumulation quests last_icecube_at accumulation_time chapters_unlocked').exec(function (err, user) {
+  		User.findOne({ _id: socket.handshake.query.id }).select('highest_accumulation flavors_sold flavors last_flavor gold total_gold total_prestige_gold today_gold week_gold quests last_icecube_at accumulation_time chapters_unlocked').exec(function (err, user) {
   			if (!user.highest_accumulation || msg.a > user.highest_accumulation) user.highest_accumulation = msg.a;
   			if (!user.accumulation_time || msg.t > user.accumulation_time) user.accumulation_time = msg.t;
   			if (msg.is_first_win) {
   				user.last_icecube_at = new Date();
   			}
 
+  			var money_earned = parseInt(msg.a);
+  			if ( isNaN(money_earned) ) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Gremlins are asleep' });
+
+  			user.gold = parseFloat(user.gold) + money_earned;
+  			user.total_gold = parseFloat(user.total_gold) + money_earned;
+			user.total_prestige_gold = parseFloat(user.total_prestige_gold) + money_earned;
+			user.today_gold = parseFloat(user.today_gold) + money_earned;
+			user.week_gold = parseFloat(user.week_gold) + money_earned;
+
+			//flavours sold
+			var flavour_position = user.flavors.indexOf( user.last_flavor );
+			user.flavors_sold[flavour_position] = parseInt(msg.sold);
+			user.markModified("flavors_sold");
+			user.updated_at = new Date();
+
   			if (msg.t > 20 && user.quests && user.quests.length > 2) {
 	  			if (!user.chapters_unlocked) user.chapters_unlocked = [];
-	  			var chance_to_unlock = 0.75 - (0.15 * user.chapters_unlocked.length);
-	  			if (chance_to_unlock < 0.05) chance_to_unlock = 0.05;
+	  			var chance_to_unlock = 0.50 - (0.02 * user.chapters_unlocked.length);
+	  			if (chance_to_unlock < 0.01) chance_to_unlock = 0.01;
 	  			if (msg.t > 60) chance_to_unlock += 0.025;
 	  			if (msg.t > 120) chance_to_unlock += 0.025;
 
@@ -447,7 +479,7 @@ io.on('connection', function ( socket ) {
 		if (!post.v || parseFloat(post.v) < 1.45) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Please update to the latest version.' });
 		User.findOne({ _id: socket.handshake.query.id }).select('achievements updated_at today_trending badges socket_id gold total_gold today_gold total_prestige_gold week_gold last_flavor last_frankenflavour last_frankenflavour_at upgrade_frankenflavour highest_accumulation items upgrade_coldhands trend_bonus prestige_bonus icecream_sold flavors_sold last_addon').exec(function (err, u) {
 		
-		if (!u || err) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Please log in.' });;
+		if (!u || err) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Please log in.' });
 		if (u.socket_id != socket.id) {
 			if (u.socket_id && io.sockets.connected[ u.socket_id ]) {
 				return io.sockets.connected[ u.socket_id ].emit("update", { refresh: true, error: 'You. Must. Refresh. (I see you in a new location)' });

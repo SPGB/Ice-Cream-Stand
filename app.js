@@ -213,10 +213,10 @@ var userSchema = new mongoose.Schema({
 	is_guest: { type: Boolean, default: true },
 	is_mod: { type: Boolean }, 
 	is_animation_clouds: { type: Boolean, default: true }, 
-	is_animation_lore: { type: Boolean, default: true }, 
-	is_animation_workers: { type: Boolean, default: true }, 
-	is_animation_cones: { type: Boolean, default: true }, 
 	is_animation_money: { type: Boolean, default: true }, 
+	is_animation_lore: { type: Boolean, default: false }, 
+	is_animation_workers: { type: Boolean, default: false }, 
+	is_animation_cones: { type: Boolean, default: false }, 
 	is_email_holiday: { type: Boolean, default: true }, 
 	is_email_password: { type: Boolean, default: true }, 
 	is_email_messages: { type: Boolean, default: true }, 
@@ -1460,13 +1460,12 @@ app.post('/unlock', function(req, res){
 	} else if (post.type=='frankenflavour') {
 		User.findOne({ _id: req.session.user_id }, function (err, user) {
 			if (err || !user) return res.send(500);
-			if (!user.items || user.items.indexOf('lab parts') == -1) {
-				return res.send('{"error":"Requires 1x Lab Parts"}');
-			}
+			var cost = 2000000;
 			if (user.upgrade_frankenflavour && user.upgrade_frankenflavour >= 3) return res.send('{"error":"Maxed"}');
+			if (user.gold < cost) return res.send('{"error":"Need money"}');
 			if (!user.upgrade_frankenflavour) user.upgrade_frankenflavour = 0;
+			user.gold -= Math.round(cost*Math.pow(10,2))/Math.pow(10,2);
 			user.upgrade_frankenflavour++;
-			user.items = [];
 			user.save(function (err, u) {
 				if (err) return res.send(err);
 				res.json({success:'frankenflavour'});
@@ -1526,6 +1525,7 @@ app.post('/unlock', function(req, res){
 			user.upgrade_legendary = 0;
 			user.upgrade_frankenflavour = 0;
 			user.flavors = '5238d9bc76c2d60000000001';
+			user.cones = 'default';
 			user.flavors_sold = '0';
 			user.toppings = '523d5800fbdef6f047000013';
 			user.combos = [];

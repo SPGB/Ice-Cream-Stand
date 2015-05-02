@@ -146,31 +146,34 @@ function first_time_init() {
     $('#version_info').html('<a href="/stats" id="online_count" target="_blank"></a> <a href="http://blog.samgb.com/tag/ice-cream-stand/" target="_blank" id="version_num">' + version + ' ' + channel[user.release_channel] + '</a>');      
 }
 function main_flavours(update_type, callback) {
-     $.ajax({
-        url : '/flavors',
-        data: { sort: 'cost', limit: (user.upgrade_flavor + 1) * 3 },
-        type: 'GET',
-        dataType: 'JSON',
-        success: function (j) {
-                flavors = j;
-                   
-                    if (update_type && update_type === 'sort_flavour') { 
-                        if (callback && typeof callback === 'function') {
-                            callback();
-                        }
-                    }
-                    if (update_type && (update_type === 'base')) {
-                        if (callback && typeof callback === 'function') {
-                            callback();
-                        }
-                        $('.flavor .option[x-id="' + user.last_flavor + '"]').eq(0).click();
-                        update_sell_value('base');
-                        Icecream.update_worker_fx('main flavours');
-                        return;
-                    }
-                    main_toppings(update_type, callback);
-                }
-    }); //end flavor call
+    //      $.ajax({
+    //         url : '/flavors',
+    //         data: { sort: 'cost', limit: (user.upgrade_flavor + 1) * 3 },
+    //         type: 'GET',
+    //         dataType: 'JSON',
+    //         success: function (j) {
+    //                 //flavors = j;
+
+
+
+    //                 }
+    //     }); //end flavor call
+
+    if (update_type && update_type === 'sort_flavour') { 
+        if (callback && typeof callback === 'function') {
+            callback();
+        }
+    }
+    if (update_type && (update_type === 'base')) {
+        if (callback && typeof callback === 'function') {
+            callback();
+        }
+        $('.flavor .option[x-id="' + user.last_flavor + '"]').eq(0).click();
+        update_sell_value('base');
+        Icecream.update_worker_fx('main flavours');
+        return;
+    }
+    main_toppings(update_type, callback);
 }
 function main_toppings(update_type, callback) {
     $.ajax({

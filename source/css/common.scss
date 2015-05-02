@@ -300,7 +300,7 @@ h4 {
 }
 .current_value {
     display: table;
-    font-size: 20px;
+    font-size: 26px;
     margin: auto;
     position: relative;
     text-align: right;
@@ -1496,8 +1496,12 @@ input {
     color: #404040;
     display: inline-block;
     padding: 5px 10px;
-    width: 33%;
+    width: 25%;
     cursor: pointer;
+}
+.user_friends .user {
+    display: inline-block;
+    padding: 5px;
 }
 .user_info_tab:hover {
     background-color: #f1f1f1;
@@ -1533,6 +1537,19 @@ input {
     min-height: 150px;
     padding: 20px 0 0 10px;
     position: relative;
+}
+.user_friends user {
+    background-color: #f1f1f1;
+    box-sizing: border-box;
+    display: inline-block;
+    font-size: 12px;
+    margin-bottom: 10px;
+    margin-right: 2%;
+    padding: 5px;
+    width: 31%;
+}
+user[x-mutual="true"] {
+    color: $green;
 }
 .playercard_anchor table {
     width: 100%;
@@ -2403,7 +2420,7 @@ h3#upgrades_text {
 	background-color: rgba(0,0,0,0.25);
 }
 .tutorial_0 {
-    left: 21%;
+    left: 23%;
     top: 316px;
 }
 .tut_ice_cube {

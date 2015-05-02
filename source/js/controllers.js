@@ -75,9 +75,6 @@ var ics = angular.module('ics', []);
     			$scope.combos = flavourService.format_combos(raw);
     		});
     	};
-    	$scope.filter = function (type, key) {
-
-    	};
 		$interval(function(){
 			var temp_flavours = upgradesService.get_unlocked_flavours();
 			if (cache_flavour_len != temp_flavours.length) {
@@ -245,13 +242,13 @@ var ics = angular.module('ics', []);
         $interval(function(){
         	$scope.gold = user.gold;
 	        if (cache_unread_message) {
-	            $('title')[0].textContent = 'Unread Message | Ice Cream Stand';
+	            $('title')[0].textContent = 'Unread Message - Ice Cream Stand';
 	        } else if (cache_unread_mention) {
-	            $('title')[0].textContent = 'You were mentioned | Ice Cream Stand';
+	            $('title')[0].textContent = 'You were mentioned - Ice Cream Stand';
 	        } else if (cached_new_messages > 0) {
-	            $('title')[0].textContent = cached_new_messages + ' Messages | Ice Cream Stand';
+	            $('title')[0].textContent = cached_new_messages + ' Messages - Ice Cream Stand';
 	        } else if (gold != user.gold) {
-	            $('title')[0].textContent = '$' + numberWithCommas( Math.floor($scope.gold) ) + ' | Ice Cream Stand';
+	            $('title')[0].textContent = '$' + numberWithCommas( Math.floor($scope.gold) ) + ' Ice Cream Stand';
 	        }
         }, 500);
 	})
@@ -318,6 +315,8 @@ var ics = angular.module('ics', []);
 		    		}
 		    	}
 		        $scope.addons_locked = locked;
+		        $scope.addons_unlocked = unlocked;
+
 		        upgradesService.set_unlocked_addons(unlocked);
 		    });
 		};
@@ -339,6 +338,8 @@ var ics = angular.module('ics', []);
 		    		}
 		    	}
 		        $scope.flavours_locked = locked;
+		        $scope.flavours_unlocked = unlocked;
+
 		        upgradesService.set_unlocked_flavours(unlocked);
 		    });
 		};

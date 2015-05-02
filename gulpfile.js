@@ -37,7 +37,7 @@ gulp.task('js', function() {
     .pipe(ngAnnotate())
     .pipe(concat('main_' + version + '.js'))
     //.pipe(uglify())
-    .pipe(jswrap({ }))
+    //.pipe(jswrap({ }))
     .pipe(gulp.dest('public/js'));
 });
 gulp.task('clear', function() {

@@ -654,8 +654,9 @@ var Icecream = {
                     user.next_quest_at = null;
                     $('.quests.main_container h4 > .lang')[0].textContent = 'Quests';
                     var reward = 'Extra $1 add-on event bonus';
-                    if (j.name == 'Bargaining Time') reward = 'Unlock Workers, chat, and a cow';
+                    if (j.name == 'Bargaining Time') reward = 'Unlock Workers, and chat';
                     if (j.name == 'Delusions of Grandeur') reward = 'Unlock Trends and Events';
+                    if (j.name == 'Ole Faithful') reward = 'Unlock cows';
                     if (j.dynamic_quest) {
                         reward = 'Extra <span class="money_icon">0.25</span> add-on event bonus';
                         j.description = parse_dynamic(j.dynamic_quest);
@@ -741,13 +742,13 @@ var Icecream = {
 	                    
 	                    if (user_progress[1] != '0') {
 	                        if (quest.level == 0) {
-	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Become an expert ' + ((cost)? cost : 5 )+ ' with her favourite flavor<br /><b>Reward</b> Unlock Workers, chat, and a cow</div>');
+	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Become an expert ' + ((cost)? cost : 5 )+ ' with her favourite flavor<br /><b>Reward</b> Unlock Workers, and chat</div>');
 	                        }
 	                        if (quest.level == 1) {
 	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Buy ' + cost + ' carts<br /><b>Reward</b> Unlock Trends</div>');
 	                        }
 	                        if (quest.level == 2) { 
-	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Discover ' + cost + ' combos<br /><b>Reward</b> + <span class="money_icon">1.00</span> event bonus</div>');
+	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Discover ' + cost + ' combos<br /><b>Reward</b> Unlock cows</div>');
 	                        }
 	                        if (quest.level == 3) {
 	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Buy ' + ((cost)? cost : 2 ) + ' truck' + ((cost != 1)? 's' : '') + '<br /><b>Reward</b> Unlock Frankenflavours</div>');
@@ -839,16 +840,19 @@ var Icecream = {
 	        }, 2000);
 	        return false;
 	    }
-	    if (user.tutorial == 0) { //where to click
+	    if (user.tutorial === 0) { //where to click
 	        $('.section-main, .section-side#upgrades, .expertise_bar_outer').css('opacity', 0.25);
 	        $('body').append('<div class="tutorial tutorial_0"><h2>' + __('Click Me!') + '</h2><p class="tutorial_text">' +
-	            __('Click here and click the scooplings as they appear.') + '. <b>' + __('Click Click!') +
-	            '</b></p><div class="tut_ice_cube" x-id="1"></div><div class="triangle-left"></div></div>');
+	            'Get money by <b>clicking on scooplings</b>. Once you have an least <b class="money_icon">10</b> click the collect button!' +
+	            '</p><div class="tut_ice_cube" x-id="1"></div><div class="triangle-left"></div></div>');
 	        for (var i = 0; i < 30; i++) {
 	            setTimeout(function () {
 	                $('.tut_ice_cube[x-id="1"]').toggleClass('active');
 	            }, i * 500);
 	        }
+            setTimeout(function () {
+                $('.icecream').click();
+            }, 3000);
 	    }
 	    if (user.tutorial == 1) {
 	        $('.expertise_bar_outer').css('opacity', 1);

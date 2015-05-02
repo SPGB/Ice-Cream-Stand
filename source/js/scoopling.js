@@ -21,16 +21,6 @@ $('body').on('click', '.icecream', function (e) {
         canvas_cache_sales = []; //progress, x, y, size, variation
         cube_new();
 
-        if (user.tutorial === 0) {
-            user.tutorial++;
-            Icecream.get_tutorial();
-            $.ajax({
-                url: 'tutorial',
-                data: 'tutorial=' + user.tutorial,
-                dataType: 'JSON',
-                type: 'POST'
-            });
-        }
     });
     
     $('body').on('mousemove', '#canvas_sales', function (e) {
@@ -82,8 +72,13 @@ $('body').on('click', '.icecream', function (e) {
                     //canvas_sales_context.clearRect(c[1] - 26 - 2, c[2] - 26 - 2, 54, 54);
                     cube_new();
                 } else if (c[4] > 7) {
-                    c[0] = 200;
-                    cubebar_end();
+                    var minus = Math.floor( cache_cube_money / 2 );
+                    cache_cube_money = minus;
+                    canvas_cache_sales = [];
+                    canvas_sales_context.clearRect(0, 0, 400, 400);
+                    cube_new();
+                    icecream_mousedown(0, e.pageX, e.pageY, -1 * minus);
+                    return false;
                 } else {
                     c[4]--;
                     if (c[3] && c[3] > 10) c[3] -= 20;
@@ -120,6 +115,77 @@ $('body').on('click', '.icecream', function (e) {
 }
 
 /** HELPERS **/
+function icecream_mousedown(amount, x, y, override) {
+
+        if (!cache_cube_multiplier) cache_cube_multiplier = 1;
+
+        if (!override) {
+            cache_sell_float = amount * cached_sell_value; // * cache_cube_multiplier * daily_mult;
+            cache_cube_money += cache_sell_float;
+            cache_sell_float_num++;
+            var c_new = numberWithCommas( (cache_sell_float).toFixed(2) );
+            
+
+            if (isNaN(cache_sell_float)) {
+                return console.log('float value is NaN (' + amount + ' ' + cached_sell_value + ' ' + cache_cube_multiplier + ')');
+            }
+            if (cache_sell_float_num === 10) {
+                    $('#icecream_float_text').remove();
+                    $('.icecream').append('<div id="icecream_float_text">Icey x2</div>');
+                    $('#icecream_float_text').animate({ 'top': '0' }, 1000, function () { $(this).remove() });
+                    cache_cube_multiplier = 2;
+            } else if (cache_sell_float_num === 30) {
+                    $('#icecream_float_text').remove();
+                    $('.icecream').append('<div id="icecream_float_text">Stone Cold x3</div>');
+                    $('#icecream_float_text').animate({ 'top': '0' }, 1000, function () { $(this).remove() });
+                    cache_cube_multiplier = 3;
+             } else if (cache_sell_float_num === 100) {
+                    $('#icecream_float_text').remove();
+                    $('.icecream').append('<div id="icecream_float_text">Frosty x4</div>');
+                    $('#icecream_float_text').animate({ 'top': '0' }, 1000, function () { $(this).remove() });
+                    cache_cube_multiplier = 4;
+             } else if (cache_sell_float_num === 150) {
+                    $('#icecream_float_text').remove();
+                    $('.icecream').append('<div id="icecream_float_text">Frozen! x5</div>');
+                    $('#icecream_float_text').animate({ 'top': '0' }, 1000, function () { $(this).remove() });
+                    cache_cube_multiplier = 4;
+            }
+            //if (is_cube) $('.infocube_multiplier')[0].textContent = cache_cube_multiplier + 'x' + ( (cache_first_win_avail)? ' +2x' : '');
+            if (!cache_sell_float_record && cache_cube_money > user.highest_accumulation) {
+                    cache_sell_float_record = true;
+            }
+        }
+        var floater = $('<div />', {
+            'class': 'icecream_float',
+            'text': (override)? override : numberWithCommas( (cache_sell_float).toFixed(2) )
+        });
+        $('body').append(floater);
+        $(floater).css('color', '#' + color_pool[Math.floor( Math.random() * color_pool.length )]).animate({ 'margin-top': '-100' }, 500, function () { $(this).remove() });
+        if (x && y) {
+            $(floater).css('top', y).css('left', x - 30);
+        }
+        if (user.is_animation_cones && window_focus && canvas_drop_cache_len < 50) {
+            if (amount == 1) {
+                 canvas_drop_cache.push([6, parseInt((Math.random() * canvas_width) / 50) * 50, 90 * Math.floor(Math.random() * -3), 1]);
+            } else {
+                canvas_drop_cache.push([6, parseInt((Math.random() * canvas_width) / 50) * 50, 90 * Math.floor(Math.random() * -3), 1.5]);
+            }
+            canvas_drop_cache_len = canvas_drop_cache.length;
+        }
+        return false;
+}
+
+function do_click(a) {
+    cache_sell_num += a;
+    //user.gold += parseFloat(cached_sell_value) * a;
+    if (cached_flavor_index > -1) {
+        user.flavors_sold[cached_flavor_index] = parseInt(user.flavors_sold[cached_flavor_index]) + a;
+        update_expertise(function () {
+            Icecream.update_quest_bar();
+        });
+    }
+}
+
 function within_z(x, x2, y, y2, z) {
     return (x > x2 - z && x < x2 + z && y > y2 - z && y < y2 + z);
 } 
@@ -142,8 +208,10 @@ function cubebar_update() {
             if (c && c[4] < 8) { //dont update rocks
                 c[0] -= 1 + speed;
                 if (c[0] < 0 - speed) {
-                    cubebar_end();
-                    c[0] = 200;
+                    canvas_cache_sales = [];
+                    cache_cube_multiplier = 1;
+                    canvas_sales_context.clearRect(0, 0, 400, 400);
+                    cube_new();
                 }
             }
         }
@@ -151,13 +219,17 @@ function cubebar_update() {
     function cubebar_end() {
         is_cube = false;
         console.log('... ending ice cubes');
-        socket.emit('accumulation', { 
+
+        var data = { 
             a: cache_cube_money,
             t: (new Date() - cache_cube_time) / 1000,
             is_first_win: cache_first_win_avail,
             flavour: user.last_flavor,
-            addon: user.last_addon
-        });
+            addon: user.last_addon,
+            sold: user.flavors_sold[cached_flavor_index]
+        };
+        console.log(data);
+        socket.emit('accumulation', data);
         $('.cube_infobar').slideUp(500, function () {
             $('.cube_infobar').remove();
             $('#canvas_sales').hide();
@@ -190,8 +262,11 @@ function cubebar_update() {
 
         //sync money
         user.icecream_sold += cache_sell_num;
-        sell_icecream(cache_sell_num, false);
+        user.gold += cache_cube_money;
+        //sell_icecream(cache_sell_num, false);
         cache_sell_num = 0;
+        cache_cube_money = 0;
+        cache_cube_time = 0;
 
         if (user.icecream_sold >= 2000000) { achievement_register('5280ef1cb61b420000000009'); }
         if (user.icecream_sold >= 1000000) { achievement_register('5280ef12b61b420000000008'); }
@@ -203,7 +278,16 @@ function cubebar_update() {
 
         if (user.quests.length === 0) Icecream.get_quest('cubes');
 
-        Icecream.get_tutorial();
+        if (user.tutorial === 0) {
+            user.tutorial++;
+            Icecream.get_tutorial();
+            $.ajax({
+                url: 'tutorial',
+                data: 'tutorial=' + user.tutorial,
+                dataType: 'JSON',
+                type: 'POST'
+            });
+        }
     }
     function cube_collision(x, y) {
         for (var i = 0; i < canvas_cache_sales.length; i++) {
@@ -218,7 +302,7 @@ function cubebar_update() {
     function cube_new(is_rock) {
         var new_x = 190, new_y = 175;
 
-        if (cache_sell_float_num > 2) {
+        if (cache_cube_multiplier > 1) {
             do {
                 new_x = 65 + (Math.random() * 275);
                 new_y = 65 + (Math.random() * 275);

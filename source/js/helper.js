@@ -37,92 +37,6 @@ function get_prestige_bonus(user) {
     $('#prestige_amount').text(ret);
     return ret;
 }
-function sell_icecream(amount, workers) {
-    if (!game_working) return;
-    
-    if (workers) {
-        //replace sold out ice cream
-        var outofstock = -1;
-        var i = Math.floor( Math.random() * 5 );
-        if (cached_worker_base_value[i] > 0.1 && window_focus && canvas_drop_cache_len < 30 && i < user.flavors.length) {
-            var i_x = (Math.random() * canvas_width) * 0.25;
-            canvas_drop_cache.push([i, (Math.random() > 0.5)? i_x : canvas_width - i_x, -90 + (-100 * i), 1]);
-            canvas_drop_cache_len = canvas_drop_cache.length;
-        }
-
-        if (outofstock > -1 && user.flavors.length > 5) {
-            console.time('sell_icecream oos');
-            var f = $('#main_base .option_wrapper').eq(outofstock);
-            var f_outer = $(f)[0].outerHTML;
-            var f_value = parseFloat($(f).find('.option').attr('x-base-value'));
-            var new_place = 5;
-            var f2 = '';
-            for (var i = 5; i < user.flavors.length; i++) {
-                //var i_value = parseFloat($('#main_base .option_wrapper').eq(i).find('.option').attr('x-base-value'));
-                if (!$('#main_base .option_wrapper').eq(i).hasClass('outofstock')) {
-                    new_place = i;
-                    f2 = $('#main_base .option_wrapper').eq(i).find('.option').attr('x-id')
-                    break;
-                }
-            }
-            console.log('.. new place: ' + new_place);
-            $.ajax({
-                url: '/switch',
-                data: {
-                    1:$(f).find('.option').attr('x-id'),
-                    2:f2
-                },
-                dataType: 'JSON',
-                type: 'POST',
-            });
-            
-            //switch in flavors list
-            var start = user.flavors[outofstock];
-            var start_sold = user.flavors_sold[outofstock];
-            user.flavors[outofstock] = user.flavors[new_place]; 
-            user.flavors[new_place] = start;
-            user.flavors_sold[outofstock] = user.flavors_sold[new_place]; 
-            user.flavors_sold[new_place] = start_sold;
-            
-            if (!$('#main_base .option_wrapper')[new_place]) return;
-            $(f)[0].outerHTML = $('#main_base .option_wrapper')[new_place].outerHTML;
-            $('#main_base .option_wrapper')[new_place].outerHTML = f_outer;
-            update_all_expertise();
-            update_sell_value('sell icecream');
-            Icecream.update_worker_fx('sell icecream');
-        }
-        var net_gold = parseFloat(sales_per * (cached_worker_total) );
-        user.gold += parseFloat(sales_per * cached_worker_total);
-
-        console.log('worker sales (' + amount + '), backlog: '  + cache_worker_sales_to_send);
-        socket.emit('sell/worker', {
-            g: user.gold,
-            d: cached_worker_total,
-            a: amount,
-            ds: is_deep_sleep,
-            v: version,
-            dsq: cache_worker_sales_to_send //sleeping queue
-        });
-        if (cache_worker_sales_to_send > 0) cache_worker_sales_to_send = 0;
-    } else {
-        console.log('ice cream sale (' + amount + ')');
-        socket.emit('sell', {
-            g: user.gold,
-            d: cached_worker_total,
-            a: amount,
-            addon: cached_addon_value,
-            ta: (trending_addon == user.last_addon),
-            c: (cache_combo)? cache_combo.value : 'false',
-            e: cached_expertise,
-            t: trending_bonus,
-            cbv: cached_flavor_value,
-            cone: cached_cone_value,
-            fp: cached_flavor_index,
-            ds: is_deep_sleep,
-            v: version,
-        });
-    }
-}
 function toast(msg, title, is_sticky) {
     var toast_id = 'toast' + Math.random();
     if (!title) title = 'Notice';
@@ -350,16 +264,6 @@ function update_all_expertise() {
                 last_sale = cost;
             }
         }
-    }
-}
-function do_click(a) {
-    cache_sell_num += a;
-    user.gold += parseFloat(cached_sell_value) * a;
-    if (cached_flavor_index > -1) {
-        user.flavors_sold[cached_flavor_index] = parseInt(user.flavors_sold[cached_flavor_index]) + a;
-        update_expertise(function () {
-            Icecream.update_quest_bar();
-        });
     }
 }
 function init_canvas() {
@@ -646,10 +550,10 @@ function get_easter_url(name, number) {
     var str = 'e2 at ics' + number + 'pleasedontcheat' + name;
     return '/easter/' + number + '/' + btoa(str);
 }
-function get_usercard(user) {
-        history.pushState({}, "Player - " + user, "/#!u/" + user);
+function get_usercard(name) {
+        history.pushState({}, "Player - " + name, "/#!u/" + name);
         $.ajax({
-            url: 'user/' + user.toLowerCase(),
+            url: 'user/' + name.toLowerCase(),
             success: function (j) {
                 if (j.error) {
                     alert(j.error, 'Error');
@@ -717,8 +621,10 @@ function get_usercard(user) {
                 alert('<div class="user_info_sash"><div class="badges">' + badges_compiled + '</div></div>' +
                     '<div class="user_info_inner"><div class="user_info_nav">' +
                     '<div class="user_info_tab user_info_tab_active" x-section="1">Player</div>' +
-                    '<div class="user_info_tab" x-section="2">Store</div><div class="user_info_tab" x-section="3">Stats</div></div>' +
-                '<div class="playercard_anchor" x-anchor="1" style="display: block;"><table><tr><td style="text-align:center;">' + 
+                    '<div class="user_info_tab" x-section="2">Store</div>' +
+                    '<div class="user_info_tab" x-section="3">Stats</div>' +
+                    '<div class="user_info_tab" x-section="4">Friends</div>' +
+                '</div><div class="playercard_anchor" x-anchor="1" style="display: block;"><table><tr><td style="text-align:center;">' + 
                 '<img src="http://www.gravatar.com/avatar/' + j.gravatar + '?s=200&d=' + default_img + '" class="gravatar" />' +
                 '<div class="button send_message" x-user="' + j.name + '">Message</div>' +
                 '<div class="button add_friend" x-enabled="' + friend_enabled + '" x-user="' + j.name + '">' + friend + '</div></td>' +
@@ -742,18 +648,35 @@ function get_usercard(user) {
                     '<td><b>Sold</b> ' + numberWithCommas(j.sold) +
                     ((user.is_mod || user.is_admin)? '<td><b>ID</b> <small>' + j._id + '</small>': '') +
                 '</td></tr></table></div>' +
-                '<div class="playercard_anchor" x-anchor="4">Achievements</div>' +
+                '<div class="playercard_anchor" x-anchor="4"><div class="user_friends"></div></div>' +
                 '<div class="user_bottom_panel">' +
                     '<time class="' + online_status + '" title="Last seen ' + j.updated_at + ' ago." x-away="' + j.is_away + '"></time>' +
                 '</div>' +
                 '<div class="user_cow" x-user="' + j.name + '" x-night="' + j.is_night + '">' + cow_cards + user_cow + '</div>', badge_avatar + ' ' + j.name.substring(0,1).toUpperCase() + j.name.substring(1) + ', ' + j.title);
-                
 
+                user_get_friends(j.name);
             },
             error: function (j) {
                 alert('failed to load user card', 'Error');
             }
         });
+}
+function user_get_friends(name, page) {
+    if (!page) page = 0;
+    var d = new Date();
+    var is_online = new Date(d - 5 * 60 * 1000);
+
+    $.ajax({
+        url: 'user/' + name + '/friends',
+        success: function (friends) {
+            for (var i = 0; i < friends.length; i++) {
+                var friend = friends[i];
+                var is_mutual = user.friends.indexOf(friend._id) > -1;
+                $('.user_friends').append('<user class="' + ((new Date(friend.updated_at) > is_online)? 'online' : 'offline') + '" x-mutual="' + is_mutual + '" x-user="' + friend.name + '" x-id="' + friend._id + '">' + friend.name + '</user>');
+                if (i > (page + 1) * 30) break;
+            }
+        }
+    });
 }
 function precise_round(num,decimals){
     return Math.round(num*Math.pow(10,decimals))/Math.pow(10,decimals);

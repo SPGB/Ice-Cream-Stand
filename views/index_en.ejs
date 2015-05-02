@@ -21,8 +21,8 @@
 			var user = <%- (typeof user != 'undefined')? JSON.stringify(user) : 'null' %>;
 			var user_start = user; //legacy
 		</script>
-		<% if (user.release_channel == 2) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_150.js.gz"></script>
-		<% } else if (user.release_channel == 1) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_149.js.gz"></script>
+		<% if (user.release_channel == 2) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_150.js.gz?cache=1"></script>
+		<% } else if (user.release_channel == 1) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_150.js.gz?cache=1"></script>
 		<% } else { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_149.js.gz"></script><% } %>
 	</head>
 	<body x-scroll-down="false">
@@ -176,7 +176,7 @@
 				</div><div class="trending_and_events main_container half_size hidden">
 					<div class="event" ng-controller="events">
 						<h4><span class="lang">Events</span></h4>
-						<div class="event_container">
+						<div class="event_container tooltip" x-type="event">
 							<span id="event_name"></span>
 							<span id="trend_time"></span>
 						</div>
@@ -196,7 +196,7 @@
 					</div>
 
 			</div><div class="chat main_container" ng-controller="chat">
-					<h4><span class="lang">Chat {{messages.length}}</span>
+					<h4><span class="lang">Chat</span>
 					<span class="container_controls">
 						<div class="chat_rooms"><span class="current_room">{{room_current}}</span> <i class="fa fa-sort-desc"></i>
 						<div class="hidden">
@@ -211,9 +211,10 @@
 						<div id="chat_window" ng-class="{ 'chat_active': is_expanded }">
 							<div class="chat announcement">
 								<span class="user_card" x-user="sam">
-									<img ng-src="http://static.icecreamstand.ca/badges/1.png" class="chat_badge" /> Sam
+									<img ng-src="http://static.icecreamstand.ca/badges/1.png" class="chat_badge" /> System
 								</span><span class="chat_textbody">
-									<i class="fa fa-thumb-tack"></i> ACCOUNCEMENT Please expect a couple bugs here and there while I make significant changes to the code for patch 1.50. Apologies for any inconvenience.
+									<i class="fa fa-thumb-tack"></i> Patch 1.50 now live on beta/alpha. Please report any bugs to the bug room.
+									<a href="http://blog.samgb.com/ics-patch-1-50/" target="_blank">Changelog Preview</a>
 								</span>
 							</div>
 
@@ -320,7 +321,7 @@
 						<div class="sale_level"></div><button x-amount="1" class="worker_increment">+1</button><button x-amount="10" class="worker_increment">+10</button><button x-amount="1000" class="worker_increment">Max</button>
 					</div>
 					<div x-type="frankenflavour" id="unlock_frankenflavour" class="unlockable">
-						<img x-src="http://static.icecreamstand.ca/frankenflavour.png" class="tooltip" /><div class="unlock_text"><span class="lang">Frankenflavour</span><span class="cost" id="frankenflavour_amount">1x Lab Parts</span></div><div class="sale_level">0</div><button class="lang">Unlock</button>
+						<img x-src="http://static.icecreamstand.ca/frankenflavour.png" class="tooltip" /><div class="unlock_text"><span class="lang">Frankenflavour</span><span class="cost">2,000,000</span></div><div class="sale_level">0</div><button class="lang">Unlock</button>
 					</div>
 					<div x-type="prestige" id="unlock_prestige" class="unlockable">
 						<img x-src="http://static.icecreamstand.ca/prestige_thumb.png" class="tooltip" /><div class="unlock_text"><span class="lang">Prestige</span><span class="cost" id="prestige_amount">*</span></div><div class="sale_level">0</div><div class="button prestige_button lang">Unlock</div>
@@ -374,7 +375,7 @@
 			</div>
 		</div>
 		<div class="money_floater" ng-controller="money">
-			<div class="gold" >{{gold | number:0}}</div>
+			<div class="gold" >{{gold | number: (gold > 1000)? 0 : 1}}</div>
 			<div class="gold_sales tooltip lang" x-type="ipm">Income per Minute <span class="money_icon"></span>
 				<div class="buff_container"></div>
 			</div>
