@@ -1,7 +1,7 @@
 body {
   background-color: #404040;
   color: #f1f1f1;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
+  font: 14px "Lucida Grande",Helvetica,Arial,sans-serif; }
 
 body.failure {
   background-color: #BC0000; }

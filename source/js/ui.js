@@ -1,4 +1,4 @@
-var version = '1.50';
+var version = '1.51';
 var channel = ['Main', 'Beta', 'Alpha'];
 var cow;
 var toppings = [];
@@ -1261,7 +1261,8 @@ $(document).ready(function () {
     });
     $('body').on('click', '#donate, .link_underline[x-link="donate"], .next_tutorial[x-link="donate"]', function () {
         document.location.hash = '#!donate';
-        alert('<p><b>100% of the donations go to making the game better!</b> Leave a note with your player name to earn a donation badge, access to alpha, and exclusive donor items. Alpha channel lets you see changes as they are being made and added to the game, before anyone else. </p> ' +
+        alert('<p><b>100% of the donations go to making the game better!</b> Leave a note with your player name to earn a donation badge, access to alpha, and exclusive donor items*. <br><small>You must reach out to us to claim monthly donor rewards.</small></p>' +
+        '<p>Alpha channel lets you see changes as they are being made and added to the game, before anyone else. </p> ' +
         '<a href="http://www.patreon.com/icecream" target="_blank" class="button donate_button">Support Ice Cream Stand</a> <small class="donate_once" x-section="1">Click here to make a one-time donation</small>' +
         '<div class="donate_anchor" x-anchor="1" style="display: none;">' +
         '<p>Donor Rewards for one-time donations are the same as ongoing donations viewable here: <a href="http://www.patreon.com/icecream" target="_blank">http://www.patreon.com/icecream</a></p>' + 
@@ -1274,7 +1275,7 @@ $(document).ready(function () {
         '<input type="hidden" name="bn" value="PP-DonationsBF:btn_donateCC_LG.gif:NonHosted">' + 
         '<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">' + 
         '<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">' + 
-        '</form>Or <a href="https://www.coinbase.com/SamGallagher" target="_blank">donate via Bitcoin</a></div>', 'Donate');
+        '</form></div> or <a href="https://www.coinbase.com/SamGallagher" target="_blank">donate via Bitcoin</a>', 'Donate');
     });
     $('body').on('click', '#invite, .link_underline[x-link="invite"], .next_tutorial[x-link="invite"]', function () {
         document.location.hash = '#!invite';
@@ -1758,10 +1759,6 @@ $(document).ready(function () {
             }
         });
         $('.message_close').click();
-    });
-    $('body').on('click', '.silo', function () {
-        var cost = get_cost(user.upgrade_silo_hay + 1, 'silo');
-        alert('<table><tr><td><b>Upgrade Silo capacity</b> - Lv' + user.upgrade_silo_hay + get_easter_bunny(2) + '<p>This increases Silo storage capacity by 25</p><div class="button button_green unlockable_ajax" x-upgrade="silo_hay" x-cost="' + cost + '" >Upgrade $' + numberWithCommas(cost) + '</div></td></tr></table>', 'Silo');
     });
     $('body').on('click', '.type_item[x-variance="2"][x-type="rock"]', function () {
         alert_inline(this, "Coooooooo");

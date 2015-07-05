@@ -28,6 +28,12 @@
     "websocket": "^1.0.18"
   },
   "devDependencies": {
-    "gulp-ng-annotate": "^0.5.2"
+    "gulp-cache": "^0.2.10",
+    "gulp-concat": "^2.6.0",
+    "gulp-image-resize": "^0.6.0",
+    "gulp-imagemin": "^2.3.0",
+    "gulp-js-wrapper": "0.0.3",
+    "gulp-ng-annotate": "^1.0.0",
+    "imagemin-pngcrush": "^4.1.0"
   }
 }

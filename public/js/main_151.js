@@ -4395,7 +4395,7 @@ function bind_tooltips() {
         
     });
 }
-var version = '1.50';
+var version = '1.51';
 var channel = ['Main', 'Beta', 'Alpha'];
 var cow;
 var toppings = [];
@@ -5672,7 +5672,7 @@ $(document).ready(function () {
         '<input type="hidden" name="bn" value="PP-DonationsBF:btn_donateCC_LG.gif:NonHosted">' + 
         '<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">' + 
         '<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">' + 
-        '</form></div>Or <a href="https://www.coinbase.com/SamGallagher" target="_blank">donate via Bitcoin</a>', 'Donate');
+        '</form></div> or <a href="https://www.coinbase.com/SamGallagher" target="_blank">donate via Bitcoin</a>', 'Donate');
     });
     $('body').on('click', '#invite, .link_underline[x-link="invite"], .next_tutorial[x-link="invite"]', function () {
         document.location.hash = '#!invite';
@@ -6156,10 +6156,6 @@ $(document).ready(function () {
             }
         });
         $('.message_close').click();
-    });
-    $('body').on('click', '.silo', function () {
-        var cost = get_cost(user.upgrade_silo_hay + 1, 'silo');
-        alert('<table><tr><td><b>Upgrade Silo capacity</b> - Lv' + user.upgrade_silo_hay + get_easter_bunny(2) + '<p>This increases Silo storage capacity by 25</p><div class="button button_green unlockable_ajax" x-upgrade="silo_hay" x-cost="' + cost + '" >Upgrade $' + numberWithCommas(cost) + '</div></td></tr></table>', 'Silo');
     });
     $('body').on('click', '.type_item[x-variance="2"][x-type="rock"]', function () {
         alert_inline(this, "Coooooooo");

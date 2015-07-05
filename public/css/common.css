@@ -260,7 +260,7 @@ h4 {
   background-color: #7F7DC7;
   color: #fff;
   margin: -10px -10px 10px;
-  padding: 5px 10px;
+  padding: 10px;
   position: relative; }
 
 .message > h4, .alert_shadow > h4 {
@@ -363,7 +363,7 @@ h4 {
 
 .chat_rooms i {
   vertical-align: top;
-  margin-top: -4px; }
+  margin-top: 2px; }
 
 .hidden {
   display: none; }
@@ -478,18 +478,19 @@ h4 {
   font-weight: bold; }
 
 .gold:before, .current_value:before, .unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before, .money_icon:before {
-  background-image: url("http://static.icecreamstand.ca/coins2.svg");
   background-size: 100% 100%;
-  content: " ";
+  content: "\f155";
   display: block;
   height: 20px;
-  left: -18px;
+  left: -22px;
   position: absolute;
   top: -2px;
-  width: 20px; }
+  width: 20px;
+  color: #7F7DC7;
+  font-family: "Fontawesome"; }
 
 .is_white.money_icon:before {
-  background-image: url("http://static.icecreamstand.ca/coins_night.svg"); }
+  color: #fff; }
 
 .money_icon.infocube_money:before {
   height: 25px;
@@ -500,14 +501,16 @@ h4 {
 .gold:before {
   width: 30px;
   height: 30px;
-  left: -25px;
-  top: 5px; }
+  left: -29px;
+  top: 7px;
+  font-size: 22px; }
 
 .current_value:before, .flavor_current:before {
-  top: 2px; }
+  top: 0; }
 
 .unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before {
-  top: -1px; }
+  top: 1px;
+  left: -9px; }
 
 .money_text {
   color: #a1a1a1; }
@@ -937,20 +940,16 @@ user:hover, .user_card:hover {
   0% {
     top: 90px;
     opacity: 1; }
-
   50% {
     margin-left: 0px;
     top: 10px;
     opacity: 0; }
-
   51% {
     margin-left: 10px;
     top: 90px;
     opacity: 0; }
-
   52% {
     opacity: 1; }
-
   100% {
     margin-left: -10px;
     top: 10px;
@@ -960,20 +959,16 @@ user:hover, .user_card:hover {
   0% {
     top: 90px;
     opacity: 1; }
-
   50% {
     margin-left: 0px;
     top: 10px;
     opacity: 0; }
-
   51% {
     margin-left: 10px;
     top: 90px;
     opacity: 0; }
-
   52% {
     opacity: 1; }
-
   100% {
     margin-left: -10px;
     top: 10px;
@@ -983,20 +978,16 @@ user:hover, .user_card:hover {
   0% {
     top: 90px;
     opacity: 1; }
-
   50% {
     margin-left: 0px;
     top: 10px;
     opacity: 0; }
-
   51% {
     margin-left: 10px;
     top: 90px;
     opacity: 0; }
-
   52% {
     opacity: 1; }
-
   100% {
     margin-left: -10px;
     top: 10px;
@@ -1441,7 +1432,7 @@ input {
   display: inline-block;
   font-size: 12px;
   font-weight: bold;
-  line-height: 12px;
+  line-height: 22px;
   height: calc(100% - 16px);
   letter-spacing: 1px;
   padding: 8px;
@@ -1716,32 +1707,24 @@ table[x-col="2"] td {
 @keyframes colorchange {
   0% {
     COLOR: #BC0000; }
-
   25% {
     COLOR: yellow; }
-
   50% {
     COLOR: #7F7DC7; }
-
   75% {
     COLOR: #0da673; }
-
   100% {
     COLOR: #BC0000; } }
 
 @-webkit-keyframes colorchange {
   0% {
     COLOR: #BC0000; }
-
   25% {
     COLOR: yellow; }
-
   50% {
     COLOR: #7F7DC7; }
-
   75% {
     COLOR: #0da673; }
-
   100% {
     COLOR: #BC0000; } }
 
@@ -1828,21 +1811,18 @@ table[x-col="2"] td {
 @-webkit-keyframes clock_move {
   0% {
     transform: rotate(0deg); }
-
   100% {
     transform: rotate(360deg); } }
 
 @-moz-keyframes clock_move {
   0% {
     transform: rotate(0deg); }
-
   100% {
     transform: rotate(360deg); } }
 
 @keyframes clock_move {
   0% {
     transform: rotate(0deg); }
-
   100% {
     transform: rotate(360deg); } }
 
@@ -2204,7 +2184,7 @@ h3#upgrades_text {
   display: inline-block;
   font-size: 12px;
   height: calc(100% - 16px);
-  line-height: 12px;
+  line-height: 22px;
   padding: 8px;
   position: relative; }
 
@@ -2293,7 +2273,6 @@ h3#upgrades_text {
   0% {
     top: -100px;
     opacity: 1; }
-
   100% {
     top: 80%;
     opacity: 0; } }
@@ -2302,7 +2281,6 @@ h3#upgrades_text {
   0% {
     top: -100px;
     opacity: 1; }
-
   100% {
     top: 80%;
     opacity: 0; } }
@@ -2311,7 +2289,6 @@ h3#upgrades_text {
   0% {
     top: -100px;
     opacity: 1; }
-
   100% {
     top: 80%;
     opacity: 0; } }
@@ -2601,7 +2578,7 @@ h3#upgrades_text {
   border-radius: 2px;
   bottom: 0;
   box-shadow: 0 2px 0 #909090;
-  height: 20px;
+  height: 18px;
   left: 0;
   padding: 5px 0;
   position: relative;
@@ -2682,14 +2659,11 @@ h3#upgrades_text {
   0% {
     margin-left: -200px;
     z-index: 1; }
-
   50% {
     margin-left: 100px;
     z-index: 1; }
-
   51% {
     z-index: -1; }
-
   100% {
     margin-left: -200px;
     z-index: -3; } }
@@ -2698,14 +2672,11 @@ h3#upgrades_text {
   0%, 100% {
     margin-left: -200px;
     z-index: 1; }
-
   50% {
     margin-left: 100px;
     z-index: 1; }
-
   51% {
     z-index: -1; }
-
   100% {
     margin-left: -200px;
     z-index: -3; } }
@@ -2713,84 +2684,72 @@ h3#upgrades_text {
 @-webkit-keyframes rotate {
   from {
     -webkit-transform: rotate(0deg); }
-
   to {
     -webkit-transform: rotate(360deg); } }
 
 @-moz-keyframes rotate {
   from {
     -moz-transform: rotate(0deg); }
-
   to {
     -moz-transform: rotate(360deg); } }
 
 @-webkit-keyframes background-move {
   from {
     background-position: 0px top; }
-
   to {
     background-position: 100% top; } }
 
 @-moz-keyframes background-move {
   from {
     background-position: 0px top; }
-
   to {
     background-position: 100% top; } }
 
 @-webkit-keyframes background-move-addon {
   from {
     background-position: 0, 0px top; }
-
   to {
     background-position: 0, 100px top; } }
 
 @keyframes background-move {
   from {
     background-position: 0px top; }
-
   to {
     background-position: 100% top; } }
 
 @-moz-keyframes background-move-addon {
   from {
     background-position: 0, 0px top; }
-
   to {
     background-position: 0, 100px top; } }
 
 @-webkit-keyframes expertise-move {
   from {
     background-position: right 0px; }
-
   to {
     background-position: right -50px; } }
 
 @-moz-keyframes expertise-move {
   from {
     background-position: right 0px; }
-
   to {
     background-position: right -50px; } }
 
 @-webkit-keyframes quest-move {
   from {
     background-position: right -85px; }
-
   to {
     background-position: right 0px; } }
 
 @-moz-keyframes quest-move {
   from {
     background-position: right -85px; }
-
   to {
     background-position: right 0px; } }
 
 @keyframes quest-move {
   from {
     background-position: right -85px; }
-
   to {
     background-position: right 0px; } }
 
@@ -3254,7 +3213,8 @@ h3#upgrades_text {
   overflow: hidden;
   position: relative; }
 
-.upgrades_inner .unlockable[x-type="research"], .upgrades_inner .unlockable[x-type="research_addon"], .upgrades_inner .unlockable[x-type="heroic"], .upgrades_inner .unlockable[x-type="legendary"] {
+.upgrades_inner .unlockable[x-type="research"], .upgrades_inner .unlockable[x-type="research_addon"],
+.upgrades_inner .unlockable[x-type="heroic"], .upgrades_inner .unlockable[x-type="legendary"] {
   display: none; }
 
 .wrapper_addon_thumb {
@@ -3814,7 +3774,7 @@ body.night {
   body.night #version_info {
     color: #fff; }
   body.night .gold:before, body.night .current_value:before, body.night .unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before, body.night .money_icon:before {
-    background-image: url(http://static.icecreamstand.ca/coins_night.svg); }
+    color: #fff; }
   body.night .footer, body.night #new_message {
     background-color: #222; }
   body.night #chat_window .chat {
@@ -4018,17 +3978,17 @@ body.night {
   width: 103px; }
 
 .type_item[x-type="rock"] {
-  background-image: url('https://s3.amazonaws.com/icecreamstand.com/rock.png'); }
+  background-image: url("https://s3.amazonaws.com/icecreamstand.com/rock.png"); }
 
 body.winter .type_item[x-type="rock"][x-variance="1"] {
-  background-image: url('https://s3.amazonaws.com/icecreamstand.com/rock_winter.png'); }
+  background-image: url("https://s3.amazonaws.com/icecreamstand.com/rock_winter.png"); }
 
 .type_item[x-type="rock"][x-variance="2"] {
   background-image: url("https://s3.amazonaws.com/icecreamstand.com/rock2.png");
   cursor: pointer; }
 
 .type_item[x-type="hay"] {
-  background-image: url('https://s3.amazonaws.com/icecreamstand.com/items/hay_0.png'); }
+  background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hay_0.png"); }
 
 .type_item[x-type="hay"][x-variance="2"] {
   background-image: url("https://s3.amazonaws.com/icecreamstand.com/items/hay_1.png"); }
@@ -4334,7 +4294,8 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   left: 12px;
   top: -24px; }
 
-.cow_attachment[x-type="cloak_designer"], .cow_attachment[x-type="cloak_gamemaster"], .cow_attachment[x-type="cloak_loremaster"], .cow_attachment[x-type="cloak_of the sun"], .cow_attachment[x-type="cloak_of the wolf"], .cow_attachment[x-type="cloak_donor"], .cow_attachment[x-type="cloak_superdonor"] {
+.cow_attachment[x-type="cloak_designer"], .cow_attachment[x-type="cloak_gamemaster"], .cow_attachment[x-type="cloak_loremaster"],
+.cow_attachment[x-type="cloak_of the sun"], .cow_attachment[x-type="cloak_of the wolf"], .cow_attachment[x-type="cloak_donor"], .cow_attachment[x-type="cloak_superdonor"] {
   background-size: 136px 110px;
   height: 110px;
   left: 55px;
@@ -4962,51 +4923,42 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
 @-webkit-keyframes lore_rotate {
   0% {
     transform: rotate(0deg); }
-
   100% {
     transform: rotate(360deg); } }
 
 @-moz-keyframes lore_rotate {
   0% {
     transform: rotate(0deg); }
-
   100% {
     transform: rotate(360deg); } }
 
 @keyframes lore_rotate {
   0% {
     transform: rotate(0deg); }
-
   100% {
     transform: rotate(360deg); } }
 
 @-webkit-keyframes lore_float {
   0% {
     bottom: 40px; }
-
   50% {
     bottom: 80px; }
-
   100% {
     bottom: 40px; } }
 
 @-moz-keyframes lore_float {
   0% {
     bottom: 40px; }
-
   50% {
     bottom: 80px; }
-
   100% {
     bottom: 40px; } }
 
 @keyframes lore_float {
   0% {
     bottom: 40px; }
-
   50% {
     bottom: 80px; }
-
   100% {
     bottom: 40px; } }
 
@@ -5182,16 +5134,19 @@ body[x-epic="aoc"] .background_hill:after {
   position: absolute;
   right: 0;
   top: 150px; }
+
 body[x-epic="aoc"] .aoc_log {
   background-color: #f1f1f1;
   margin-bottom: 20px;
   padding: 10px; }
+
 body[x-epic="aoc"] .fort_options .button {
   display: inline-block;
   margin-bottom: 10px;
   margin-left: 10px;
   margin-top: -5px;
   float: right; }
+
 body[x-epic="aoc"] .epic_aoc_invite {
   background-color: #aaa;
   color: #fff;
@@ -5199,25 +5154,32 @@ body[x-epic="aoc"] .epic_aoc_invite {
   margin: 10px -10px -30px;
   padding: 10px;
   text-align: center; }
+
 body[x-epic="aoc"] .aoc_dynamic td img {
   height: 25px;
   margin-right: 10px;
   vertical-align: sub; }
+
 body[x-epic="aoc"] .epic_aoc_invite input {
   background-color: #fff;
   margin: 0; }
+
 body[x-epic="aoc"] .epic_aoc_invite span {
   background-color: #0da673;
   font-weight: bold;
   padding: 5px 10px;
   cursor: pointer; }
+
 body[x-epic="aoc"] .epic_aoc_invite span:hover {
   background-color: #097752; }
+
 body[x-epic="aoc"] .aoc_forts {
   border-bottom: 1px solid #f1f1f1;
   margin-bottom: 20px; }
+
 body[x-epic="aoc"] .aoc_log_msg > small {
   float: right; }
+
 body[x-epic="aoc"] .aoc_log {
   height: 170px;
   overflow-y: scroll; }
@@ -5593,30 +5555,24 @@ body[x-epic="aoc"] .aoc_log {
 @-moz-keyframes spin {
   0% {
     -moz-transform: rotate(-20deg); }
-
   50% {
     -moz-transform: rotate(20deg); }
-
   100% {
     -moz-transform: rotate(-20deg); } }
 
 @-webkit-keyframes spin {
   0% {
     -webkit-transform: rotate(-20deg); }
-
   50% {
     -webkit-transform: rotate(20deg); }
-
   100% {
     -webkit-transform: rotate(-20deg); } }
 
 @keyframes spin {
   0% {
     transform: rotate(-20deg); }
-
   50% {
     transform: rotate(20deg); }
-
   100% {
     transform: rotate(-20deg); } }
 
@@ -5679,6 +5635,15 @@ body[x-epic="aoc"] .aoc_log {
   margin-left: 10px;
   margin-top: 20px;
   width: 80px; }
+
+.row_9 {
+  width: 66%;
+  display: inline-block; }
+
+.row_3 {
+  width: 33%;
+  display: inline-block;
+  text-align: center; }
 
 /* RESPONSIVE */
 @media all and (min-width: 1921px) {

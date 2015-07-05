@@ -666,269 +666,268 @@ var Icecream = {
                 }
             }
         });
-	},
-	quests_timer: function () {
-	    if (!user.next_quest_at) return;
-	    var diff = (new Date(user.next_quest_at) - new Date()) / 1000;
-	    var suffix;
-	    if (diff < 0) { 
-	        user.next_quest_at = null;
-	        clearInterval(quest_interval);
-	        $('.quests.main_container h4 > .lang')[0].textContent = 'Quests - Unlocking... ';
-	        setTimeout(function () {
-	            Icecream.get_quest();
-	        }, 1000);
-	        return false;
-	    }
-	    if (diff > 60) {
-	        var minutes = (diff / 60).toFixed(1);
-	        suffix = minutes + ' ' + ((minutes == 1)? 'minute' : 'minutes');
-	    } else {
-	        var seconds = Math.floor(diff);
-	        suffix = seconds  + ' ' + ((seconds == 1)? 'second' : 'seconds');
-	    }
-	    $('.quests.main_container h4 > .lang')[0].textContent = 'Quests - Next quest unlocks in ' + suffix;
-	},
-	get_quests: function(origin) {
-	    console.log('getting quests');
-	    if (user.quests.length == 0) {
-	        $('.quest_default').remove(); 
-	        $('.quest_list').append('<p class="quest_default">You aren\'t currently on any quests...</p>');
-	        if (user.gold > 10) Icecream.get_quest('get_quests');
-	        return;
-	    }
-	    if (user.next_quest_at && new Date(user.next_quest_at) > new Date()) {
-	        clearInterval(quest_interval);
-	        quest_interval = setInterval(function () {
-	            Icecream.quests_timer();
-	        }, 1000);
-	    } else {
-	        var last_quest = user.quests[ user.quests.length - 1];
-	        var split = last_quest.split('&');
-	        if (split[1] == '0') { //last quest complete
-	            Icecream.get_quest();
-	        }
-	    }
-	    $.ajax({
-	        url : 'quests',
-	        dataType: 'JSON',
-	        success: function (j) {
-	            if (!j) return false;
-	            quests = j;
-	            var q_len = user.quests.length - 1;
-	            var last_quest = user.quests[q_len].split('&');
-	            $('.quest_default').remove(); 
-	            for (var i = 0; i <= q_len; i++) {
-	                var q = user.quests[i];
-	                if (q.substring(0,2) == '!d') {
-	                    var user_progress = q.split('&');
-	                    var complete = (user_progress[1] == '0')? '<center><img src="'+image_prepend+'/star.png" class="quest_star" /><b>' + __('Completed') + '</b></center>' : '<div class="button complete_quest"><div id="complete_quest_progress"></div><b>' + __('Complete Quest') + '</b></div>';
-	                    $('.quest[x-dynamic="' + q + '"]').remove();
-	                    $('.quest_list').prepend('<div class="quest" x-dynamic="' + q + '" x-num="' + i + '">' +
-	                    '<div class="quest_body">' + parse_dynamic(q) + '<div class="quest_goal"><b>' + __('Reward') + '</b> <span class="money_icon">0.25</span> Event Bonus</div></div>' + complete + '</div>');
-	                  } else {
-	                    var quest = j[i];
-	                    if (typeof quest == 'undefined') break;
-	                    
-	                    $('.quest[x-id="' + quest._id + '"]').remove(); //just making sure
-	                    var user_progress = user.quests[i].split('&');
-	                    if (user_progress[2]) {
-	                        var cost = user_progress[2];
-	                        quest.description = quest.description.replace('[cost]', cost);
-	                    }
-	                    $('.quest_list').prepend('<div class="quest" x-num="' + i + '" x-id="' + quest._id + '">' +
-	                    '<div class="quest_body">' + quest.description + '</div></div>');
-	                    
-	                    
-	                    if (user_progress[1] != '0') {
-	                        if (quest.level == 0) {
-	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Become an expert ' + ((cost)? cost : 5 )+ ' with her favourite flavor<br /><b>Reward</b> Unlock Workers, and chat</div>');
-	                        }
-	                        if (quest.level == 1) {
-	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Buy ' + cost + ' carts<br /><b>Reward</b> Unlock Trends</div>');
-	                        }
-	                        if (quest.level == 2) { 
-	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Discover ' + cost + ' combos<br /><b>Reward</b> Unlock cows</div>');
-	                        }
-	                        if (quest.level == 3) {
-	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Buy ' + ((cost)? cost : 2 ) + ' truck' + ((cost != 1)? 's' : '') + '<br /><b>Reward</b> Unlock Frankenflavours</div>');
-	                        }
-	                        if (quest.level == 4) {
-	                            $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Sell 100 of ' + ((cost)? cost : 5 ) + ' flavors<br /><b>Reward</b>: Unlocks prestige, + $1 event bonus</div>');
-	                        }
-	                        $('.quest[x-id="' + quest._id + '"]').append('<div class="button complete_quest"><div id="complete_quest_progress"></div><b>' + __('Complete') + ' ' + quest.name + '</b></div>');
-	                    } else {
-	                        $('.quest[x-id="' + quest._id + '"]').append('<center><img src="'+image_prepend+'/star.png" class="quest_star" /><b>' + __('Completed') + ' ' + quest.name + '</b></center>');
-	                    }
-	                }
-	            }
-	            if (user.quests.length == 20 && last_quest[1] == '0') {
-	                 $('.quest_list').prepend('<div class="quest"><div class="quest_title">' + __('Prestige') + '</div>' +
-	                '<p>When you are ready, go to upgrades and unlock Prestige. You will get a bonus based on cash balance, and the number of flavours and add-ons unlocked. ' +
-	                'This restarts the game with a percentage bonus on all income.</p>' +
-	                '<img src="' + image_prepend + '/prestige_thumb.png" id="quest_prestige"></div>');
-	            }
-	            $('.quest').hide();
-	            $('.quest:first').show();
-	            Icecream.update_quest_bar();
-	        }
-	    });
-	},
-	update_trending: function() {
-	    if (!cache_event_trend_enable) return;
-	    console.log('socket:trending ->');
-	    socket.emit('trending');
-	},
-	update_clock: function(item, seconds_left) { 
-	    var mins = Math.floor(seconds_left / 60);
-	    var secs = seconds_left % 60;
-	    if (seconds_left > 0) {
-	        $(item)[0].textContent = mins + ':' + ((secs < 10)? '0' + secs : secs);
-	    }
-	},
-	update_worker_fx: function(origin) {
-	    if (origin) console.log('update_worker_fx <- ' + origin);
-	    $('.wrapper_addon_thumb').remove();
-	    for (var i = 0; i < 5; i++) {
-	        var topping = user.toppings[i];
-	        if (topping) {
-	            var t_len = toppings.length;
-	            for (var j = 0; j < t_len; j++) {
-	                if (toppings[j]._id === topping) {
-	                    topping = toppings[j].name;
-	                    break;
-	                }
-	            }
-	            var is_new =  new_art_addons.indexOf(topping) > -1;
-	            var url = (!is_new)? image_prepend+'/toppings/' + topping.replace(/\s+/g, '') + '_thumb.png' : image_prepend + '/addons/thumb/' + topping.replace(/\s+/g, '') + '.png.gz';
-	            $('#main_base .option_wrapper').eq(i).append('<img src="'+ url + '" x-is-new="' + is_new + '" class="wrapper_addon_thumb" />');
-	        }
-	    }
+    },
+    quests_timer: function () {
+        if (!user.next_quest_at) return;
+        var diff = (new Date(user.next_quest_at) - new Date()) / 1000;
+        var suffix;
+        if (diff < 0) { 
+            user.next_quest_at = null;
+            clearInterval(quest_interval);
+            $('.quests.main_container h4 > .lang')[0].textContent = 'Quests - Unlocking... ';
+            setTimeout(function () {
+                Icecream.get_quest();
+            }, 1000);
+            return false;
+        }
+        if (diff > 60) {
+            var minutes = (diff / 60).toFixed(1);
+            suffix = minutes + ' ' + ((minutes == 1)? 'minute' : 'minutes');
+        } else {
+            var seconds = Math.floor(diff);
+            suffix = seconds  + ' ' + ((seconds == 1)? 'second' : 'seconds');
+        }
+        $('.quests.main_container h4 > .lang')[0].textContent = 'Quests - Next quest unlocks in ' + suffix;
+    },
+    get_quests: function(origin) {
+        console.log('getting quests');
+        if (user.quests.length == 0) {
+            $('.quest_default').remove(); 
+            $('.quest_list').append('<p class="quest_default">You aren\'t currently on any quests...</p>');
+            if (user.gold > 10) Icecream.get_quest('get_quests');
+            return;
+        }
+        if (user.next_quest_at && new Date(user.next_quest_at) > new Date()) {
+            clearInterval(quest_interval);
+            quest_interval = setInterval(function () {
+                Icecream.quests_timer();
+            }, 1000);
+        } else {
+            var last_quest = user.quests[ user.quests.length - 1];
+            var split = last_quest.split('&');
+            if (split[1] == '0') { //last quest complete
+                Icecream.get_quest();
+            }
+        }
+        $.ajax({
+            url : 'quests',
+            dataType: 'JSON',
+            success: function (j) {
+                if (!j) return false;
+                quests = j;
+                var q_len = user.quests.length - 1;
+                var last_quest = user.quests[q_len].split('&');
+                $('.quest_default').remove(); 
+                for (var i = 0; i <= q_len; i++) {
+                    var q = user.quests[i];
+                    if (q.substring(0,2) == '!d') {
+                        var user_progress = q.split('&');
+                        var complete = (user_progress[1] == '0')? '<center><img src="'+image_prepend+'/star.png" class="quest_star" /><b>' + __('Completed') + '</b></center>' : '<div class="button complete_quest"><div id="complete_quest_progress"></div><b>' + __('Complete Quest') + '</b></div>';
+                        $('.quest[x-dynamic="' + q + '"]').remove();
+                        $('.quest_list').prepend('<div class="quest" x-dynamic="' + q + '" x-num="' + i + '">' +
+                        '<div class="quest_body">' + parse_dynamic(q) + '<div class="quest_goal"><b>' + __('Reward') + '</b> <span class="money_icon">0.25</span> Event Bonus</div></div>' + complete + '</div>');
+                      } else {
+                        var quest = j[i];
+                        if (typeof quest == 'undefined') break;
+                        
+                        $('.quest[x-id="' + quest._id + '"]').remove(); //just making sure
+                        var user_progress = user.quests[i].split('&');
+                        if (user_progress[2]) {
+                            var cost = user_progress[2];
+                            quest.description = quest.description.replace('[cost]', cost);
+                        }
+                        $('.quest_list').prepend('<div class="quest" x-num="' + i + '" x-id="' + quest._id + '">' +
+                        '<div class="quest_body">' + quest.description + '</div></div>');
+                        
+                        
+                        if (user_progress[1] != '0') {
+                            if (quest.level == 0) {
+                                $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Become an expert ' + ((cost)? cost : 5 )+ ' with her favourite flavor<br /><b>Reward</b> Unlock Workers, and chat</div>');
+                            }
+                            if (quest.level == 1) {
+                                $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Buy ' + cost + ' carts<br /><b>Reward</b> Unlock Trends</div>');
+                            }
+                            if (quest.level == 2) { 
+                                $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Discover ' + cost + ' combos<br /><b>Reward</b> Unlock cows</div>');
+                            }
+                            if (quest.level == 3) {
+                                $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Buy ' + ((cost)? cost : 2 ) + ' truck' + ((cost != 1)? 's' : '') + '<br /><b>Reward</b> Unlock Frankenflavours</div>');
+                            }
+                            if (quest.level == 4) {
+                                $('.quest:first .quest_body').append('<div class="quest_goal"><b>Goal</b>: Sell 100 of ' + ((cost)? cost : 5 ) + ' flavors<br /><b>Reward</b>: Unlocks prestige, + $1 event bonus</div>');
+                            }
+                            $('.quest[x-id="' + quest._id + '"]').append('<div class="button complete_quest"><div id="complete_quest_progress"></div><b>' + __('Complete') + ' ' + quest.name + '</b></div>');
+                        } else {
+                            $('.quest[x-id="' + quest._id + '"]').append('<center><img src="'+image_prepend+'/star.png" class="quest_star" /><b>' + __('Completed') + ' ' + quest.name + '</b></center>');
+                        }
+                    }
+                }
+                if (user.quests.length == 20 && last_quest[1] == '0') {
+                     $('.quest_list').prepend('<div class="quest"><div class="quest_title">' + __('Prestige') + '</div>' +
+                    '<p>When you are ready, go to upgrades and unlock Prestige. You will get a bonus based on cash balance, and the number of flavours and add-ons unlocked. ' +
+                    'This restarts the game with a percentage bonus on all income.</p>' +
+                    '<img src="' + image_prepend + '/prestige_thumb.png" id="quest_prestige"></div>');
+                }
+                $('.quest').hide();
+                $('.quest:first').show();
+                Icecream.update_quest_bar();
+            }
+        });
+    },
+    update_trending: function() {
+        if (!cache_event_trend_enable) return;
+        console.log('socket:trending ->');
+        socket.emit('trending');
+    },
+    update_clock: function(item, seconds_left) { 
+        var mins = Math.floor(seconds_left / 60);
+        var secs = seconds_left % 60;
+        if (seconds_left > 0) {
+            $(item)[0].textContent = mins + ':' + ((secs < 10)? '0' + secs : secs);
+        }
+    },
+    update_worker_fx: function(origin) {
+        if (origin) console.log('update_worker_fx <- ' + origin);
+        $('.wrapper_addon_thumb').remove();
+        for (var i = 0; i < 5; i++) {
+            var topping = user.toppings[i];
+            if (topping) {
+                var t_len = toppings.length;
+                for (var j = 0; j < t_len; j++) {
+                    if (toppings[j]._id === topping) {
+                        topping = toppings[j].name;
+                        break;
+                    }
+                }
+                var is_new =  new_art_addons.indexOf(topping) > -1;
+                var url = (!is_new)? image_prepend+'/toppings/' + topping.replace(/\s+/g, '') + '_thumb.png' : image_prepend + '/addons/thumb/' + topping.replace(/\s+/g, '') + '.png.gz';
+                $('#main_base .option_wrapper').eq(i).append('<img src="'+ url + '" x-is-new="' + is_new + '" class="wrapper_addon_thumb" />');
+            }
+        }
 
-	    $('#main_base .option_wrapper .icecream_float').remove();
-	    for (var last_worker_fx = 0; last_worker_fx < 5; last_worker_fx++) {
-	        //if (last_worker_fx >= user.carts) return;
-	        
-	        var icecream_to_fx = $('#main_base .option').eq(last_worker_fx);
-	        var addon_to_fx = $('#main_addon .option').eq(last_worker_fx);
+        $('#main_base .option_wrapper .icecream_float').remove();
+        for (var last_worker_fx = 0; last_worker_fx < 5; last_worker_fx++) {
 
-	        if ( user.flavors.length > last_worker_fx) {
-	            var flavour = Icecream.get_flavor(user.flavors[last_worker_fx]);
+            var icecream_to_fx = $('#main_base .option').eq(last_worker_fx);
+            var addon_to_fx = $('#main_addon .option').eq(last_worker_fx);
 
-	            if (user.is_animation_workers && user.carts > last_worker_fx) {
-	                $('#main_base .option[x-id="' + flavour._id + '"]').parent().prepend('<div class="icecream_float">' + precise_round(cached_worker_sell_value[last_worker_fx],2).toFixed(2) + '</div>');
-	            }
-	            //$('.icecream_particle[x-id="' + $(icecream_to_fx).attr('id') + '"]').remove();
-	            canvas_cache_workers[last_worker_fx] = new Image();
-	            canvas_cache_workers[last_worker_fx].src = image_prepend + "/flavours/thumb/" + flavour.name.replace(/\s+/g, '') + '.png.gz';
-	            console.log('loading img: ' + flavour.name.replace(/\s+/g, ''));
-	        }
-	        if (user.toppings.length > last_worker_fx) {
-	            var addon = Icecream.get_addon( user.toppings[last_worker_fx] );
-	            canvas_cache_addon[last_worker_fx] = new Image();
-	            canvas_cache_addon[last_worker_fx].src = image_prepend + "/toppings/" + addon.name.replace(/\s+/g, '') + '_thumb.png';
-	            console.log('loading img: ' + addon.name.replace(/\s+/g, ''));
-	        }
-	    }
-	},
-	get_tutorial: function() {
-	    $('.tutorial, .tutorial_shadow').remove();
+            if ( user.flavors.length > last_worker_fx) {
+                var flavour = Icecream.get_flavor(user.flavors[last_worker_fx]);
 
-	    if (is_cube) {
-	        setTimeout(function () {
-	            Icecream.get_tutorial();
-	        }, 2000);
-	        return false;
-	    }
-	    if (user.tutorial === 0) { //where to click
-	        $('.section-main, .section-side#upgrades, .expertise_bar_outer').css('opacity', 0.25);
-	        $('body').append('<div class="tutorial tutorial_0"><h2>' + __('Click Me!') + '</h2><p class="tutorial_text">' +
-	            'Get money by <b>clicking on scooplings</b>. Once you have an least <b class="money_icon">10</b> click the collect button!' +
-	            '</p><div class="tut_ice_cube" x-id="1"></div><div class="triangle-left"></div></div>');
-	        for (var i = 0; i < 30; i++) {
-	            setTimeout(function () {
-	                $('.tut_ice_cube[x-id="1"]').toggleClass('active');
-	            }, i * 500);
-	        }
+                if (user.is_animation_workers && user.carts > last_worker_fx) {
+                    $('#main_base .option[x-id="' + flavour._id + '"]').parent().prepend('<div class="icecream_float">' + precise_round(cached_worker_sell_value[last_worker_fx],2).toFixed(2) + '</div>');
+                }
+                //$('.icecream_particle[x-id="' + $(icecream_to_fx).attr('id') + '"]').remove();
+                canvas_cache_workers[last_worker_fx] = new Image();
+                canvas_cache_workers[last_worker_fx].src = image_prepend + "/flavours/thumb/" + flavour.name.replace(/\s+/g, '') + '.png.gz';
+                console.log('loading img: ' + flavour.name.replace(/\s+/g, ''));
+            }
+            if (user.toppings.length > last_worker_fx) {
+                var addon = Icecream.get_addon( user.toppings[last_worker_fx] );
+                canvas_cache_addon[last_worker_fx] = new Image();
+                canvas_cache_addon[last_worker_fx].src = image_prepend + "/toppings/" + addon.name.replace(/\s+/g, '') + '_thumb.png';
+                console.log('loading img: ' + addon.name.replace(/\s+/g, ''));
+            }
+        }
+    },
+    get_tutorial: function() {
+        $('.tutorial, .tutorial_shadow').remove();
+
+        if (is_cube) {
+            setTimeout(function () {
+                Icecream.get_tutorial();
+            }, 2000);
+            return false;
+        }
+        if (user.tutorial === 0) { //where to click
+            $('.section-main, .section-side#upgrades, .expertise_bar_outer').css('opacity', 0);
+            $('body').append('<div class="tutorial tutorial_0"><h2>' + __('Click Me!') + '</h2><p class="tutorial_text">' +
+                'Get money by <b>clicking on scooplings</b>. Once you have an least <b class="money_icon">10</b> click the collect button!' +
+                '</p><div class="tut_ice_cube" x-id="1"></div><div class="triangle-left"></div></div>');
+            for (var i = 0; i < 30; i++) {
+                setTimeout(function () {
+                    $('.tut_ice_cube[x-id="1"]').toggleClass('active');
+                }, i * 500);
+            }
             setTimeout(function () {
                 $('.icecream').click();
             }, 3000);
-	    }
-	    if (user.tutorial == 1) {
-	        $('.expertise_bar_outer').css('opacity', 1);
-	        $('body').append('<div class="tutorial tutorial_2"><h2>' + __('Get better with expertise') + '</h2><p class="tutorial_text">' +
-	            __('The more Ice Cream you sell, <b>the better you will get</b> at making it (and the more you can sell it for). This is called ') + '<b>' + __('Expertise') +
-	            '</b></p><div class="button next_tutorial button_green">Got it</div><div class="triangle-left"></div></div><div class="tutorial_shadow"></div>');
-	    }
-	    if (user.tutorial == 2) {
-	        $('.section-main, .section-side#upgrades').css('opacity', 1);
-	        var top = $('.flavor.main_container').offset().top;
-	        $('body').append('<div class="tutorial tutorial_3" style="top: ' + top + 'px;"><h2>' + __('Almost done! Customize here') + '</h2><p class="tutorial_text">' +
-	            __('Choose your <b>favourite flavours and add-ons</b> as you unlock them. If you want to see more than your top 5 click Expand.') +
-	            '</p><div class="button next_tutorial button_green">Ok cool</div><div class="triangle-left"></div></div><div class="tutorial_shadow"></div>');
-	    }
-	    if (user.total_gold > 50 && user.tutorial == 3) {
-	        $('body').append('<div class="tutorial tutorial_4"><h2>' + __('Buy All The Things!') + '</h2>' +
-	        'Research <b>powerful upgrades</b> for your Ice Cream here. Hire workers, or get upgrades.<div class="button next_tutorial button_green">' + __("Let's Start") + 
-	        '</div><div class="triangle-right"></div></div><div class="tutorial_shadow"></div>');
-	    }
-	    if (user.total_gold > 500 && user.tutorial == 4) {
-	        $('body').append('<div class="tutorial tutorial_6"><h2>' + __('Connect your Facebook') + '</h2>' +
-	        __('Secure your account and find friends that play Ice Cream Stand!<br>') +
-	        '<div class="clearfix"></div><br><div class="button next_tutorial">' + __('No thanks') + '</div><a class="button next_tutorial button_facebook" href="/auth/facebook"><i class="fa fa-facebook"></i> Connect</a>' +
-	        '</div><div class="tutorial_shadow"></div>');
-	        
-	    }
-	    if (user.total_gold > 500000 && user.tutorial == 5) {
-	         $('body').append('<div class="tutorial tutorial_6"><h2>' + __('Support Ice Cream Stand') + '</h2>' +
-	         __('Please help keep Ice Cream Stand free and awesome, <b>support us by donating</b> and earn cosmetic rewards.') +
-	         '<div class="clearfix"></div><div class="button next_tutorial">' + __('No thanks') + '</div><div x-link="donate" class="button next_tutorial">' +
-	          __('Support the game') + '</div></div><div class="tutorial_shadow"></div>');
-	    }
-	    if (user.total_gold > 5000000 && user.tutorial == 6) {
-	        $('body').append('<div class="tutorial tutorial_5"><h2>' + __('Sharing is caring') + '</h2>' +
-	        __('If you enjoy Ice Cream Stand <b>please tell your friends</b>. Any time someone you invite completes a quest, you earn money!') +
-	        '<div class="clearfix"></div><div class="button next_tutorial button_red">' + __('No thanks') + 
-	        '</div><div id="invite" x-link="invite" class="button next_tutorial button_green">' + __('Sure') + '</div></div><div class="tutorial_shadow"></div>');
-	    }
-	},
-	get_flavor: function(id) {
-	    var f_len = flavors.length;
-	    for (var i = 0; i < f_len; i++) {
-	        if (flavors[i]._id === id) {
-	            return flavors[i];
-	        }
-	    }
-	    return { name: 'vanilla', value: '?', total_value: '?'};
-	},
-	get_friend: function(id) {
-	    var f_len = cache_friends.length;
-	    for (var i = 0; i < f_len; i++) {
-	        if (cache_friends[i]._id === id) {
-	            return cache_friends[i];
-	        }
-	    }
-	    return;
-	},
-	get_combo: function(id) {
-	    console.log('getting combo with id ' + id);
-	    var len = combos.length;
-	    for (var i = 0; i < len; i++) {
-	        if (combos[i]._id === id) {
-	            return combos[i];
-	        }
-	    }
-	    return { name: 'mystery'};
-	},
-	get_addon: function(id) {
-	    var len = toppings.length;
-	    for (var i = 0; i < len; i++) {
-	        if (toppings[i]._id === id) {
-	            return toppings[i];
-	        }
-	    }
-	    return { name: 'cherries'};
-	}
+        }
+        if (user.tutorial == 1) {
+            $('.expertise_bar_outer').css('opacity', 1);
+            $('body').append('<div class="tutorial tutorial_2"><h2>' + __('Get better with expertise') + '</h2><p class="tutorial_text">' +
+                __('The more Ice Cream you sell, <b>the better you will get</b> at making it (and the more you can sell it for). This is called ') + '<b>' + __('Expertise') +
+                '</b></p><div class="button next_tutorial button_green">Got it</div><div class="triangle-left"></div></div><div class="tutorial_shadow"></div>');
+        }
+        if (user.tutorial == 2) {
+            $('.section-main, .section-side#upgrades').css('opacity', 1);
+            var top = $('.flavor.main_container').offset().top;
+            $('body').append('<div class="tutorial tutorial_3" style="top: ' + top + 'px;"><h2>' + __('Almost done! Customize here') + '</h2><p class="tutorial_text">' +
+                __('Choose your <b>favourite flavours and add-ons</b> as you unlock them. If you want to see more than your top 5 click Expand.') +
+                '</p><div class="button next_tutorial button_green">Ok cool</div><div class="triangle-left"></div></div><div class="tutorial_shadow"></div>');
+        }
+        if (user.total_gold > 50 && user.tutorial == 3) {
+            $('body').append('<div class="tutorial tutorial_4"><h2>' + __('Buy All The Things!') + '</h2>' +
+            'Research <b>powerful upgrades</b> for your Ice Cream here. Hire workers, or get upgrades.<div class="button next_tutorial button_green">' + __("Let's Start") + 
+            '</div><div class="triangle-right"></div></div><div class="tutorial_shadow"></div>');
+        }
+        if (user.total_gold > 500 && user.tutorial == 4) {
+            $('body').append('<div class="tutorial tutorial_6"><h2>' + __('Connect your Facebook') + '</h2>' +
+            __('Secure your account and find friends that play Ice Cream Stand!<br>') +
+            '<div class="clearfix"></div><br><div class="button next_tutorial">' + __('No thanks') + '</div><a class="button next_tutorial button_facebook" href="/auth/facebook"><i class="fa fa-facebook"></i> Connect</a>' +
+            '</div><div class="tutorial_shadow"></div>');
+            
+        }
+        if (user.total_gold > 500000 && user.tutorial == 5) {
+             $('body').append('<div class="tutorial tutorial_6"><h2>' + __('Support Ice Cream Stand') + '</h2>' +
+             __('Please help keep Ice Cream Stand free and awesome, <b>support us by donating</b> and earn cosmetic rewards.') +
+             '<div class="clearfix"></div><div class="button next_tutorial">' + __('No thanks') + '</div><div x-link="donate" class="button next_tutorial">' +
+              __('Support the game') + '</div></div><div class="tutorial_shadow"></div>');
+        }
+        if (user.total_gold > 5000000 && user.tutorial == 6) {
+            $('body').append('<div class="tutorial tutorial_5"><h2>' + __('Sharing is caring') + '</h2>' +
+            __('If you enjoy Ice Cream Stand <b>please tell your friends</b>. Any time someone you invite completes a quest, you earn money!') +
+            '<div class="clearfix"></div><div class="button next_tutorial button_red">' + __('No thanks') + 
+            '</div><div id="invite" x-link="invite" class="button next_tutorial button_green">' + __('Sure') + '</div></div><div class="tutorial_shadow"></div>');
+        }
+    },
+    get_flavor: function(id) {
+        var f_len = flavors.length;
+        for (var i = 0; i < f_len; i++) {
+            if (flavors[i]._id === id) {
+                return flavors[i];
+            }
+        }
+        return { name: 'vanilla', value: '?', total_value: '?'};
+    },
+    get_friend: function(id) {
+        var f_len = cache_friends.length;
+        for (var i = 0; i < f_len; i++) {
+            if (cache_friends[i]._id === id) {
+                return cache_friends[i];
+            }
+        }
+        return;
+    },
+    get_combo: function(id) {
+        console.log('getting combo with id ' + id);
+        var len = combos.length;
+        for (var i = 0; i < len; i++) {
+            if (combos[i]._id === id) {
+                return combos[i];
+            }
+        }
+        return { name: 'mystery'};
+    },
+    get_addon: function(id) {
+        var len = toppings.length;
+        for (var i = 0; i < len; i++) {
+            if (toppings[i]._id === id) {
+                return toppings[i];
+            }
+        }
+        return { name: 'cherries'};
+    }
 };
 function update_sell_value(origin) {
     if (origin) console.log('update_sell_value <- ' + origin);

@@ -282,7 +282,7 @@ h4 {
     background-color: $purple;
     color: #fff;
     margin: -10px -10px 10px;
-    padding: 5px 10px;
+    padding: 10px;
     position: relative;
 }
 .message > h4, .alert_shadow > h4 {
@@ -382,7 +382,7 @@ h4 {
 }
 .chat_rooms i {
   vertical-align: top; 
-  margin-top: -4px;
+  margin-top: 2px;
 }
 .hidden {
     display: none;
@@ -497,18 +497,19 @@ h4 {
     font-weight: bold;
 }
 .gold:before, .current_value:before, .unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before, .money_icon:before {
-    background-image: url("http://static.icecreamstand.ca/coins2.svg");
     background-size: 100% 100%;
-    content: " ";
+    content: "\f155";
     display: block;
     height: 20px;
-    left: -18px;
+    left: -22px;
     position: absolute;
     top: -2px;
     width: 20px;
+    color: $purple;
+    font-family: "Fontawesome"
 }
 .is_white.money_icon:before {
-    background-image: url("http://static.icecreamstand.ca/coins_night.svg");
+    color: #fff;
 }
 .money_icon.infocube_money:before {
     height: 25px;
@@ -519,14 +520,17 @@ h4 {
 .gold:before {
     width: 30px;
     height: 30px;
-    left: -25px;
-    top: 5px;
+    left: -29px;
+    top: 7px;
+    font-size: 22px;
+    
 }
 .current_value:before, .flavor_current:before {
-    top: 2px;
+    top: 0;
 }
 .unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before {
-    top: -1px;
+    top: 1px;
+    left: -9px;
 }
 .money_text {
     color: #a1a1a1;
@@ -1421,7 +1425,7 @@ input {
     display: inline-block;
     font-size: 12px;
     font-weight: bold;
-    line-height: 12px;
+    line-height: 22px;
     height: calc(100% - 16px);
     letter-spacing: 1px;
     padding: 8px;
@@ -2153,7 +2157,7 @@ h3#upgrades_text {
     display: inline-block;
     font-size: 12px;
     height: calc(100% - 16px);
-    line-height: 12px;
+    line-height: 22px;
     padding: 8px;
     position: relative;
 }
@@ -2533,7 +2537,7 @@ h3#upgrades_text {
     border-radius: 2px;
     bottom: 0;
     box-shadow: 0 2px 0 darken(#aaa, 10%);
-    height: 20px;
+    height: 18px;
     left: 0;
     padding: 5px 0;
     position: relative;
@@ -2930,6 +2934,7 @@ h3#upgrades_text {
 .chat_container_main input[type="submit"], .button_green {
     background-color: $green;
     box-shadow: 0 2px 0 darken($green, 10%);
+    text-align: center;
 } 
 .button_green:hover {
 	background-color: darken($green, 10%);
@@ -3746,7 +3751,7 @@ body.night {
         color: #fff;
     }
     .gold:before, .current_value:before, .unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before, .money_icon:before {
-        background-image: url(http://static.icecreamstand.ca/coins_night.svg);
+        color: #fff;
     }
     .footer, #new_message {
         background-color: #222;
@@ -5589,7 +5594,16 @@ body[x-epic="aoc"] {
     margin-top: 20px;
     width: 80px;
 }
+.row_9 {
+    width: 66%;
+    display: inline-block;
+}
 
+.row_3 {
+    width: 33%;
+    display: inline-block;
+    text-align: center;
+}
 
 /* RESPONSIVE */
 

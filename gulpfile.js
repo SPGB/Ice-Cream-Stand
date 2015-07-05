@@ -28,7 +28,7 @@ var headers_image = {
   'Cache-Control': 'max-age=315350000, no-transform, public',
   'Content-Type': 'image/png'
 };
-var version = '150';
+var version = '151';
 
 gulp.task('js', function() {
   // Minify and copy all JavaScript (except vendor scripts)
