@@ -333,6 +333,7 @@ function bind_tooltips() {
 
             var flavour = Icecream.get_flavor(user.last_flavor);
             $('.hovercard').attr('x-new-art', true);
+            $('.hovercard').html('<div class="hover_title">' + __(t.name) + '<span class="level flavor_current money_icon is_white">' + ((t.value)? t.value.toFixed(2) : '?') + '</span></div><p>' + __('Add-ons can be used with a flavour to increase the value of ice cream.') + '</p><p class="flavor_text">' + __('Add-ons increase the value of every ice cream you or your workers sell and do not decrease in value over time.') + '</p>');
             $('.hovercard').append('<div class="icecream_hovercard_art" style="background-image: url(' + image_prepend + '/flavours/thumb/' + flavour.name.replace(/\s+/g, '') + '.png.gz), url(http://static.icecreamstand.ca/cones/thumb/' + ((cached_cone)? cached_cone : 'default') + '.png.gz);">' +
                 '<img src="' + image_prepend + '/addons/thumb/' + t.name.replace(/\s+/g, '') + '.png.gz" class="hovercard_addon" /></div>');
 

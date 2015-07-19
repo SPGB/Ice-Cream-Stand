@@ -102,9 +102,11 @@
 					<div id="main_base" class="inner_flavor_container">
 						<div ng-repeat="flavour in flavours_unlocked | startFrom:0 | limitTo:5" class="option_wrapper" x-new="true">
 							<img ng-src="http://static.icecreamstand.ca/flavours/thumb/{{flavour.name | img_sanitize}}.png.gz" draggable="true" x-id="{{flavour._id}}" class="option tooltip" x-base-value="{{flavour.base_value}}" x-value="{{flavour.value}}" x-type="base" />
+							<div class="expertise_level" ng-bind="display_experience($index)"></div>
 						</div>
 						<div ng-repeat="flavour in flavours_unlocked | startFrom:currentPage*pageSize + 5 | limitTo:pageSize + 5" class="option_wrapper" x-new="true">
 							<img ng-src="http://static.icecreamstand.ca/flavours/thumb/{{flavour.name | img_sanitize}}.png.gz" draggable="true" x-id="{{flavour._id}}" class="option tooltip" x-base-value="{{flavour.base_value}}" x-value="{{flavour.value}}" x-type="base" />
+							<div class="expertise_level" ng-bind="display_experience($index)"></div>
 						</div>
 						<div class="filter_box" ng-show="flavours_unlocked.length > 20">
 							<div ng-click="update_page(currentPage-1)" class="filter_prev button" ng-class="{ 'inactive': currentPage === 0 }">

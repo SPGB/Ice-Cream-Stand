@@ -1,5 +1,5 @@
 ics
-.factory('expertiseService', function($http) {
+.factory('expertiseService', function() {
     return {
         get_level: function (sales) {
             var last_sale = 0;
