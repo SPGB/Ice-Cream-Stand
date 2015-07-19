@@ -737,7 +737,7 @@ var Icecream = {
                             quest.description = quest.description.replace('[cost]', cost);
                         }
                         $('.quest_list').prepend('<div class="quest" x-num="' + i + '" x-id="' + quest._id + '">' +
-                        '<div class="quest_body">' + quest.description + '</div></div>');
+                        '<div class="quest_body">' + quest.description.replace(/\\r\\n/g, '<br />').replace(/\*([^\*]+)\*/g, '<b>$1</b>') + '</div></div>');
                         
                         
                         if (user_progress[1] != '0') {
@@ -799,9 +799,8 @@ var Icecream = {
                         break;
                     }
                 }
-                var is_new =  new_art_addons.indexOf(topping) > -1;
-                var url = (!is_new)? image_prepend+'/toppings/' + topping.replace(/\s+/g, '') + '_thumb.png' : image_prepend + '/addons/thumb/' + topping.replace(/\s+/g, '') + '.png.gz';
-                $('#main_base .option_wrapper').eq(i).append('<img src="'+ url + '" x-is-new="' + is_new + '" class="wrapper_addon_thumb" />');
+                var url = image_prepend + '/addons/thumb/' + topping.replace(/\s+/g, '') + '.png.gz';
+                $('#main_base .option_wrapper').eq(i).append('<img src="'+ url + '" x-is-new="true" class="wrapper_addon_thumb" />');
             }
         }
 

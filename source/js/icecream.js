@@ -106,11 +106,9 @@ function flavour_switch( id ) {
 
 function addon_switch(id) {
         var addon = Icecream.get_addon( id );
-        var is_new = new_art_addons.indexOf( addon.name ) > -1;
-        var addon_name = (is_new)? image_prepend + '/addons/' + addon.name.replace(/\W/g, '') + '.png.gz' : image_prepend + '/toppings/' + addon.name.replace(/\W/g, '') + '.png';
+        var addon_name = image_prepend + '/addons/' + addon.name.replace(/\W/g, '') + '.png.gz';
 
         $('.icecream #topping').attr('style', 'background-image: url(' +addon_name + ');');
-        $('.icecream #topping').attr('x-addon', addon.name).attr('x-new-art', is_new);
 
         if (combos.length === 0 || user.last_addon != id ) {
             user.last_addon = id;
@@ -160,8 +158,7 @@ function combos_load() {
                                         var flavor = Icecream.get_flavor(combo.flavor_id);
                                         var addon = Icecream.get_addon(combo.topping_id);
                                         if (combo.franken_id) combo_franken = Icecream.get_flavor(combo.franken_id);
-                                        var is_new_addon = new_art_addons.indexOf(addon.name) > -1;
-                                        var addon_url = (is_new_addon)? image_prepend + '/addons/thumb/' + addon.name.replace(/\W/g, '') + '.png.gz' : image_prepend + '/toppings/' + addon.name.replace(/\W/g, '') + '.png';
+                                        var addon_url = image_prepend + '/addons/thumb/' + addon.name.replace(/\W/g, '') + '.png.gz';
                                         var div = $('<div />', {
                                                 'class': 'combo_option tooltip option', 
                                                 'x-type': 'combo', 
@@ -171,7 +168,7 @@ function combos_load() {
                                                 'x-franken': combo.franken_id,
                                                 'x-value': combo.value,
                                                 'x-name': combo.name,
-                                                'x-new-art': is_new_addon,
+                                                'x-new-art': true,
                                                 'draggable': true,
                                                 'style': 'background-image:url(' + addon_url + '), url('+image_prepend+'/flavours/thumb/' + flavor.name.replace(/\s+/g, '') + '.png.gz)',
                                                 'html': combo.name + ( (combo_franken)? '<div class="combo_split" style="background-image: url('+image_prepend+'/flavours/thumb/' + combo_franken.name.replace(/\s+/g, '') + '.png.gz)"></div>' : '')

@@ -137,7 +137,9 @@ getFbData = function(accessToken, apiPath, callback) {
 
 log_error('Starting up the app'); //really more of a debug..
 
-/* OUR SCHEMA */
+/* 
+* MODELS 
+*/
 var userSchema = new mongoose.Schema({
 	name: { type: String, required: true, index: { unique: true } },
 	ip: { type: String },
@@ -464,7 +466,9 @@ var chapterSchema = new mongoose.Schema({
 });
 var Chapter = mongoose.model('Chapter', chapterSchema);
 
-
+/*
+* MIDDLEWARE
+*/
 function checkAuth(req, res, next) {
   if (req.session.user_id) {
 	User.findOne({ _id: req.session.user_id }).exec(function (err, user) {
@@ -472,18 +476,6 @@ function checkAuth(req, res, next) {
 		var lang = req.session.lang;
 		if (!lang) {
 			req.session.lang = 'en';
-			
-			// if (req.headers['accept-language']) {
-			// 	if (req.headers['accept-language'].indexOf('en') > -1) {
-			// 		req.session.lang = 'en';
-			// 	} else if (req.headers['accept-language'].indexOf('ja') > -1) {
-			// 		req.session.lang = 'jp'; //should be ja
-			// 	} else if (req.headers['accept-language'].indexOf('ru') > -1) {
-			// 		req.session.lang = 'ru';
-			// 	}
-			// } else {
-				
-			// }
 		}
 		if (user.ip != req.connection.remoteAddress) {
 			user.ip = req.connection.remoteAddress;
@@ -517,8 +509,6 @@ function checkAdmin(req, res, next) {
 }
 
 var donor_welcome_queue = [];
-//var io = require('./io');
-//io.listen(server);
 var io = require('./io').listen(server);
 
 /* routes */
@@ -559,7 +549,6 @@ app.get('/', checkAuth, function(req, res) {
 		} else { //user already with your ip
 			if (!users[0].password && users.length == 1) { //more then one user or user[0] has a password
 				req.session.user_id = users[0]._id;
-				//res.send(users);
 				res.render('index_en', {
 					release_channel: users[0].release_channel,
 					user: users[0]

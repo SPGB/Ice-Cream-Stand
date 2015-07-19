@@ -1,12 +1,3 @@
-var new_art_addons = ['cherries', 'sprinkles', 'jelly beans', 'peanuts', 'gummy worms', 'peanut butter', 'onions', 'honey', 'berry jelly',
-'gummy sodas', 'blackberries', 'raspberries', 'chopped strawberries', 'marshmallow cream', 'vanilla frosting', 'chocolate frosting', 'crumbled candy bars', 'sugar cookies',
-'crumbled brownies', 'crumbled fudge', 'red velvet cake', 'cookie dough', 'm&m\'s', 'oreo',
-'chocolate chips', 'white chocolate chips', 'dark chocolate chips', 'pecans', 'acorns', 'almonds', 'gumballs', 'mini marshmallows', 'candied lemon rinds',
-'rice', 'chili peppers', 'gravy', 'coconut', 'peas', 'fudge ripple', 'chopped peaches', 'chopped pineapple',
-'croutons', 'fries', 'olives', 'candied bacon', 'bacon', 'shrimp', 'blueberries', 'raisins', 'waffles', 'cheese',
- 'eyeballs', 'bat wings', 'nuts and bolts', 'warts', 'oil', 'sausage', 'pepperoni', 'ram', 'egg',
- 'gold nuggets', 'pearls', 'gun powder', 'flowers', 'coffee beans', 'caviar', 'ice cubes', 'snowflakes', 'mint',
- 'telescope', 'calculator', 'constellation'];
 var image_prepend = 'http://static.icecreamstand.ca';
 var cones = [
 	{ name: 'baby',	cost: '1000' },
@@ -48,7 +39,7 @@ var ics = angular.module('ics', []);
 		$scope.pageSize = 20;
 		$scope.is_expanded = false;
 		$scope.numberOfPages=function(){
-        	return Math.ceil($scope.flavours_unlocked.length/$scope.pageSize);                
+        	return Math.ceil($scope.flavours_unlocked.length/$scope.pageSize);
     	};
     	$scope.update_page = function(new_page) {
     		if (new_page > 6) new_page = 6;
@@ -305,9 +296,8 @@ var ics = angular.module('ics', []);
 		    	var unlocked = [];
 		    	for (var i = 0; i < addons.length; i++) {
 		    		var addon = addons[i];
-		    		var is_new = new_art_addons.indexOf(addon.name) > -1;
 		    		var name = addon.name.replace(/\s+/g, '');
-		    		addon.image = (is_new)? image_prepend + '/addons/thumb/' + name + '.png.gz' : image_prepend + '/toppings/' + name + '_thumb.png'; 
+		    		addon.image = image_prepend + '/addons/thumb/' + name + '.png.gz';
 		    		if (user.toppings.indexOf(addon._id) === -1) {
 		    			locked.push(addon);
 		    		} else {

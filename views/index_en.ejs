@@ -21,9 +21,9 @@
 			var user = <%- (typeof user != 'undefined')? JSON.stringify(user) : 'null' %>;
 			var user_start = user; //legacy
 		</script>
-		<% if (user.release_channel == 2) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_150.js.gz?cache=1"></script>
-		<% } else if (user.release_channel == 1) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_150.js.gz?cache=1"></script>
-		<% } else { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_149.js.gz"></script><% } %>
+		<% if (user.release_channel == 2) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_151.js.gz?cache=1"></script>
+		<% } else if (user.release_channel == 1) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_151.js.gz?cache=1"></script>
+		<% } else { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_151.js.gz"></script><% } %>
 	</head>
 	<body x-scroll-down="false">
 	<div id="fb-root"></div>
@@ -36,7 +36,7 @@
 		  fjs.parentNode.insertBefore(js, fjs);
 		}(document, 'script', 'facebook-jssdk'));
 	</script>
-	
+	<style> [ng-cloak] { display: none !important; } </style>
 	<canvas id="canvas_main" x-resize="true" style="width: 100%; position: fixed; height: 100%;"></canvas>
 	<div class="section-side">
 		<canvas id="canvas_sales" width="400" height="400"></canvas>
@@ -209,15 +209,6 @@
 					</span></h4>
 					<div class="chat_container_main">
 						<div id="chat_window" ng-class="{ 'chat_active': is_expanded }">
-							<div class="chat announcement">
-								<span class="user_card" x-user="sam">
-									<img ng-src="http://static.icecreamstand.ca/badges/1.png" class="chat_badge" /> System
-								</span><span class="chat_textbody">
-									<i class="fa fa-thumb-tack"></i> Patch 1.50 now live on beta/alpha. Please report any bugs to the bug room.
-									<a href="http://blog.samgb.com/ics-patch-1-50/" target="_blank">Changelog Preview</a>
-								</span>
-							</div>
-
 							<div class="chat" ng-repeat="message in messages | startFrom: messages.length - message_count" x-id="{{message._id}}">
 								<span class="user_card" x-user="{{message.user}}">
 									<img ng-src="http://static.icecreamstand.ca/badges/{{message.badge}}.png" class="chat_badge" /> {{message.user}}
@@ -374,7 +365,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="money_floater" ng-controller="money">
+		<div class="money_floater" ng-controller="money" ng-cloak>
 			<div class="gold" >{{gold | number: (gold > 1000)? 0 : 1}}</div>
 			<div class="gold_sales tooltip lang" x-type="ipm">Income per Minute <span class="money_icon"></span>
 				<div class="buff_container"></div>

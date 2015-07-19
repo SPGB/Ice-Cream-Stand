@@ -323,8 +323,6 @@ h4 {
   position: absolute;
   height: 180px;
   z-index: 2;
-  top: 100px;
-  width: 225px;
   user-drag: none;
   -moz-user-select: none;
   -webkit-user-drag: none;
@@ -335,7 +333,13 @@ h4 {
   /* From IE10 only */
   user-select: none;
   /* Not valid CSS yet, as of July 2012 */
-  background-size: cover; }
+  background-size: cover;
+  background-position: 5px top;
+  background-size: auto 245px;
+  background-repeat: no-repeat;
+  height: 229px;
+  top: 95px;
+  width: 275px; }
 
 .icecream #topping[x-new-art="true"] {
   background-position: 5px top;
@@ -371,6 +375,57 @@ h4 {
 #topping[x-addon="bacon"] {
   margin-left: -2px;
   margin-top: -11px; }
+
+#topping[x-addon="carbon fiber"] {
+  left: -23px;
+  top: 102px; }
+
+#topping[x-addon="graphite"] {
+  left: -28px;
+  top: 85px; }
+
+#topping[x-addon="platinum"] {
+  left: -39px;
+  top: 67px; }
+
+#topping[x-addon="rainbow"] {
+  left: -22px; }
+
+#topping[x-addon="timey wimey stuff"] {
+  left: -31px; }
+
+#topping[x-addon="holy hand grenade"] {
+  left: -70px;
+  top: 44px; }
+
+#topping[x-addon="friendship"] {
+  top: 66px;
+  left: -15px;
+  animation: friendship_rotate 20s linear;
+  /* animation-name followed by duration in seconds*/
+  -webkit-animation: friendship_rotate 20s linear;
+  /* Chrome and Safari */
+  -webkit-animation-iteration-count: infinite;
+  /*Safari and Chrome*/
+  -moz-animation-iteration-count: infinite;
+  /*Safari and Chrome*/
+  animation-iteration-count: infinite;
+  transform-origin: 120px 125px 0; }
+
+@keyframes friendship_rotate {
+  0% {
+    transform: rotate(0deg); }
+  100% {
+    transform: rotate(-360deg); } }
+
+@-webkit-keyframes friendship_rotate {
+  0% {
+    transform: rotate(0deg); }
+  100% {
+    transform: rotate(-360deg); } }
+
+#topping[x-addon="sun"] {
+  background-position: right top; }
 
 .unlockable .option_wrapper {
   float: left;
@@ -480,12 +535,11 @@ h4 {
 .gold:before, .current_value:before, .unlockable .cost:not(#frankenflavour_amount):not(#prestige_amount):before, .money_icon:before {
   background-size: 100% 100%;
   content: "\f155";
-  display: block;
+  display: inline-block;
   height: 20px;
-  left: -22px;
-  position: absolute;
+  left: -10px;
   top: -2px;
-  width: 20px;
+  margin-right: 0px;
   color: #7F7DC7;
   font-family: "Fontawesome"; }
 
@@ -497,13 +551,6 @@ h4 {
   left: -21px;
   top: 5px;
   width: 25px; }
-
-.gold:before {
-  width: 30px;
-  height: 30px;
-  left: -29px;
-  top: 7px;
-  font-size: 22px; }
 
 .current_value:before, .flavor_current:before {
   top: 0; }
@@ -1194,10 +1241,7 @@ iframe.facebook {
   font-weight: bold; }
 
 .unlockable .cost {
-  font-weight: normal;
-  position: absolute;
-  top: 22px;
-  left: 12px; }
+  float: right; }
 
 .unlockable img:nth-child(1) {
   background-color: rgba(255, 255, 255, 0.5);
@@ -2066,7 +2110,7 @@ h3#upgrades_text {
 .unlock_text {
   display: inline-block;
   font-weight: bold;
-  padding-bottom: 18px;
+  padding-top: 13px;
   position: relative;
   text-align: left;
   text-transform: capitalize;
@@ -3008,7 +3052,8 @@ h3#upgrades_text {
 
 .chat_container_main input[type="submit"], .button_green {
   background-color: #0da673;
-  box-shadow: 0 2px 0 #097752; }
+  box-shadow: 0 2px 0 #097752;
+  text-align: center; }
 
 .button_green:hover {
   background-color: #097752; }

@@ -1,12 +1,3 @@
-var new_art_addons = ['cherries', 'sprinkles', 'jelly beans', 'peanuts', 'gummy worms', 'peanut butter', 'onions', 'honey', 'berry jelly',
-'gummy sodas', 'blackberries', 'raspberries', 'chopped strawberries', 'marshmallow cream', 'vanilla frosting', 'chocolate frosting', 'crumbled candy bars', 'sugar cookies',
-'crumbled brownies', 'crumbled fudge', 'red velvet cake', 'cookie dough', 'm&m\'s', 'oreo',
-'chocolate chips', 'white chocolate chips', 'dark chocolate chips', 'pecans', 'acorns', 'almonds', 'gumballs', 'mini marshmallows', 'candied lemon rinds',
-'rice', 'chili peppers', 'gravy', 'coconut', 'peas', 'fudge ripple', 'chopped peaches', 'chopped pineapple',
-'croutons', 'fries', 'olives', 'candied bacon', 'bacon', 'shrimp', 'blueberries', 'raisins', 'waffles', 'cheese',
- 'eyeballs', 'bat wings', 'nuts and bolts', 'warts', 'oil', 'sausage', 'pepperoni', 'ram', 'egg',
- 'gold nuggets', 'pearls', 'gun powder', 'flowers', 'coffee beans', 'caviar', 'ice cubes', 'snowflakes', 'mint',
- 'telescope', 'calculator', 'constellation'];
 var image_prepend = 'http://static.icecreamstand.ca';
 var cones = [
 	{ name: 'baby',	cost: '1000' },
@@ -48,7 +39,7 @@ var ics = angular.module('ics', []);
 		$scope.pageSize = 20;
 		$scope.is_expanded = false;
 		$scope.numberOfPages=function(){
-        	return Math.ceil($scope.flavours_unlocked.length/$scope.pageSize);                
+        	return Math.ceil($scope.flavours_unlocked.length/$scope.pageSize);
     	};
     	$scope.update_page = function(new_page) {
     		if (new_page > 6) new_page = 6;
@@ -305,9 +296,8 @@ var ics = angular.module('ics', []);
 		    	var unlocked = [];
 		    	for (var i = 0; i < addons.length; i++) {
 		    		var addon = addons[i];
-		    		var is_new = new_art_addons.indexOf(addon.name) > -1;
 		    		var name = addon.name.replace(/\s+/g, '');
-		    		addon.image = (is_new)? image_prepend + '/addons/thumb/' + name + '.png.gz' : image_prepend + '/toppings/' + name + '_thumb.png'; 
+		    		addon.image = image_prepend + '/addons/thumb/' + name + '.png.gz';
 		    		if (user.toppings.indexOf(addon._id) === -1) {
 		    			locked.push(addon);
 		    		} else {
@@ -1498,8 +1488,7 @@ function get_usercard(name) {
                 var default_img = defaults[0];
                 if (j.quests > 2) default_img = defaults[1];
                 if (j.prestige_level > 1) default_img = defaults[2];
-                var is_new_art = new_art_addons.indexOf(j.last_addon) > -1;
-                var addon_url = is_new_art? image_prepend + '/addons/thumb/' + j.last_addon.replace(/\s+/g, '') + '.png.gz' : image_prepend + '/toppings/' + j.last_addon.replace(/\s+/g, '') + '.png';
+                var addon_url = image_prepend + '/addons/thumb/' + j.last_addon.replace(/\s+/g, '') + '.png.gz';
                 var cow_cards = '';
                 for (var i = 0; i < j.cows.length; i++) {
                     cow_cards = cow_cards + '<div class="user_cow_title" x-num="' + i + '" x-id="' + j.cows[i]._id + '">' + j.cows[i].name + '<span class="cow_card_level">lv' + Math.floor(j.cows[i].level) + '</span></div>';
@@ -1524,7 +1513,7 @@ function get_usercard(name) {
                 '<div class="button send_message" x-user="' + j.name + '">Message</div>' +
                 '<div class="button add_friend" x-enabled="' + friend_enabled + '" x-user="' + j.name + '">' + friend + '</div></td>' +
                 '<td><div class="user_icecream_holder"><div class="user_icecream" style="background-image: url(' + image_prepend + '/flavours/thumb/' + j.last_flavor.replace(/\s+/g, '') + 
-                '.png.gz), url(' + image_prepend + '/cones/' + j.cone + '.png.gz)"><img src="' + addon_url + '" x-new-art="' + is_new_art + '" class="user_addon" /></div></div>' +
+                '.png.gz), url(' + image_prepend + '/cones/' + j.cone + '.png.gz)"><img src="' + addon_url + '" x-new-art="true" class="user_addon" /></div></div>' +
                 '</td></tr></table></div><div class="playercard_anchor" x-anchor="2"><table>' +
                     '<tr><td><b>Carts</b> ' + j.carts + '</td><td><b>Employees</b> ' + j.employees + '</td></tr>' +
                     '<tr><td><b>Trucks</b> ' + j.trucks + '</td><td><b>Robots</b> ' + j.robots + '</td></tr>' +
@@ -1734,11 +1723,9 @@ function flavour_switch( id ) {
 
 function addon_switch(id) {
         var addon = Icecream.get_addon( id );
-        var is_new = new_art_addons.indexOf( addon.name ) > -1;
-        var addon_name = (is_new)? image_prepend + '/addons/' + addon.name.replace(/\W/g, '') + '.png.gz' : image_prepend + '/toppings/' + addon.name.replace(/\W/g, '') + '.png';
+        var addon_name = image_prepend + '/addons/' + addon.name.replace(/\W/g, '') + '.png.gz';
 
         $('.icecream #topping').attr('style', 'background-image: url(' +addon_name + ');');
-        $('.icecream #topping').attr('x-addon', addon.name).attr('x-new-art', is_new);
 
         if (combos.length === 0 || user.last_addon != id ) {
             user.last_addon = id;
@@ -1788,8 +1775,7 @@ function combos_load() {
                                         var flavor = Icecream.get_flavor(combo.flavor_id);
                                         var addon = Icecream.get_addon(combo.topping_id);
                                         if (combo.franken_id) combo_franken = Icecream.get_flavor(combo.franken_id);
-                                        var is_new_addon = new_art_addons.indexOf(addon.name) > -1;
-                                        var addon_url = (is_new_addon)? image_prepend + '/addons/thumb/' + addon.name.replace(/\W/g, '') + '.png.gz' : image_prepend + '/toppings/' + addon.name.replace(/\W/g, '') + '.png';
+                                        var addon_url = image_prepend + '/addons/thumb/' + addon.name.replace(/\W/g, '') + '.png.gz';
                                         var div = $('<div />', {
                                                 'class': 'combo_option tooltip option', 
                                                 'x-type': 'combo', 
@@ -1799,7 +1785,7 @@ function combos_load() {
                                                 'x-franken': combo.franken_id,
                                                 'x-value': combo.value,
                                                 'x-name': combo.name,
-                                                'x-new-art': is_new_addon,
+                                                'x-new-art': true,
                                                 'draggable': true,
                                                 'style': 'background-image:url(' + addon_url + '), url('+image_prepend+'/flavours/thumb/' + flavor.name.replace(/\s+/g, '') + '.png.gz)',
                                                 'html': combo.name + ( (combo_franken)? '<div class="combo_split" style="background-image: url('+image_prepend+'/flavours/thumb/' + combo_franken.name.replace(/\s+/g, '') + '.png.gz)"></div>' : '')
@@ -2779,7 +2765,7 @@ var Icecream = {
                             quest.description = quest.description.replace('[cost]', cost);
                         }
                         $('.quest_list').prepend('<div class="quest" x-num="' + i + '" x-id="' + quest._id + '">' +
-                        '<div class="quest_body">' + quest.description + '</div></div>');
+                        '<div class="quest_body">' + quest.description.replace(/\\r\\n/g, '<br />').replace(/\*([^\*]+)\*/g, '<b>$1</b>') + '</div></div>');
                         
                         
                         if (user_progress[1] != '0') {
@@ -2841,9 +2827,8 @@ var Icecream = {
                         break;
                     }
                 }
-                var is_new =  new_art_addons.indexOf(topping) > -1;
-                var url = (!is_new)? image_prepend+'/toppings/' + topping.replace(/\s+/g, '') + '_thumb.png' : image_prepend + '/addons/thumb/' + topping.replace(/\s+/g, '') + '.png.gz';
-                $('#main_base .option_wrapper').eq(i).append('<img src="'+ url + '" x-is-new="' + is_new + '" class="wrapper_addon_thumb" />');
+                var url = image_prepend + '/addons/thumb/' + topping.replace(/\s+/g, '') + '.png.gz';
+                $('#main_base .option_wrapper').eq(i).append('<img src="'+ url + '" x-is-new="true" class="wrapper_addon_thumb" />');
             }
         }
 
@@ -3786,7 +3771,7 @@ function main_flavours(update_type, callback) {
 }
 function main_toppings(update_type, callback) {
     $.ajax({
-        url : '/toppings',
+        url : '/addons.json',
         data: 'cache=' + Math.random(),
         type: 'GET',
         dataType: 'JSON',
@@ -4356,7 +4341,6 @@ function bind_tooltips() {
 
             if (flavour._id) {
                 var f_name = flavour.name.replace(/\s+/g, '');
-                var is_new_art = true;
                 var expertise = parseInt($(elem).parent().find('.expertise_level').text());
                 if (isNaN(expertise)) expertise = 0;
                 var expertise_bonus = flavour.value * (.1 * expertise);
@@ -4378,14 +4362,12 @@ function bind_tooltips() {
             }
         } else if (xtype == 'addon') {
             var t = Icecream.get_addon($(elem).attr('x-id'));
-            var is_new_art = new_art_addons.indexOf(t.name) > -1;
-            $('.hovercard').html('<div class="hover_title">' + __(t.name) + '<span class="level flavor_current money_icon is_white">' + ((t.value)? t.value.toFixed(2) : '?') + '</span></div><p>' + __('Add-ons can be used with a flavour to increase the value of ice cream.') + '</p><p class="flavor_text">' + __('Add-ons increase the value of every ice cream you or your workers sell and do not decrease in value over time.') + '</p>');
-            if (is_new_art) {
-                var flavour = Icecream.get_flavor(user.last_flavor);
-                $('.hovercard').attr('x-new-art', true);
-                $('.hovercard').append('<div class="icecream_hovercard_art" style="background-image: url(' + image_prepend + '/flavours/thumb/' + flavour.name.replace(/\s+/g, '') + '.png.gz), url(http://static.icecreamstand.ca/cones/thumb/' + ((cached_cone)? cached_cone : 'default') + '.png.gz);">' +
-                    '<img src="' + image_prepend + '/addons/thumb/' + t.name.replace(/\s+/g, '') + '.png.gz" class="hovercard_addon" /></div>');
-            }
+
+            var flavour = Icecream.get_flavor(user.last_flavor);
+            $('.hovercard').attr('x-new-art', true);
+            $('.hovercard').append('<div class="icecream_hovercard_art" style="background-image: url(' + image_prepend + '/flavours/thumb/' + flavour.name.replace(/\s+/g, '') + '.png.gz), url(http://static.icecreamstand.ca/cones/thumb/' + ((cached_cone)? cached_cone : 'default') + '.png.gz);">' +
+                '<img src="' + image_prepend + '/addons/thumb/' + t.name.replace(/\s+/g, '') + '.png.gz" class="hovercard_addon" /></div>');
+
         }
         if (reverse) {
             $('.hovercard').append('<div class="triangle-up"></div>');
@@ -5105,6 +5087,7 @@ $(document).ready(function () {
     $('body').on('click', '.message_close, .darkness.faded_in', function () {
         if ($(this).hasClass('update')) return;
         var scr = document.body.scrollTop;
+        console.log('Reseting location hash');
         window.location.hash = ' ';
         document.body.scrollTop = scr;
         $('.message, .darkness, .alert_shadow:last').remove();

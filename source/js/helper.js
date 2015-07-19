@@ -603,8 +603,7 @@ function get_usercard(name) {
                 var default_img = defaults[0];
                 if (j.quests > 2) default_img = defaults[1];
                 if (j.prestige_level > 1) default_img = defaults[2];
-                var is_new_art = new_art_addons.indexOf(j.last_addon) > -1;
-                var addon_url = is_new_art? image_prepend + '/addons/thumb/' + j.last_addon.replace(/\s+/g, '') + '.png.gz' : image_prepend + '/toppings/' + j.last_addon.replace(/\s+/g, '') + '.png';
+                var addon_url = image_prepend + '/addons/thumb/' + j.last_addon.replace(/\s+/g, '') + '.png.gz';
                 var cow_cards = '';
                 for (var i = 0; i < j.cows.length; i++) {
                     cow_cards = cow_cards + '<div class="user_cow_title" x-num="' + i + '" x-id="' + j.cows[i]._id + '">' + j.cows[i].name + '<span class="cow_card_level">lv' + Math.floor(j.cows[i].level) + '</span></div>';
@@ -629,7 +628,7 @@ function get_usercard(name) {
                 '<div class="button send_message" x-user="' + j.name + '">Message</div>' +
                 '<div class="button add_friend" x-enabled="' + friend_enabled + '" x-user="' + j.name + '">' + friend + '</div></td>' +
                 '<td><div class="user_icecream_holder"><div class="user_icecream" style="background-image: url(' + image_prepend + '/flavours/thumb/' + j.last_flavor.replace(/\s+/g, '') + 
-                '.png.gz), url(' + image_prepend + '/cones/' + j.cone + '.png.gz)"><img src="' + addon_url + '" x-new-art="' + is_new_art + '" class="user_addon" /></div></div>' +
+                '.png.gz), url(' + image_prepend + '/cones/' + j.cone + '.png.gz)"><img src="' + addon_url + '" x-new-art="true" class="user_addon" /></div></div>' +
                 '</td></tr></table></div><div class="playercard_anchor" x-anchor="2"><table>' +
                     '<tr><td><b>Carts</b> ' + j.carts + '</td><td><b>Employees</b> ' + j.employees + '</td></tr>' +
                     '<tr><td><b>Trucks</b> ' + j.trucks + '</td><td><b>Robots</b> ' + j.robots + '</td></tr>' +

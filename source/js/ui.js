@@ -708,6 +708,7 @@ $(document).ready(function () {
     $('body').on('click', '.message_close, .darkness.faded_in', function () {
         if ($(this).hasClass('update')) return;
         var scr = document.body.scrollTop;
+        console.log('Reseting location hash');
         window.location.hash = ' ';
         document.body.scrollTop = scr;
         $('.message, .darkness, .alert_shadow:last').remove();

@@ -177,7 +177,7 @@ function main_flavours(update_type, callback) {
 }
 function main_toppings(update_type, callback) {
     $.ajax({
-        url : '/toppings',
+        url : '/addons.json',
         data: 'cache=' + Math.random(),
         type: 'GET',
         dataType: 'JSON',
