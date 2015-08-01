@@ -159,7 +159,6 @@ function achievement_register(id) {
     });
 }
 function get_achievements() {
-    alert('. . .', 'Achievements');
     $.ajax({
         url: 'achievements',
         dataType: 'JSON',
@@ -185,6 +184,7 @@ function get_achievements() {
                 }
             }
             alert('<h5>Achievement points: ' + (user.achievements.length * 10) + '</h5><div class="achievements_unlocked">' + text_unlocked + '</div><h5>Remaining Achievements...' + get_easter_bunny(10) + '</h5><div class="achievements_locked">' + text_locked + '</div>', 'Achievements');
+            alert_update();
         }
     });
 }

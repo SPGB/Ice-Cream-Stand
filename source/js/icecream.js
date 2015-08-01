@@ -108,7 +108,7 @@ function addon_switch(id) {
         var addon = Icecream.get_addon( id );
         var addon_name = image_prepend + '/addons/' + addon.name.replace(/\W/g, '') + '.png.gz';
 
-        $('.icecream #topping').attr('style', 'background-image: url(' +addon_name + ');');
+        $('.icecream #topping').attr('x-addon', addon.name).attr('style', 'background-image: url(' +addon_name + ');');
 
         if (combos.length === 0 || user.last_addon != id ) {
             user.last_addon = id;

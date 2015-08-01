@@ -1044,7 +1044,6 @@ function achievement_register(id) {
     });
 }
 function get_achievements() {
-    alert('. . .', 'Achievements');
     $.ajax({
         url: 'achievements',
         dataType: 'JSON',
@@ -1070,6 +1069,7 @@ function get_achievements() {
                 }
             }
             alert('<h5>Achievement points: ' + (user.achievements.length * 10) + '</h5><div class="achievements_unlocked">' + text_unlocked + '</div><h5>Remaining Achievements...' + get_easter_bunny(10) + '</h5><div class="achievements_locked">' + text_locked + '</div>', 'Achievements');
+            alert_update();
         }
     });
 }
@@ -1725,7 +1725,7 @@ function addon_switch(id) {
         var addon = Icecream.get_addon( id );
         var addon_name = image_prepend + '/addons/' + addon.name.replace(/\W/g, '') + '.png.gz';
 
-        $('.icecream #topping').attr('style', 'background-image: url(' +addon_name + ');');
+        $('.icecream #topping').attr('x-addon', addon.name).attr('style', 'background-image: url(' +addon_name + ');');
 
         if (combos.length === 0 || user.last_addon != id ) {
             user.last_addon = id;

@@ -339,9 +339,7 @@ h4 {
   background-repeat: no-repeat;
   height: 229px;
   top: 95px;
-  width: 275px; }
-
-.icecream #topping[x-new-art="true"] {
+  width: 275px;
   background-position: 5px top;
   background-size: auto 245px;
   height: 229px;
@@ -2346,6 +2344,9 @@ h3#upgrades_text {
   -moz-animation-duration: 4s;
   -moz-animation-iteration-count: infinite;
   -moz-animation-timing-function: ease-in; }
+
+.icecream #topping[x-addon="moon"] {
+  width: 300px; }
 
 .login > form {
   background-color: #FFF1C6;
