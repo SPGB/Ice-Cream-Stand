@@ -142,7 +142,7 @@ function bind_tooltips() {
         } else if (xtype === 'coldhands') {
             $('.hovercard').html('<div class="hover_title">' + __('Cold Hands') + '<span class="level">' + user.upgrade_coldhands + '</span></div><p>Clicking a Scoopling sells an additional 0.25 Ice cream.</p><p>It can be leveled up to 1000.</p>');
         } else if (xtype === 'shop') {
-            $('.hovercard').html('<div class="hover_title">' + __('The Bovine Boutique') + '</div><p>Buy powerful items for your cow.</p>');
+            $('.hovercard').html('<div class="hover_title">' + __('The Bovine Boutique') + '</div><p>Buy powerful items for your cow, flavours, add-ons, workers, and upgrades.</p>');
         } else if (xtype === 'cone') {
             if (!id) id = $(this).find('.option').attr('x-id');
             if (id === 'baby') {

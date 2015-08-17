@@ -143,7 +143,7 @@ function first_time_init() {
     Icecream.employees_working();
     populate_easter();
     $('body').addClass( channel[user.release_channel] );
-    $('#version_info').html('<a href="/stats" id="online_count" target="_blank"></a> <a href="http://blog.samgb.com/tag/ice-cream-stand/" target="_blank" id="version_num">' + version + ' ' + channel[user.release_channel] + '</a>');      
+    $('#version_info').html('<a href="/stats" id="online_count" target="_blank"></a> <a href="http://blog.samgb.com/tag/ice-cream-stand/" target="_blank" id="version_num">' + version + ' "' + version_name + '" ' + channel[user.release_channel] + '</a>');
 }
 function main_flavours(update_type, callback) {
     //      $.ajax({

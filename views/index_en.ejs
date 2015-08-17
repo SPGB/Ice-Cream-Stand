@@ -21,9 +21,21 @@
 			var user = <%- (typeof user != 'undefined')? JSON.stringify(user) : 'null' %>;
 			var user_start = user; //legacy
 		</script>
-		<% if (user.release_channel == 2) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_151.js.gz?cache=1"></script>
+		<% if (user.release_channel == 2) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_152.js.gz?cache=1"></script>
 		<% } else if (user.release_channel == 1) { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_151.js.gz?cache=1"></script>
 		<% } else { %><script type="text/javascript" src="https://s3.amazonaws.com/icecreamstand.com/main_151.js.gz"></script><% } %>
+
+		<script type="text/javascript">
+		  var _gaq = _gaq || [];
+		  _gaq.push(['_setAccount', 'UA-44957881-1']);
+		  _gaq.push(['_trackPageview']);
+
+		  (function() {
+		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+		  })();
+		</script>
 	</head>
 	<body x-scroll-down="false">
 	<div id="fb-root"></div>
@@ -177,10 +189,10 @@
 					<div class="quest_list"></div>
 				</div><div class="trending_and_events main_container half_size hidden">
 					<div class="event" ng-controller="events">
-						<h4><span class="lang">Events</span></h4>
+						<h4><span class="lang">Events</span><span id="trend_time"></span></h4>
 						<div class="event_container tooltip" x-type="event">
 							<span id="event_name"></span>
-							<span id="trend_time"></span>
+							<span id="trend_bonus"></span>
 						</div>
 					</div>
 
@@ -211,7 +223,7 @@
 					</span></h4>
 					<div class="chat_container_main">
 						<div id="chat_window" ng-class="{ 'chat_active': is_expanded }">
-							<div class="chat" ng-repeat="message in messages | startFrom: messages.length - message_count" x-id="{{message._id}}">
+							<div class="chat" ng-repeat="message in messages | startFrom: messages.length - message_count track by message._id" x-id="{{message._id}}">
 								<span class="user_card" x-user="{{message.user}}">
 									<img ng-src="http://static.icecreamstand.ca/badges/{{message.badge}}.png" class="chat_badge" /> {{message.user}}
 								</span><span class="chat_textbody" ng-bind-html="message.text | chat_sanitize"></span>
@@ -331,7 +343,7 @@
 						<img x-src="http://static.icecreamstand.ca/research_thumb.png" class="tooltip" />
 						<div class="unlock_text"><span class="lang">Flavor Research</span><span class="cost">500</span></div>
 						<button class="lang">Unlock</button>
-					</div>					
+					</div>
 				</div>
 				<div class="flavors_inner">
 					<div ng-repeat="flavour in flavours_locked | orderBy:'cost' | limitTo:3" class="unlockable" x-cost="{{flavour.cost}}" x-id="{{flavour._id}}" x-new="true" x-type="base">
@@ -404,21 +416,11 @@
 		</div>
 		<div class="background_hill">
 			<div class="lore" x-link="lore"><div class="lore_book"></div><div class="lore_glow"></div></div>
-			<div class="shop tooltip" x-type="shop"></div>
+			<div class="shop tooltip" x-type="shop" ng-click="toggleShop()"></div>
 			<div class="silo tooltip" x-type="silo"><b class="silo_bar"></b></div>
 			<div class="cow" x-type="cow"></div>
 		</div>
+		<shop></shop>
 		<link rel="stylesheet" href="http://static.icecreamstand.ca/font-awesome-4.2.0/css/font-awesome.min.css" />
-		<script type="text/javascript">
-		  var _gaq = _gaq || [];
-		  _gaq.push(['_setAccount', 'UA-44957881-1']);
-		  _gaq.push(['_trackPageview']);
-
-		  (function() {
-		    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-		    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-		    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-		  })();
-		</script>
 	</body>
 </html>

@@ -146,7 +146,9 @@ input:focus, textarea:focus, keygen:focus, select:focus {
   outline: none; }
 
 progress[value] {
-  appearance: none;
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
   border: none;
   width: 100%;
   height: 20px;
@@ -211,7 +213,8 @@ progress[value]#happiness[x-full="true"]::-moz-progress-bar {
   left: 0;
   bottom: auto;
   z-index: 2;
-  transition: opacity 0.25s ease 0s;
+  -webkit-transition: opacity 0.25s ease 0s;
+          transition: opacity 0.25s ease 0s;
   opacity: 1; }
 
 .shop_leftend {
@@ -405,22 +408,27 @@ h4 {
   /* Chrome and Safari */
   -webkit-animation-iteration-count: infinite;
   /*Safari and Chrome*/
-  -moz-animation-iteration-count: infinite;
   /*Safari and Chrome*/
   animation-iteration-count: infinite;
-  transform-origin: 120px 125px 0; }
+  -webkit-transform-origin: 120px 125px 0;
+      -ms-transform-origin: 120px 125px 0;
+          transform-origin: 120px 125px 0; }
 
 @keyframes friendship_rotate {
   0% {
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
   100% {
-    transform: rotate(-360deg); } }
+    -webkit-transform: rotate(-360deg);
+            transform: rotate(-360deg); } }
 
 @-webkit-keyframes friendship_rotate {
   0% {
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
   100% {
-    transform: rotate(-360deg); } }
+    -webkit-transform: rotate(-360deg);
+            transform: rotate(-360deg); } }
 
 #topping[x-addon="sun"] {
   background-position: right top; }
@@ -503,12 +511,15 @@ h4 {
   border-top: 10px solid #999;
   cursor: pointer;
   position: absolute;
-  transition: transform 0.5s linear 0s;
+  -webkit-transition: -webkit-transform 0.5s linear 0s;
+          transition: transform 0.5s linear 0s;
   margin-top: 3px;
   right: -15px; }
 
 .nav_triangle.inactive {
-  transform: rotate(-90deg); }
+  -webkit-transform: rotate(-90deg);
+      -ms-transform: rotate(-90deg);
+          transform: rotate(-90deg); }
 
 .name_tri_up {
   border-bottom: 10px solid #F1F1F1;
@@ -586,7 +597,8 @@ h4 {
   color: #FEFFED;
   display: inline-block;
   padding: 5px 10px;
-  transition: background 0.5s;
+  -webkit-transition: background 0.5s;
+          transition: background 0.5s;
   margin-left: 10px; }
 
 .search_form {
@@ -689,7 +701,8 @@ h4 {
 
 user, .user_card {
   cursor: pointer;
-  transition: color 0.25s ease 0s;
+  -webkit-transition: color 0.25s ease 0s;
+          transition: color 0.25s ease 0s;
   text-transform: capitalize; }
 
 user:hover, .user_card:hover {
@@ -728,7 +741,9 @@ user:hover, .user_card:hover {
   margin-left: 5px;
   margin-top: -7px;
   position: absolute;
-  transform: rotate(45deg); }
+  -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+          transform: rotate(45deg); }
 
 .friend_message:hover, .friend_poke:hover, .friend_delete:hover {
   background-color: #6462AC; }
@@ -808,7 +823,8 @@ user:hover, .user_card:hover {
   right: 20px;
   text-align: center;
   top: 355px;
-  transition: left 0.5s ease 0s;
+  -webkit-transition: left 0.5s ease 0s;
+          transition: left 0.5s ease 0s;
   z-index: 2; }
 
 #new_message {
@@ -952,7 +968,8 @@ user:hover, .user_card:hover {
   background-color: rgba(255, 255, 255, 0.3);
   background-image: url(http://static.icecreamstand.ca/background_icons2.png);
   cursor: pointer;
-  transition: background 0.5s;
+  -webkit-transition: background 0.5s;
+          transition: background 0.5s;
   overflow: hidden;
   background-size: 30px 1px; }
 
@@ -970,10 +987,8 @@ user:hover, .user_card:hover {
   top: 0px;
   font-weight: bold;
   -webkit-animation: worker_float 6s linear;
-  -moz-animation: worker_float 6s linear;
   animation: worker_float 6s linear;
   -webkit-animation-iteration-count: infinite;
-  -moz-animation-iteration-count: infinite;
   animation-iteration-count: infinite;
   color: #fff;
   text-shadow: -1px 0 rgba(0, 0, 0, 0.5), 0 1px rgba(0, 0, 0, 0.5), 1px 0 rgba(0, 0, 0, 0.5), 0 -1px rgba(0, 0, 0, 0.5); }
@@ -982,25 +997,6 @@ user:hover, .user_card:hover {
   text-shadow: -1px 0 #fff, 0 1px #fff, 1px 0 #fff, 0 -1px #fff; }
 
 @-webkit-keyframes worker_float {
-  0% {
-    top: 90px;
-    opacity: 1; }
-  50% {
-    margin-left: 0px;
-    top: 10px;
-    opacity: 0; }
-  51% {
-    margin-left: 10px;
-    top: 90px;
-    opacity: 0; }
-  52% {
-    opacity: 1; }
-  100% {
-    margin-left: -10px;
-    top: 10px;
-    opacity: 0; } }
-
-@-moz-keyframes worker_float {
   0% {
     top: 90px;
     opacity: 1; }
@@ -1076,7 +1072,8 @@ user:hover, .user_card:hover {
   position: absolute;
   right: 5px;
   top: 0px;
-  transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
   -webkit-transform: rotate(45deg);
   -moz-transform: rotate(45deg);
   font-size: 20px; }
@@ -1168,7 +1165,8 @@ iframe.facebook {
 
 .alert_shadow {
   min-height: 40px;
-  transition: margin 0.25s ease 0s;
+  -webkit-transition: margin 0.25s ease 0s;
+          transition: margin 0.25s ease 0s;
   opacity: 1;
   z-index: 9; }
 
@@ -1220,7 +1218,8 @@ iframe.facebook {
   clear: both;
   position: relative;
   text-align: center;
-  transition: background 0.25s ease-in 0s; }
+  -webkit-transition: background 0.25s ease-in 0s;
+          transition: background 0.25s ease-in 0s; }
 
 .unlockable.locked {
   opacity: 0.7; }
@@ -1295,7 +1294,8 @@ iframe.facebook {
   cursor: pointer;
   font-weight: bold;
   padding: 5px;
-  transition: background 0.25s ease 0s; }
+  -webkit-transition: background 0.25s ease 0s;
+          transition: background 0.25s ease 0s; }
 
 .button:hover, button:hover {
   background-color: #5c59b8; }
@@ -1336,7 +1336,8 @@ iframe.facebook {
   width: 21%;
   box-shadow: 0 2px 0 #097752;
   border-radius: 2px;
-  transition: background 0.25s ease 0s; }
+  -webkit-transition: background 0.25s ease 0s;
+          transition: background 0.25s ease 0s; }
 
 .unlockable button:hover, .unlockable .button:hover {
   background-color: #999; }
@@ -1436,10 +1437,14 @@ input {
   -moz-animation-duration: 4s;
   -moz-animation-iteration-count: infinite;
   -moz-animation-timing-function: linear;
-  animation-name: background-move-addon;
-  animation-duration: 4s;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear; }
+  -webkit-animation-name: background-move-addon;
+          animation-name: background-move-addon;
+  -webkit-animation-duration: 4s;
+          animation-duration: 4s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear; }
 
 .option {
   max-height: 100px; }
@@ -1699,7 +1704,9 @@ table[x-col="2"] td {
   left: -20px;
   position: absolute;
   right: 0;
-  transform: scale(0.85);
+  -webkit-transform: scale(0.85);
+      -ms-transform: scale(0.85);
+          transform: scale(0.85);
   height: 150px; }
 
 .user_cow_title {
@@ -1742,7 +1749,6 @@ table[x-col="2"] td {
   /* Chrome and Safari */
   -webkit-animation-iteration-count: infinite;
   /*Safari and Chrome*/
-  -moz-animation-iteration-count: infinite;
   /*Safari and Chrome*/
   animation-iteration-count: infinite; }
 
@@ -1827,7 +1833,8 @@ table[x-col="2"] td {
   display: block;
   height: 100px;
   line-height: 27px;
-  transform: rotateZ(10deg);
+  -webkit-transform: rotateZ(10deg);
+          transform: rotateZ(10deg);
   width: 60px; }
 
 .clock {
@@ -1842,31 +1849,27 @@ table[x-col="2"] td {
 
 .clock_hand {
   -webkit-animation: clock_move 15s linear;
-  -moz-animation: clock_move 15s linear;
   animation: clock_move 15s linear;
   -webkit-animation-iteration-count: infinite;
   /*Safari and Chrome*/
-  -moz-animation-iteration-count: infinite;
   /*Safari and Chrome*/
   animation-iteration-count: infinite; }
 
 @-webkit-keyframes clock_move {
   0% {
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
   100% {
-    transform: rotate(360deg); } }
-
-@-moz-keyframes clock_move {
-  0% {
-    transform: rotate(0deg); }
-  100% {
-    transform: rotate(360deg); } }
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg); } }
 
 @keyframes clock_move {
   0% {
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
   100% {
-    transform: rotate(360deg); } }
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg); } }
 
 .chat_badge {
   height: 25px;
@@ -2089,12 +2092,8 @@ table[x-col="2"] td {
   text-transform: capitalize; }
 
 .event #trend_time {
-  bottom: -30px;
   font-size: 14px;
-  left: 0;
-  position: absolute;
-  right: 0;
-  text-align: right; }
+  float: right; }
 
 h3#upgrades_text {
   font-size: 20px;
@@ -2250,7 +2249,8 @@ h3#upgrades_text {
   letter-spacing: 1px;
   margin-top: 0px;
   vertical-align: top;
-  transition: background 0.25s ease-in 0s; }
+  -webkit-transition: background 0.25s ease-in 0s;
+          transition: background 0.25s ease-in 0s; }
 
 .tab:hover, .flavor_tab:hover, .expand:hover, .chat_rooms:hover {
   background-color: #5c59b8; }
@@ -2294,7 +2294,6 @@ h3#upgrades_text {
   top: -100px;
   opacity: 100;
   -webkit-animation: particle_fade 2.5s linear;
-  -moz-animation: particle_fade 2.5s linear;
   animation: particle_fade 2.5s linear;
   animation-iteration-count: infinite;
   -webkit-animation-iteration-count: infinite;
@@ -2302,7 +2301,6 @@ h3#upgrades_text {
   -moz-animation-iteration-count: infinite;
   /*Safari and Chrome*/
   -webkit-animation-fill-mode: forwards;
-  -moz-animation-fill-mode: forwards;
   animation-fill-mode: forwards; }
 
 .icecream_particle.finished {
@@ -2312,14 +2310,6 @@ h3#upgrades_text {
   width: 50px; }
 
 @-webkit-keyframes particle_fade {
-  0% {
-    top: -100px;
-    opacity: 1; }
-  100% {
-    top: 80%;
-    opacity: 0; } }
-
-@-moz-keyframes particle_fade {
   0% {
     top: -100px;
     opacity: 1; }
@@ -2629,7 +2619,8 @@ h3#upgrades_text {
   position: relative;
   right: 0;
   text-align: center;
-  transition: background 0.25s ease 0s; }
+  -webkit-transition: background 0.25s ease 0s;
+          transition: background 0.25s ease 0s; }
 
 .button.complete_quest:hover {
   background-color: #909090; }
@@ -2653,17 +2644,22 @@ h3#upgrades_text {
   background-color: #0da673;
   box-shadow: 0 2px 0 #097752;
   border-radius: 2px 0 0 2px;
-  transition: background 0.25s ease 0s; }
+  -webkit-transition: background 0.25s ease 0s;
+          transition: background 0.25s ease 0s; }
 
 #complete_quest_progress.active {
   -webkit-animation-duration: 8s;
   -webkit-animation-iteration-count: infinite;
   -webkit-animation-name: quest-move;
   -webkit-animation-timing-function: linear;
-  animation-duration: 8s;
-  animation-iteration-count: infinite;
-  animation-name: quest-move;
-  animation-timing-function: linear;
+  -webkit-animation-duration: 8s;
+          animation-duration: 8s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-name: quest-move;
+          animation-name: quest-move;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
   background-image: url(http://static.icecreamstand.ca/quest_tile.png);
   background-repeat: repeat-y;
   background-position: right top;
@@ -2713,38 +2709,13 @@ h3#upgrades_text {
     margin-left: -200px;
     z-index: -3; } }
 
-@-moz-keyframes addon_moon {
-  0%, 100% {
-    margin-left: -200px;
-    z-index: 1; }
-  50% {
-    margin-left: 100px;
-    z-index: 1; }
-  51% {
-    z-index: -1; }
-  100% {
-    margin-left: -200px;
-    z-index: -3; } }
-
 @-webkit-keyframes rotate {
   from {
     -webkit-transform: rotate(0deg); }
   to {
     -webkit-transform: rotate(360deg); } }
 
-@-moz-keyframes rotate {
-  from {
-    -moz-transform: rotate(0deg); }
-  to {
-    -moz-transform: rotate(360deg); } }
-
 @-webkit-keyframes background-move {
-  from {
-    background-position: 0px top; }
-  to {
-    background-position: 100% top; } }
-
-@-moz-keyframes background-move {
   from {
     background-position: 0px top; }
   to {
@@ -2762,31 +2733,13 @@ h3#upgrades_text {
   to {
     background-position: 100% top; } }
 
-@-moz-keyframes background-move-addon {
-  from {
-    background-position: 0, 0px top; }
-  to {
-    background-position: 0, 100px top; } }
-
 @-webkit-keyframes expertise-move {
   from {
     background-position: right 0px; }
   to {
     background-position: right -50px; } }
 
-@-moz-keyframes expertise-move {
-  from {
-    background-position: right 0px; }
-  to {
-    background-position: right -50px; } }
-
 @-webkit-keyframes quest-move {
-  from {
-    background-position: right -85px; }
-  to {
-    background-position: right 0px; } }
-
-@-moz-keyframes quest-move {
   from {
     background-position: right -85px; }
   to {
@@ -2868,10 +2821,14 @@ h3#upgrades_text {
   margin-right: 20px; }
 
 .achievement_bubble > img:hover {
-  animation-name: background-move;
-  animation-duration: 4s;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear; }
+  -webkit-animation-name: background-move;
+          animation-name: background-move;
+  -webkit-animation-duration: 4s;
+          animation-duration: 4s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear; }
 
 .achievement_bubble > span#title {
   display: block;
@@ -2888,7 +2845,8 @@ h3#upgrades_text {
   position: absolute;
   top: 250px;
   width: 20px;
-  transition: left 0.5s, width 0.5s; }
+  -webkit-transition: left 0.5s, width 0.5s;
+          transition: left 0.5s, width 0.5s; }
 
 .expertise_bar_inner {
   background-color: #F9C9D3;
@@ -2896,7 +2854,8 @@ h3#upgrades_text {
   background-position: left bottom;
   background-repeat: repeat-y;
   border-radius: 5px 0 0 0;
-  transition: height 1s;
+  -webkit-transition: height 1s;
+          transition: height 1s;
   position: absolute;
   bottom: 5px;
   width: 100%;
@@ -3246,9 +3205,7 @@ h3#upgrades_text {
   left: 38px;
   margin-top: 7px;
   -webkit-transform: rotate(-21deg);
-  -moz-transform: rotate(-21deg);
   -ms-transform: rotate(-21deg);
-  -o-transform: rotate(-21deg);
   transform: rotate(-21deg); }
 
 #gamble_icon.gamble_addon {
@@ -3320,7 +3277,9 @@ h3#upgrades_text {
 .cow_background > .alert_inline {
   left: 50px;
   margin-top: -50px;
-  transform: scale(2); }
+  -webkit-transform: scale(2);
+      -ms-transform: scale(2);
+          transform: scale(2); }
 
 .easter {
   width: 20px;
@@ -3332,7 +3291,8 @@ h3#upgrades_text {
   left: 50%;
   opacity: 0;
   top: 66px;
-  transition: opacity 5s ease 0s; }
+  -webkit-transition: opacity 5s ease 0s;
+          transition: opacity 5s ease 0s; }
 
 .e10:hover {
   opacity: 1 !important; }
@@ -3391,10 +3351,14 @@ h3#upgrades_text {
   right: 0; }
 
 #trend_sold_inner {
-  animation-duration: 5s;
-  animation-iteration-count: infinite;
-  animation-name: expertise-move;
-  animation-timing-function: linear;
+  -webkit-animation-duration: 5s;
+          animation-duration: 5s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-name: expertise-move;
+          animation-name: expertise-move;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
   -webkit-animation-duration: 5s;
   -webkit-animation-iteration-count: infinite;
   -webkit-animation-name: expertise-move;
@@ -3406,7 +3370,8 @@ h3#upgrades_text {
   background-size: 50px auto;
   height: 10px;
   position: absolute;
-  transition: width 1s ease 0s; }
+  -webkit-transition: width 1s ease 0s;
+          transition: width 1s ease 0s; }
 
 #moneybag {
   height: 34px;
@@ -3423,7 +3388,8 @@ h3#upgrades_text {
   margin-left: 0;
   padding: 0;
   vertical-align: middle;
-  transition: background 0.5s ease 0s; }
+  -webkit-transition: background 0.5s ease 0s;
+          transition: background 0.5s ease 0s; }
 
 .friends_button_container:hover, .friends_add:hover, .friends_counter:hover {
   background-color: #5c59b8;
@@ -3554,7 +3520,8 @@ message-next {
   text-align: center;
   cursor: pointer;
   bottom: 0px;
-  transition: bottom 0.2s ease 0s;
+  -webkit-transition: bottom 0.2s ease 0s;
+          transition: bottom 0.2s ease 0s;
   background-image: url("http://static.icecreamstand.ca/cones/thumb/default.png.gz");
   background-position: 0 43px;
   background-repeat: no-repeat; }
@@ -3589,7 +3556,8 @@ message-next {
   bottom: -20px !important;
   right: auto !important;
   left: 0;
-  transform: scale(0.5);
+  -ms-transform: scale(0.5);
+      transform: scale(0.5);
   -webkit-transform: scale(0.5);
   -ie-transform: scale(0.5);
   -moz-transform: scale(0.5);
@@ -3616,7 +3584,8 @@ message-next {
   position: absolute;
   right: 0;
   top: 40px;
-  transition: height 0.25s ease 0s;
+  -webkit-transition: height 0.25s ease 0s;
+          transition: height 0.25s ease 0s;
   width: 260px;
   z-index: 3; }
 
@@ -3670,12 +3639,15 @@ message-next {
   position: absolute;
   right: 0;
   top: 0;
-  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+          transform: rotate(45deg);
   text-align: center;
   width: 20px;
   border-radius: 20px;
   background-color: rgba(255, 255, 255, 0.1);
-  transition: background 0.25s ease 0s;
+  -webkit-transition: background 0.25s ease 0s;
+          transition: background 0.25s ease 0s;
   color: #111; }
 
 .inventory_clear:hover {
@@ -3910,8 +3882,6 @@ body.night {
   width: 175px; }
 
 .shop_table .inventory_thumb {
-  background-color: #ddd;
-  background-image: url("http://static.icecreamstand.ca/background_icons2.png");
   max-width: 100px; }
 
 .skin_td {
@@ -4661,7 +4631,7 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
 #refer_url {
   width: 90%; }
 
-.settings_tab {
+.settings_tab, .shop__tab {
   display: inline-block;
   cursor: pointer;
   background-color: #9f9de7;
@@ -4669,9 +4639,10 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   color: #fff;
   font-weight: bold;
   font-size: 14px;
-  margin-right: 10px; }
+  margin-right: 10px;
+  text-transform: capitalize; }
 
-.settings_tab[x-active="true"] {
+.settings_tab[x-active="true"], .shop__tab.active {
   color: #7F7DC7;
   background-color: #fff; }
 
@@ -4720,7 +4691,12 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   z-index: 2; }
 
 .shop_table {
-  width: 100%; }
+  width: 100%;
+  text-align: left; }
+
+.shop_table .unlockable {
+  width: 48%;
+  display: inline-block; }
 
 .shop_table thead {
   background-color: #f1f1f1; }
@@ -4809,9 +4785,6 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
 
 #canvas_sales {
   display: none; }
-
-.icecream {
-  cursor: pointer; }
 
 .time_left {
   float: right;
@@ -4926,7 +4899,9 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   left: -20px;
   position: absolute;
   top: -40px;
-  transform-origin: 75px 79px 0;
+  -webkit-transform-origin: 75px 79px 0;
+      -ms-transform-origin: 75px 79px 0;
+          transform-origin: 75px 79px 0;
   width: 150px;
   z-index: -1;
   display: none; }
@@ -4957,42 +4932,30 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   display: none; }
 
 .lore:hover > .lore_glow {
-  -moz-animation: 12s linear 0s normal none infinite running lore_rotate;
   -webkit-animation: 12s linear 0s normal none infinite running lore_rotate;
   animation: 12s linear 0s normal none infinite running lore_rotate; }
 
 .lore_float {
-  -moz-animation: 6s ease 0s normal none infinite running lore_float;
   -webkit-animation: 6s ease 0s normal none infinite running lore_float;
   animation: 6s ease 0s normal none infinite running lore_float; }
 
 @-webkit-keyframes lore_rotate {
   0% {
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
   100% {
-    transform: rotate(360deg); } }
-
-@-moz-keyframes lore_rotate {
-  0% {
-    transform: rotate(0deg); }
-  100% {
-    transform: rotate(360deg); } }
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg); } }
 
 @keyframes lore_rotate {
   0% {
-    transform: rotate(0deg); }
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg); }
   100% {
-    transform: rotate(360deg); } }
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg); } }
 
 @-webkit-keyframes lore_float {
-  0% {
-    bottom: 40px; }
-  50% {
-    bottom: 80px; }
-  100% {
-    bottom: 40px; } }
-
-@-moz-keyframes lore_float {
   0% {
     bottom: 40px; }
   50% {
@@ -5035,7 +4998,8 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   height: 20px;
   left: 50%;
   position: absolute;
-  transition: all 0.25s ease 0s;
+  -webkit-transition: all 0.25s ease 0s;
+          transition: all 0.25s ease 0s;
   width: 20px;
   z-index: 1; }
 
@@ -5120,7 +5084,9 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   right: 0;
   text-align: center;
   top: 50%;
-  transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
   color: #7F7DC7;
   font-size: 42px; }
 
@@ -5274,7 +5240,8 @@ body[x-epic="aoc"] .aoc_log {
   height: 40px;
   width: 50%;
   box-shadow: 0 -20px 0 rgba(0, 0, 0, 0.1) inset;
-  transition: width 0.25s ease 0s; }
+  -webkit-transition: width 0.25s ease 0s;
+          transition: width 0.25s ease 0s; }
 
 .epic_progress_bar_2 {
   background-color: #03a9f4;
@@ -5292,10 +5259,14 @@ body[x-epic="aoc"] .aoc_log {
   -webkit-animation-duration: 20s;
   -webkit-animation-iteration-count: infinite;
   -webkit-animation-timing-function: linear;
-  animation-name: background-move;
-  animation-duration: 20s;
-  animation-iteration-count: infinite;
-  animation-timing-function: linear; }
+  -webkit-animation-name: background-move;
+          animation-name: background-move;
+  -webkit-animation-duration: 20s;
+          animation-duration: 20s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear; }
 
 .buff {
   background-color: #7F7DC7;
@@ -5415,7 +5386,8 @@ body[x-epic="aoc"] .aoc_log {
   position: absolute;
   right: 10px;
   top: 37px;
-  transition: color 0.25s ease 0s; }
+  -webkit-transition: color 0.25s ease 0s;
+          transition: color 0.25s ease 0s; }
 
 .mobile_menu.active {
   color: #7F7DC7; }
@@ -5589,7 +5561,6 @@ body[x-epic="aoc"] .aoc_log {
   cursor: pointer;
   vertical-align: middle;
   -webkit-animation: spin 4s ease infinite;
-  -moz-animation: spin 4s ease infinite;
   animation: spin 4s ease infinite;
   display: inline-block; }
 
@@ -5597,14 +5568,6 @@ body[x-epic="aoc"] .aoc_log {
   background: none repeat scroll 0 0 transparent !important;
   height: 25px !important;
   width: 20px !important; }
-
-@-moz-keyframes spin {
-  0% {
-    -moz-transform: rotate(-20deg); }
-  50% {
-    -moz-transform: rotate(20deg); }
-  100% {
-    -moz-transform: rotate(-20deg); } }
 
 @-webkit-keyframes spin {
   0% {
@@ -5616,11 +5579,14 @@ body[x-epic="aoc"] .aoc_log {
 
 @keyframes spin {
   0% {
-    transform: rotate(-20deg); }
+    -webkit-transform: rotate(-20deg);
+            transform: rotate(-20deg); }
   50% {
-    transform: rotate(20deg); }
+    -webkit-transform: rotate(20deg);
+            transform: rotate(20deg); }
   100% {
-    transform: rotate(-20deg); } }
+    -webkit-transform: rotate(-20deg);
+            transform: rotate(-20deg); } }
 
 .page_button_container {
   display: inline-block;
@@ -5690,6 +5656,61 @@ body[x-epic="aoc"] .aoc_log {
   width: 33%;
   display: inline-block;
   text-align: center; }
+
+.shop--window {
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  right: 20px;
+  z-index: 4;
+  max-width: 960px;
+  -webkit-transform: translateX(-50%);
+      -ms-transform: translateX(-50%);
+          transform: translateX(-50%);
+  background-color: #fff;
+  padding: 0 10px;
+  box-shadow: 0 0 0 10000px rgba(0, 0, 0, 0.65); }
+
+.shop__search {
+  background-color: #fff;
+  float: right;
+  border-radius: 4px; }
+
+.card {
+  background-color: #ddd;
+  display: inline-block;
+  width: 200px;
+  vertical-align: top;
+  margin: 20px 20px;
+  border-radius: 4px;
+  padding-bottom: 20px; }
+
+.card__image {
+  background-color: #ccc;
+  padding: 5px 0;
+  height: 50px; }
+
+.align_right {
+  text-align: right; }
+
+.align_center {
+  text-align: center; }
+
+.shop_page_container {
+  text-align: left;
+  padding: 0 20px 20px; }
+
+.shop_page_container__current {
+  position: absolute;
+  left: 50%;
+  margin-left: -20px;
+  color: #404040; }
+
+.button.button--gray {
+  background-color: #ddd;
+  box-shadow: none;
+  color: #404040;
+  font-size: 12px; }
 
 /* RESPONSIVE */
 @media all and (min-width: 1921px) {

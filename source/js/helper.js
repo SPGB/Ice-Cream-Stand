@@ -6,12 +6,14 @@ function lazy_load(image) {
     }
 }
 function get_cost(x, type) {
+    if (type == 'cart' && x == 0) return 0;
     if (type == 'cart') return 25 + (Math.pow(x, 2) / 4);
     if (type == 'employee') return 150 + (x * 100);
     if (type == 'truck') return 1000 + (x * x * 50);
     if (type == 'robot') return 5000 + (x * x * 100);
     if (type == 'rocket') return 50000 + (x * x * 500);
     if (type == 'alien') return 500000+(30 * Math.pow(x,2.5));
+    if (type == 'cow-centaur') return 900000+(30 * Math.pow(x,3));
     if (type == 'autopilot') return (250 * (x+1) * (x+1)) + Math.pow(1.05, x*2);
     if (type == 'coldhands') return 250 * Math.pow(x*2,1.6);
     if (type == 'silo') return 500000+(30 * Math.pow(x,6));

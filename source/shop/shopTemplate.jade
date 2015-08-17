@@ -1,0 +1,103 @@
+.shop--window(ng-if="isVisible")
+  h4.title Bovine Boutique, {{activeTab}}
+    .message_close(ng-click="toggleShop(false)")
+      i.fa.fa-times
+  .shop_nab.button_container
+    .shop__tab(ng-repeat="tab in shopTabs" x-area='shop_tab_{{tab}}' x-type='shop' ng-bind="tab" ng-click="setTab(tab)" ng-class="{ 'active': activeTab == tab }")
+    input.shop__search(placeholder="Search" ng-model="query.title")
+  .clearfix
+
+  .shop_table.align_center(ng-show="activeTab == 'items'")
+    .card(ng-repeat="item in items | startFrom:currentPage*pageSize | limitTo: pageSize | filter: query")
+      .card__image
+        img.tooltip.inventory_thumb(
+        ng-src="https://s3.amazonaws.com/icecreamstand.com/items/{{item.title}}.png"
+        x-type="item"
+        x-name="{{item.title}}/{{item.int || 0}}/{{item.str || 0}}/{{item.con || 0}}/{{item.rarity}}")
+      .card__label
+        | {{ item.title | item_name }}
+        br
+        .shop_button.button(x-cost="{{item.cost}}" x-item="{{item.title}}")
+          span.money_icon.is_white(ng-bind="item.cost | number_commas")
+
+  .shop_table.align_center(ng-show="activeTab == 'skins'")
+    .card(ng-repeat="item in skins | startFrom:currentPage*pageSize | limitTo: pageSize | filter: query")
+      .card__image
+        img.tooltip.inventory_thumb(
+        ng-src="https://s3.amazonaws.com/icecreamstand.com/skins/{{item.title | item_image}}.png"
+        x-name="{{item.title}}"
+        x-type="skin")
+      .card__label
+        | {{ item.title | item_name }}
+        br
+        .shop_button.button(x-cost="{{item.cost}}" x-item="{{item.title}}" ng-if="item.cost")
+          span.money_icon.is_white(ng-bind="item.cost | number_commas")
+        .shop_button.button.button--gray(ng-if="item.note") {{item.note}}
+        .shop_button.button.button--gray(ng-if="item.match-expertise") Requires level 15 expertise with {{item.match-expertise}}
+        .shop_button.button.button--gray(ng-if="item.match-item") Requires the item: {{item.match-item}}
+
+  .shop_table.align_center(ng-show="activeTab == 'badges'")
+    .card(ng-repeat="item in badges | startFrom:currentPage*pageSize | limitTo: pageSize | filter: query")
+      .card__image
+        img.tooltip.inventory_thumb(
+        ng-src="https://s3.amazonaws.com/icecreamstand.com/badges/{{item.badge}}.png"
+        x-type="badge")
+      .card__label
+        | {{ item.title | item_name }}
+        br
+        .shop_button.button(x-cost="{{item.cost}}" x-item="{{item.title}}")
+          span.money_icon.is_white(ng-bind="item.cost | number_commas")
+
+  .shop_table(ng-show="activeTab == 'flavour'" ng-controller="upgrades as upgrades")
+    .unlockable(ng-repeat="flavour in flavours_locked | orderBy:'cost' | limitTo:6" class="unlockable" x-cost="{{flavour.cost}}" x-id="{{flavour._id}}" x-new="true" x-type="base")
+      img.tooltip(ng-src="{{flavour.image}}")
+      .unlock_text {{flavour.name}}
+        span.cost {{flavour.cost | number:0}}
+      button(ng-click="purchase('flavour', flavour)") Unlock
+    p.empty(ng-if="flavours_locked.length === 0") All flavours unlocked
+
+  .shop_table(ng-show="activeTab == 'add-on'")
+    .unlockable(ng-repeat="addons in addons_locked | orderBy:'cost' | limitTo:6" class="unlockable" x-cost="{{flavour.cost}}" x-id="{{flavour._id}}" x-new="true" x-type="base")
+      img.tooltip(ng-src="{{addons.image}}")
+      .unlock_text {{addons.name}}
+        span.cost {{addons.cost | number:0}}
+      button(ng-click="purchase('addons', addons)") Unlock
+    p.empty(ng-if="addons_locked.length === 0") All add-ons unlocked
+
+  .shop_table(ng-show="activeTab == 'worker'")
+    .unlockable(ng-repeat="worker in workerTiers" id="unlock_cart" x-worker="{{worker}}" x-type="sales_cart")
+      img.tooltip(ng-src="http://static.icecreamstand.ca/{{worker}}_thumb.png" x-type="sales_{{worker}}")
+      .unlock_text
+        span.lang {{worker}}
+        span.cost {{get_cost(worker) | number_commas}}
+      .sale_level
+      .shop__button__container
+        button.worker_increment(x-amount="1") +1
+        button.worker_increment(x-amount="10") +10
+        button.worker_increment.lang(x-amount="1000") Max
+
+  .shop_table(ng-show="activeTab == 'cone'")
+    .unlockable(ng-repeat="cone in cones | orderBy:'cost' | limitTo:3" class="unlockable" x-cost="{{cone.cost}}" x-id="{{cone._id}}" x-new="true" x-type="base")
+      img.tooltip(ng-src="http://static.icecreamstand.ca/cones/thumb/{{cone.name}}.png.gz")
+      .unlock_text {{cone.name}}
+        span.cost {{cone.cost | number:0}}
+      button(ng-click="purchase('cone', cone)") Unlock
+
+  .shop_table(ng-show="activeTab == 'upgrade'")
+    .unlockable(ng-repeat="worker in upgrades" id="unlock_cart" x-worker="{{worker}}" x-type="sales_cart")
+      img.tooltip(ng-src="http://static.icecreamstand.ca/{{worker}}_thumb.png" x-type="sales_{{worker}}")
+      .unlock_text
+        span.lang {{worker}}
+        span.cost {{get_cost(user[worker], worker)}}
+      .sale_level
+      .shop__button__container
+        button.worker_increment( x-amount="1") +1
+        button.worker_increment(x-amount="10") +10
+        button.worker_increment.lang(x-amount="1000") Max
+
+  .shop_page_container
+    .filter_prev.button(ng-click="shop_paginate(-1)")
+      i.fa.fa-arrow-left
+    .shop_page_container__current Page {{currentPage + 1}}
+    .filter_next.button(ng-click="shop_paginate(1)")
+      i.fa.fa-arrow-right

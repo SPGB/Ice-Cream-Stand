@@ -1,3 +1,4 @@
+var image_prepend = 'http://static.icecreamstand.ca';
 var interval_employees;
 var interval_gold;
 var interval_sell;
@@ -6,7 +7,6 @@ var interval_events;
 var cached_new_messages = 0;
 var process_clicks_iteration = 0;
 var game_working = true;
-var image_prepend = 'http://static.icecreamstand.ca';
 var cached_language = [];
 var lang;
 var cache_event_trend_enable = false;
@@ -890,6 +890,12 @@ var Icecream = {
             '</div><div id="invite" x-link="invite" class="button next_tutorial button_green">' + __('Sure') + '</div></div><div class="tutorial_shadow"></div>');
         }
     },
+    set_flavors: function(f) {
+        flavors = f;
+    },
+    set_toppings: function(f) {
+        toppings = f;
+    },
     get_flavor: function(id) {
         var f_len = flavors.length;
         for (var i = 0; i < f_len; i++) {
@@ -1009,7 +1015,7 @@ function update_sell_value(origin) {
                         break;
                     }
                 }
-                var expertise_bonus = base * ( .1 * parseInt($('#main_base .option_wrapper').eq(j).find('.expertise_level').text()) );
+                var expertise_bonus = base * ( .1 * parseInt($('#main_base .option_wrapper').eq(j).find('.expertise_level').text()) ); //TODO change from .text()
                 if (isNaN(expertise_bonus)) { console.log('NaN expertise'); expertise_bonus = 0; }
                 var prestige_bonus =  base * (user.prestige_bonus / 100);
                 var f_value = cached_worker_addon_value[j] + base + expertise_bonus + prestige_bonus;

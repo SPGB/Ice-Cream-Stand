@@ -1,4 +1,8 @@
-var version = '1.51';
+
+//Vars
+var version = '1.52';
+var version_name = 'Vanilla Vacation';
+
 var channel = ['Main', 'Beta', 'Alpha'];
 var cow;
 var toppings = [];
@@ -65,16 +69,6 @@ var epic_last_attack;
 var quest_interval;
 var cache_chapter;
 var cache_civvie_attack = 0;
-var new_art_addons = ['cherries', 'sprinkles', 'jelly beans', 'peanuts', 'gummy worms', 'peanut butter', 'onions', 'honey', 'berry jelly',
-'gummy sodas', 'blackberries', 'raspberries', 'chopped strawberries', 'marshmallow cream', 'vanilla frosting', 'chocolate frosting', 'crumbled candy bars', 'sugar cookies',
-'crumbled brownies', 'crumbled fudge', 'red velvet cake', 'cookie dough', 'm&m\'s', 'oreo',
-'chocolate chips', 'white chocolate chips', 'dark chocolate chips', 'pecans', 'acorns', 'almonds', 'gumballs', 'mini marshmallows', 'candied lemon rinds',
-'rice', 'chili peppers', 'gravy', 'coconut', 'peas', 'fudge ripple', 'chopped peaches', 'chopped pineapple',
-'croutons', 'fries', 'olives', 'candied bacon', 'bacon', 'shrimp', 'blueberries', 'raisins', 'waffles', 'cheese',
- 'eyeballs', 'bat wings', 'nuts and bolts', 'warts', 'oil', 'sausage', 'pepperoni', 'ram', 'egg',
- 'gold nuggets', 'pearls', 'gun powder', 'flowers', 'coffee beans', 'caviar', 'ice cubes', 'snowflakes', 'mint',
- 'emeralds', 'rubies', 'diamonds', 'telescope', 'calculator', 'constellation',
- 'four leaf clovers', 'felix felicis', 'gold rings', 'melange', 'soma', 'philosophers stone'];
 var messages_afk = ['is back in Ice Creamtopia', 'is baaaccckkkk', ' returns', 'joins us mortals', 'makes an appearance', 'has been summoned', 'apparates', 'appears out of thin air', 'emerges from the shadows',
 'is back', 'swoops in', 'dances into view', 'wiggles about', 'pops out of a bush', 'can be sensed nearby', 'jumps out of the hay', 'rolled a natural 20', 'rolled a natural 1'];
 
@@ -97,6 +91,8 @@ $(document).ready(function () {
     me_callback(user, 'start');
     bind_scoopling();
 
+    $('#upgrades.section-side').remove();
+    
     $('body').on('click', '.lore_pback, .lore_pnext', function () {
         $('.message_close:visible').click();
         lore_load_page( Number($(this).attr('x-page')) );
@@ -333,162 +329,11 @@ $(document).ready(function () {
             $(this).text('Expand').removeClass('active');
         }
     });
-    $('body').on('click', '.shop_button', function () {
-        var item = $(this).attr('x-item');
-        var is_skin = $(this).attr('x-is-skin') == 'true';
-        var is_badge = $(this).attr('x-is-badge') == 'true';
-        var cost = parseInt($(this).attr('x-cost'));
-        if (!isNaN(cost) && user.gold < cost) {
-            return toast('<p>You need more money to buy this item!</p>', 'Can not Afford');
-        }
-        if (!cow) {
-            return toast('<p>"Come back when you have a cow."</p><p>Who said that? You only see a cart.</p>', 'A talking cart?');
-        }        
-        if (item && !is_skin && !is_badge) {
-            if (cow.items.length >= 12) {
-                return toast('<p>Your inventory is full</p>', 'Inventory Full');
-            }
-            toast('<p>Success! You have purchased <b class="tooltip" x-type="item" x-name="' + item + '">' + item.replace(/_/g, ' - ') + '</b> for ' + cow.name + '.</p>', 'Purchased');
-        }
-        if (is_skin && cow.skins_unlocked && cow.skins_unlocked.indexOf(item) > -1) {
-            return toast('<p>You already own the <b>' + item + '</b> cow skin.</p>', 'Already own');
-        }
-        $.ajax({
-            url: '/shop/item',
-            data: { item: item },
-            dataType: 'json',
-            type: 'post',
-            success: function(j) {
-                if (j.error) return alert(j.error);
-                if (!isNaN(cost)) user.gold = user.gold - parseInt(cost);
-                if (j.gamble) {
-                    cow = {}; //resync
-                    Icecream.sync_cow(function () {
-                        cow_redraw();
-                        update_sell_value('shopping');
-                    });
-                    return alert('<p>Success! You have found a <b class="tooltip" x-type="item" x-name="' + j.gamble + '">' + j.gamble.split('/')[0].replace(/_/g, ' - ') + '</b> for ' + j.cow.name + '.</p>', 'Mystery Item');
-                }
-                if (j.unlocked_skin) {
-                    if (!cow.skins_unlocked) cow.skins_unlocked = [];
-                    cow.skins_unlocked.push(j.unlocked_skin);
-                    return alert('<p>Success! You have unlocked the <b>' + j.unlocked_skin + '</b> skin for ' + cow.name + '.</p>', 'Skin Unlocked');
-                }
-                if (j.unlocked_badge) {
-                    user.badges.push(msg.add_badge);
-                    main();
-                    return alert('<p>Success! You have unlocked a new badge.</p>', 'Badge Unlocked');
-                }
-                cow = j;
-                cow_redraw();
-                main();
-            }
-        });
-    });
-    // $('body').on('click', '.chat.main_container .expand', function () {
-    //     if (!$(this).hasClass('active')) {
-    //         $('.chat.main_container').attr('x-expand', true);
-    //         $('#chat_window').css('overflow-y', 'scroll');
-    //         $(this).text('Minimize').addClass('active');
-    //     } else {
-    //         $('.chat.main_container').attr('x-expand', false);
-    //         $('#chat_window').css('overflow-y', 'hidden');
-    //         $(this).text('Expand').removeClass('active');
-    //     }
-    //     cached_last_message = '';
-    //     $('#chat_window').text('');
-    //     Icecream.sync_chat();
-    // });
-    
+
     $('body').on('click', '.tooltip_click', function () {
         $(this).addClass('tooltip').trigger('mouseover');
     });
-    $('body').on('click', '.shop', function () {
-        $.ajax({
-            url: 'https://s3.amazonaws.com/icecreamstand.com/shop.json.gz',
-            data: { 'cache': Math.random() },
-            dataType: 'json',
-            success: function(items) {
-                var compiled = '<tr><td><img src="https://s3.amazonaws.com/icecreamstand.com/gamble.png" class="tooltip inventory_thumb" x-type="gamble" /> Mystery Item' +
-                    '</td><td><div class="shop_button button" x-cost="250000"><span class="money_icon is_white">250,000</span></div></td></tr>';
-                var skin_compiled = '';
-                var badge_compiled = '';
-                for(var i in items) {
-                    var item = items[i];
-                    var cost = item.cost;
-                    if (!cost || isNaN(cost) ) cost = 0;
-                    if (item.type == 'skin') {
-                        skin_compiled = shop_skin_add(skin_compiled, i, item);
-                    } else if (item.type == 'badge') {
-                        badge_compiled = shop_badge_add(badge_compiled, i, item);
-                    }else if (item['match-name']) {
-                        if (item['match-name'] == user.name) {
-                            compiled = shop_item_add(compiled, i, item);
-                        }
-                    } else if (item['match-badge']) {
-                        if (user.badges && user.badges.indexOf(item['match-badge']) > -1) {
-                            compiled = shop_item_add(compiled, i, item);
-                        }
-                    } else if (item['match-epic']) {
-                        console.log(item['match-epic'] + ' - ' + user.epic_id);
-                        if (user.epic_id && user.epic_id == item['match-epic'] && 
-                            (!item['match-epic-collected'] || user.epic_collected > item['match-epic-collected']) ) {
-                            compiled = shop_item_add(compiled, i, item);
-                        }
-                    } else if (cost) {
-                        compiled = shop_item_add(compiled, i, item);
-                    }
-                }
-                alert('<div class="shop_nab button_container"><div class="settings_tab" x-active="true" x-area="shop_tab_items" x-type="shop">Items</div>' +
-                    '<div class="settings_tab" x-area="shop_tab_skins" x-type="shop">Skins</div>' +
-                    '<div class="settings_tab" x-area="shop_tab_badges" x-type="shop">Badges</div></div>' +
-                    '<table class="shop_table settings_area" x-active="true" x-index="0" x-page="5" x-area="shop_tab_items">' + compiled + '</table>' +
-                    '<table class="shop_table settings_area" x-area="shop_tab_skins" x-index="0" x-page="3">' + skin_compiled + '</table>' +
-                    '<table class="shop_table settings_area" x-area="shop_tab_badges" x-index="0" x-page="5">' + badge_compiled + '</table>' +
-                    '<div class="shop_page_container"><div onclick="Icecream.shop_paginate(-1)" class="filter_prev button"><img src="http://static.icecreamstand.ca/arrow.svg"></div>' +
-                    '<div onclick="Icecream.shop_paginate(1)" class="filter_next button"><img src="http://static.icecreamstand.ca/arrow_right.svg"></div></div>', 'Bovine Boutique');
-                shop_page();
-            },
-            error: function(err, e) {
-                console.log(e);
-                alert('The shop is closed.', 'Come back later!');
-            }
-        });
-    });
-    function shop_page() {
-        $('.shop_table tr:gt(5)').hide();
-        alert_update();
-    }
-    function shop_item_add(compiled, i, item) {
-        return compiled + '<tr><td><img src="https://s3.amazonaws.com/icecreamstand.com/items/' + i.replace(/\s/g, '') + '.png" class="tooltip inventory_thumb" x-type="item" x-name="' + i + '/' + item.int + '/' + item.str + '/' + item.con + '/' + item.rarity + '" /> ' + i.replace(/_/g, ' - ') +
-        '</td><td><div class="shop_button button" x-cost="' + item.cost + '" x-item="' + i + '"><span class="money_icon is_white">' + numberWithCommas(item.cost) + '</span></div></td></tr>';
-    }
-    function shop_badge_add(compiled, i, item) {
-        console.log(item);
-        var badge = item.badge;
-        return compiled + '<tr><td><img src="https://s3.amazonaws.com/icecreamstand.com/badges/' + badge + '.png" class="inventory_thumb" x-type="badge" /> ' + i.replace(/_/g, ' - ') +
-        '</td><td><div class="shop_button button" x-cost="' + item.cost + '" x-item="' + i + '" x-is-badge="true"><span class="money_icon is_white">' + numberWithCommas(item.cost) + '</span></div></td></tr>';
     
-    }
-    function shop_skin_add(compiled, i, item) {
-        console.log('displaying skin: ' + i);
-        var req = '';
-        if (item['match-expertise']) {
-            var flavour = Icecream.get_flavor( item['match-expertise'] );
-            req = 'Requires level 15 expertise with ' + flavour.name;
-        }
-        if (item['match-item']) {
-            req = 'Requires the item: ' + item['match-item'];
-        }
-        if (item['match-badge']) {
-            req = 'Requires the badge: <img src="' + image_prepend + '/badges/' + item['match-badge'] + '.png" width="25" />';
-        }
-        if (item.note) {
-            req = item.note;
-        }
-        return compiled + '<tr><td class="skin_td"  x-background="' + item.background + '"><img src="https://s3.amazonaws.com/icecreamstand.com/skins/' + i.replace(/\s/g, '').toLowerCase() + '.png" class="tooltip inventory_thumb thumb_wide" x-type="skin" x-name="' + i + '" /></td><td>' + i.replace(/_/g, ' - ') + '<div class="item_req">' + req + '</div>' +
-        '</td><td><div class="shop_button button" x-cost="' + item.cost + '" x-item="' + i + '" x-is-skin="true" x-unlocked="' + (cow.skins_unlocked && cow.skins_unlocked.indexOf(i) > -1) + '"><span class="money_icon is_white">' + numberWithCommas(item.cost) + '</span></div></td></tr>';
-    }
     $('body').on('click', '.inline-message', function () {
         $(this).hide();
     });
@@ -512,7 +357,6 @@ $(document).ready(function () {
 
         unlockable.find('.cost')[0].textContent = numberWithCommas( Math.floor(cost) ) + ' (x' + real_amount + ')';
     });
-    
     bind_tooltips();
 
     $('body').on('click', '.prestige_cancel', function () {
@@ -826,7 +670,7 @@ $(document).ready(function () {
         return false;
     });
     function format_stats() {
-        return '<table><tr><td>Total money</td><td>$' + numberWithCommas(user.total_gold.toFixed(2)) + 
+        return '<table class="align_right"><tr><td>Total money</td><td>$' + numberWithCommas(user.total_gold.toFixed(2)) + 
                 '</td></tr><tr><td>Total money this prestige</td><td>$' + numberWithCommas(user.total_prestige_gold.toFixed(2)) + 
                 '</td></tr><tr><td>Today\'s money</td><td>$' + numberWithCommas(user.today_gold.toFixed(2)) + 
                 '</td></tr><tr><td>This week\'s money</td><td>$' + numberWithCommas(user.week_gold.toFixed(2)) + 

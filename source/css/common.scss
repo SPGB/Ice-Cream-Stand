@@ -2054,12 +2054,8 @@ table[x-col="2"] td {
     text-transform: capitalize;
 }
 .event #trend_time {
-    bottom: -30px;
     font-size: 14px;
-    left: 0;
-    position: absolute;
-    right: 0;
-    text-align: right;
+    float: right;
 }
 h3#upgrades_text {
     font-size: 20px;
@@ -3883,8 +3879,6 @@ body.night {
     width: 175px;
 }
 .shop_table .inventory_thumb {
-    background-color: #ddd;
-    background-image: url("http://static.icecreamstand.ca/background_icons2.png");
     max-width: 100px;
 }
 .skin_td {
@@ -4635,7 +4629,7 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
 #refer_url {
     width: 90%;
 }
-.settings_tab {
+.settings_tab, .shop__tab {
     display: inline-block;
     cursor: pointer;
     background-color: $purple-light;
@@ -4644,8 +4638,9 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
     font-weight: bold;
     font-size: 14px;
     margin-right: 10px;
+    text-transform: capitalize;
 }
-.settings_tab[x-active="true"] {
+.settings_tab[x-active="true"], .shop__tab.active {
     color: $purple;
     background-color: #fff;
 }
@@ -4695,6 +4690,11 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
 }
 .shop_table {
     width: 100%;
+    text-align: left;
+}
+.shop_table .unlockable {
+    width: 48%;
+    display: inline-block;
 }
 .shop_table thead {
     background-color: #f1f1f1;
@@ -4783,9 +4783,6 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
 }
 #canvas_sales {
     display: none;
-}
-.icecream {
-    cursor: pointer;
 }
 .time_left {
     float: right;
@@ -5642,6 +5639,60 @@ body[x-epic="aoc"] {
     text-align: center;
 }
 
+.shop--window {
+    position: fixed;
+    top: 40px;
+    left: 50%;
+    right: 20px;
+    z-index: 4;
+    max-width: 960px;
+    transform: translateX(-50%);
+    background-color: #fff;
+    padding: 0 10px;
+    box-shadow: 0 0 0 10000px rgba(0, 0, 0, 0.65);
+}
+.shop__search {
+    background-color: #fff;
+    float: right;
+    border-radius: 4px;
+}
+.card {
+    background-color: #ddd;
+    display: inline-block;
+    width: 200px;
+    vertical-align: top;
+    margin: 20px 20px;
+    border-radius: 4px;
+    padding-bottom: 20px;
+}
+
+.card__image {
+    background-color: #ccc;
+    padding: 5px 0;
+    height: 50px;
+}
+.align_right {
+    text-align: right;
+}
+.align_center {
+    text-align: center;
+}
+.shop_page_container {
+    text-align: left;
+    padding: 0 20px 20px;
+}
+.shop_page_container__current {
+    position: absolute;
+    left: 50%;
+    margin-left: -20px;
+    color: #404040;
+}
+.button.button--gray {
+    background-color: #ddd;
+    box-shadow: none;
+    color: #404040;
+    font-size: 12px;
+}
 /* RESPONSIVE */
 
 @media all and (min-width : 1921px) {

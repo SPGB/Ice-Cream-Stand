@@ -1,4 +1,4 @@
-ics
+angular.module('ics')
 .factory('expertiseService', function() {
     return {
         get_level: function (sales) {
@@ -45,7 +45,7 @@ function update_expertise(cb) {
         if (expertise == 15) achievement_register('53eac41538574559408a53e1');
         Icecream.update_worker_fx('expertise');
         cached_expertise = expertise;
-        $('#main_base .option[x-id="' + user.last_flavor + '"]').parent().find('.expertise_level').text(expertise);
+        //$('#main_base .option[x-id="' + user.last_flavor + '"]').parent().find('.expertise_level').text(expertise);
         update_sell_value('expertise');
     }
     var remaining = 100 * ((sold-last_sale) / (sales_needed-last_sale));

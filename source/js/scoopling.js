@@ -1,26 +1,25 @@
 function bind_scoopling() {
-$('body').on('click', '.icecream', function (e) {
-    if (is_cube || $('.cube_infobar').length > 0) return false;
-    _gaq.push(['_trackEvent', 'Ice Cube', 'Start']);
-    is_cube = true;
-    cache_cube_time = new Date();
-    cache_cube_money = 0;
-    cache_sell_float_record = false;
-    cache_sell_float_num = 0;
-    cache_cube_multiplier = 1;
-    $('.cube_infobar').remove();
-    $('#canvas_sales').show();
-    $('.icecream').prepend('<div class="cube_infobar"><div class="cube_collect button"><span class="money_icon infocube_money">0</span></div></div>');
-    //$('.infocube_multiplier')[0].textContent = cache_cube_multiplier + 'x' + ( (cache_first_win_avail)? ' +2x' : '');
-
-    cache_cube_interval = setInterval(function () {
-        cubebar_update();
-    }, 50);
+    return false; //LEGACY
+    $('body').on('click', '.icecream', function (e) {
+        if (is_cube || $('.cube_infobar').length > 0) return false;
+        _gaq.push(['_trackEvent', 'Ice Cube', 'Start']);
+        is_cube = true;
+        cache_cube_time = new Date();
+        cache_cube_money = 0;
+        cache_sell_float_record = false;
+        cache_sell_float_num = 0;
+        cache_cube_multiplier = 1;
+        $('.cube_infobar').remove();
+        $('#canvas_sales').show();
+        $('.icecream').prepend('<div class="cube_infobar"><div class="cube_collect button"><span class="money_icon infocube_money">0</span></div></div>');
+ 
+        cache_cube_interval = setInterval(function () {
+            cubebar_update();
+        }, 50);
 
         var eye_height = Math.random() * 100;
         canvas_cache_sales = []; //progress, x, y, size, variation
         cube_new();
-
     });
     
     $('body').on('mousemove', '#canvas_sales', function (e) {
