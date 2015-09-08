@@ -2,7 +2,7 @@ angular.module('ics')
   .controller 'flavourController', ($scope, upgradesService, flavourService, $interval, expertiseService, addonService) ->
     $scope.flavours_unlocked = []
     $scope.addons_unlocked = []
-    $scope.cones_unlocked = if user.cones then user.cones else []
+    $scope.cones_unlocked = []
     $scope.combos = []
     cache_flavour_len = 0
     cache_addon_len = 0
@@ -10,6 +10,9 @@ angular.module('ics')
         if $scope.cones_unlocked[i] is 'babycone' then $scope.cones_unlocked[i] = 'baby'
         if $scope.cones_unlocked[i] is 'sugarcone' then $scope.cones_unlocked[i] = 'sugar'
 
+    for i in user.cones
+        $scope.cones_unlocked.push i
+        
     $scope.currentPage = 0
     $scope.pageSize = 20
     $scope.is_expanded = false
@@ -60,6 +63,7 @@ angular.module('ics')
         if cache_flavour_len != unlocked.length
             $scope.flavours_unlocked = upgradesService.order_by_id(unlocked, user.flavors)
             cache_flavour_len = $scope.flavours_unlocked.length
+            console.log "new unlocked flavours", $scope.flavours_unlocked
 
     $scope.process_unlocked_addons = (unlocked) ->
         if cache_addon_len != unlocked.length
@@ -67,7 +71,10 @@ angular.module('ics')
             cache_addon_len = $scope.addons_unlocked.length
 
     $scope.$on 'flavours', (event, unlocked) ->
-        $scope.process_unlocked unlocked
+        if unlocked
+            $scope.process_unlocked unlocked
+        else
+            console.log "flavours broadcast", "no unlocked"
 
     $scope.$on 'addons', (event, unlocked) ->
         $scope.process_unlocked_addons unlocked

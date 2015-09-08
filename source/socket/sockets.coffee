@@ -29,25 +29,8 @@ bind_sockets = ->
       $('#trend_sold_inner').css('width', ((j.total_sold / 75000.00) * 100) + '%');
 
     socket.on 'cow', (msg) ->
-        console.log(msg);
-        if (msg.resync)
-            cow = null;
-            Icecream.sync_cow()
-
-        if (msg.experience)
-            cow.experience = msg.experience;
-
-        if (cow.level < 5 && msg.level > 5)
-            alert('<center><b>Your cow is growing up!</b><br><br><img src="' + image_prepend + '/skins/default.png" class="cow_evolve" /></center>', cow.name + ' is evolving!');
-            cow = null;
-            $('.cow')[0].textContent = '';
-            Icecream.sync_cow();
-
-        cow.level = msg.level;
-        cow.experience = msg.experience;
-        cow.happiness = msg.happiness;
-        if (msg.item_change)
-          cow_item_stats();
+      console.log(msg)
+      Icecream.update_cow msg
 
     socket.on 'epic/aoc/log', (msg) ->
         message = '';
@@ -65,10 +48,13 @@ bind_sockets = ->
 
     socket.on 'update', (msg) ->
       if (msg.gold)
-          user.gold = parseFloat(msg.gold);
+        user.gold = parseFloat(msg.gold);
+
+      if (msg.sold and cached_flavor_index > -1)
+        user.flavors_sold[cached_flavor_index] = msg.sold
 
       if (msg.ifr)
-          main('flavor')
+        main('flavor')
 
       if (msg.chapter)
           toast('You have unlocked <b>' + msg.chapter + '</b>', 'Lore Chapter Unlocked!');

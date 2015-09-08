@@ -44,7 +44,7 @@ var smtpTransport = nodemailer.createTransport({
         pass: config.gmail.password
     }
 });
-var session = require('express-session'); 
+var session = require('express-session');
 var MongoStore  = require('connect-mongo')(session);
 var sessionStore = session( {
 	store: new MongoStore(config.db),
@@ -163,12 +163,17 @@ var userSchema = new mongoose.Schema({
 	achievements: { type: [String]},
 	items: { type: [String]},
 	ignore: { type: String},
-	employees: { type: Number, default: 0},
+
+  //workers 
 	carts: { type: Number, default: 0},
+  employees: { type: Number, default: 0},
 	trucks: { type: Number, default: 0},
 	robots: { type: Number, default: 0},
 	rockets: { type: Number, default: 0},
-	aliens: { type: Number, default: 0},
+  aliens: { type: Number, default: 0},
+	cow_centaurs: { type: Number, default: 0},
+
+  //upgrades
 	upgrade_machinery: { type: Number, default: 0},
 	upgrade_autopilot: { type: Number, default: 0},
 	upgrade_coldhands: { type: Number, default: 0},
@@ -251,7 +256,7 @@ var userSchema = new mongoose.Schema({
 	facebook_id: { type: String },
 	titles: { type: [String] },
 	backgrounds: { type: [String] },
-	easter2: { type: [Number] },
+	buffs: { type: [String] },
 	active_background: { type: String },
 });
 userSchema.methods.getPublicFields = function () {
@@ -273,7 +278,8 @@ userSchema.methods.getPublicFields = function () {
 		trucks: this.trucks,
 		robots: this.robots,
 		rockets: this.rockets,
-		aliens: this.aliens,
+    aliens: this.aliens,
+		cow_centaurs: this.cow_centaurs,
 		upgrade_autopilot: this.upgrade_autopilot,
 		upgrade_coldhands: this.upgrade_coldhands,
 		upgrade_machinery: this.upgrade_machinery,
@@ -779,6 +785,20 @@ app.get('/quests_restart', function(req, res){
 		user.quests = [];
 		user.save(function (err,u) { res.redirect('/'); });
 	});
+});
+app.get('/employee_restart', function(req, res){ 
+  User.findOne({ _id: req.session.user_id }, function (err, user) {
+    if (err || !user) return res.send(500, 'er: ' + err);
+    user.employees = 0;
+    user.save(function (err,u) { res.redirect('/'); });
+  });
+});
+app.get('/cart_restart', function(req, res){ 
+  User.findOne({ _id: req.session.user_id }, function (err, user) {
+    if (err || !user) return res.send(500, 'er: ' + err);
+    user.carts = 0;
+    user.save(function (err,u) { res.redirect('/'); });
+  });
 });
 app.get('/tutorials_restart', function(req, res){ 
 	User.findOne({ _id: req.session.user_id }, function (err, user) {
@@ -1297,7 +1317,7 @@ app.post('/unlock', function(req, res){
 			});
 		});
 	} else if (post.type=='sales_cart' || post.type=='sales_employee' || post.type=='sales_truck' || 
-		post.type=='sales_robot' || post.type=='sales_rocket' || post.type=='sales_alien') {
+		post.type=='sales_robot' || post.type=='sales_rocket' || post.type=='sales_alien' || post.type=='sales_cow_centaurs') {
 
 		var worker_pool = {
 			'sales_cart': 'carts',
@@ -1305,24 +1325,26 @@ app.post('/unlock', function(req, res){
 			'sales_truck': 'trucks',
 			'sales_robot': 'robots',
 			'sales_rocket': 'rockets',
-			'sales_alien': 'aliens',
+      'sales_alien': 'aliens',
+			'sales_cow_centaurs': 'cow_centaurs',
 		};
+
 		var worker_type = worker_pool[post.type];
 		if (!worker_type) return res.json({ error: 'Worker not detected'});
 
-		User.findOne({ _id: req.session.user_id }).select(worker_type + ' gold').exec(function (err, user) {
+		User.findOne({ _id: req.session.user_id }).select(worker_type + ' gold upgrade_coldhands').exec(function (err, user) {
 			if (err || !user) return res.send({ error: 'User not detected'});
 			if (!user[worker_type]) user[worker_type] = 0;
 				var amount = (post.amount && post.amount > 0)? post.amount : 1;
 				for (var i = 0; i < amount; i++) {
 					var cost = get_cost(user[worker_type], worker_type); // 25 + (Math.pow(user[worker_type], 2) / 4);
-					if (user.gold < cost) { 
-						if (amount == 10 || i == 0) { 
+					if (user.gold < cost) {
+						if (amount == 10 || i == 0) {
 							return res.json({ error: ( (cost * (amount - i)) - user.gold ).toFixed(0) });
 						}
 						ret = 'Bought ' + i; break;
 					}
-					if (user[worker_type] >= 1000)  { ret = 'Maxed '; break; }
+					if (user[worker_type] >= 1000 + 2 * (user.upgrade_coldhands || 0))  { ret = 'Maxed '; break; }
 					user.gold -= Math.round(cost*Math.pow(10,2))/Math.pow(10,2);
 					user[worker_type]++;
 				}
@@ -1357,7 +1379,7 @@ app.post('/unlock', function(req, res){
 				});
 			});
 		});
-	} else if (post.type=='machine') {
+	} else if (post.type=='machine' || post.type=='machinery') {
 		User.findOne({ _id: req.session.user_id }, function (err, user) {
 			if (err || !user) return res.send(500);
 			var cost = 15000 + (user.upgrade_machinery * 150000);
@@ -1370,7 +1392,7 @@ app.post('/unlock', function(req, res){
 				res.json({success:'machine'});
 			});
 		});  
-	} else if (post.type=='silo_hay') {
+	} else if (post.type=='silo_upgrade') {
 		User.findOne({ _id: req.session.user_id }, function (err, user) {
 			if (err || !user) return res.send(500);
 			var cost = get_cost(user.upgrade_silo_hay, 'silo');
@@ -1383,7 +1405,20 @@ app.post('/unlock', function(req, res){
 				res.json({success:'upgrade_silo_hay'});
 			});
 		});  
-	} else if (post.type=='research') {
+	} else if (post.type=='silo_hay') {
+    User.findOne({ _id: req.session.user_id }, function (err, user) {
+      if (err || !user) return res.send(500);
+      var cost = get_cost(user.prestige_bonus, 'hay');
+      if (user.silo_hay >= (175 + (25 * user.upgrade_silo_hay)) ) return res.send('{"error":"You can not store any more hay"}');
+      if (user.gold < cost) return res.send('{"error":"Need money"}');
+      user.gold -= Math.round(cost*Math.pow(10,2))/Math.pow(10,2);
+      user.silo_hay += 25;
+      user.save(function (err, u) {
+        if (err) return res.send(err);
+        res.json({success:'upgrade_silo_hay'});
+      });
+    });
+  } else if (post.type=='research') {
 		User.findOne({ _id: req.session.user_id }, function (err, user) {
 			if (err || !user) return res.send(500);
 			var cost = 50 + (user.upgrade_flavor * user.upgrade_flavor * 100);
@@ -1723,7 +1758,8 @@ app.get('/reward', checkAdmin, function(req, res){
 	var cow_exp = req.param('cow_exp', null);  // second parameter is default
 	var cow_skin = req.param('skin', null);  // second parameter is default
 	var cow_remove_skin = req.param('remove_skin', null);  // second parameter is default
-	var cow_age = req.param('cow_age', null);  // second parameter is default
+  var cow_age = req.param('cow_age', null);  // second parameter is default
+	var cone_index = req.param('cone_index', null);  // second parameter is default
 	if (email) {
 		User.findOne({ name : n }).exec(function (err, user) {
 			if (!user) return res.send('user not found!');
@@ -1844,7 +1880,10 @@ app.get('/reward', checkAdmin, function(req, res){
 				user.title = title;
 			} else if (friend_gold) {
 				user.friend_gold = friend_gold;
-			} if (item) {
+			}  else if (cone_index) {
+        user.cones.splice(cone_index, 1);
+        user.markModified('cones');
+      } if (item) {
 				user.items.push(item);
 			} else if (a > 0) {
 				user.gold = user.gold + parseInt(a);
@@ -1909,7 +1948,8 @@ app.post('/new_quest', function(req, res){
 			if (err || !quest) return res.send(500, err);
 			if (post.description) quest.description = post.description;
 			if (post.cost)  quest.cost = post.cost;
-			if (post.name)  quest.name = post.name;
+      if (post.name)  quest.name = post.name;
+			if (post.level)  quest.level = post.level;
 			quest.save(function (err, q) {
 				if (err) return res.send(err);
 				res.send(q);
@@ -2146,7 +2186,7 @@ function quest_dynamic_check(dynamic, starting_point, u, res) {
 app.post('/complete_quest', function(req, res){ 
 	var post = req.body;
 	User.findOne({ _id: req.session.user_id }).exec(function (err, u) {
-		if (err || !u || !u.quests) return res.send(500);  
+		if (err || !u || !u.quests) return res.send(500, 'no quests');
 		var last_quest = u.quests[ u.quests.length - 1];
 		var quest_split = last_quest.split('&');
 		if (quest_split[1] == '0') return res.json({error:'Already Complete'});
@@ -2160,21 +2200,23 @@ app.post('/complete_quest', function(req, res){
 			var new_refer = false;
 			var real_cost = parseInt(quest_split[2]);
 
-			if (quest.level == 0) {
+      if (quest.level == 0) {
+        if (u.gold < real_cost) return res.send('{"error":"You need  ' + (real_cost - u.gold) + ' more from workers"}');
+      } else if (quest.level == 1) {
 				new_refer = true;
 				var position_of_strawberry = u.flavors.indexOf('5238d9d376c2d60000000002');
 				if (position_of_strawberry < 0) return res.send('{"error":"Unlock her favourite flavor first!"}');
 				var flavor_sold = u.flavors_sold[position_of_strawberry];
 				var strawberry_flavor_req = [15,50,150,300,600,900,1600,2400,4000,10000,50000, 95000, 225000, 1000000, 5000000, 10000000];
 				if (flavor_sold < strawberry_flavor_req[real_cost-1]) return res.send('{"error":"Sell ' + (strawberry_flavor_req[real_cost-1] - flavor_sold) + ' more of her favourite"}');
-			} else if (quest.level == 1) { 
+			} else if (quest.level == 2) {
 				if (u.carts < real_cost) return res.send('{"error":"' + (real_cost - u.carts) + ' more ' + ((real_cost - u.carts == 1)? 'cart' : 'carts') + '"}');
-			} else if (quest.level == 2) { 
+			} else if (quest.level == 3) {
 				if (u.combos.length < real_cost) return res.send('{"error":"Need  ' + (real_cost - u.combos.length) + ' Combos"}');
-			} else if (quest.level == 3) { 
+			} else if (quest.level == 4) {
 				if (u.trucks < real_cost) return res.send('{"error":"buy ' + (real_cost - u.trucks) + ' more truck(s)"}');
 				u.upgrade_frankenflavour = 1;
-			} else if (quest.level == 4) { 
+			} else if (quest.level == 5) {
 				var num_above_100 = 0;
 				var last_flavor_cull = '';
 				var outstanding = [];
@@ -2199,6 +2241,7 @@ app.post('/complete_quest', function(req, res){
 						return res.send('{"error":"Only ' + num_above_100 + ' flavors past 100"}'); 
 					}
 				}
+
 				if (quest_complete) {
 					if (quest.level > 1) u.trend_bonus = Number(u.trend_bonus) + 1;
 					var quest_len = u.quests.length;
@@ -2212,7 +2255,8 @@ app.post('/complete_quest', function(req, res){
 						}
 						var q_split = u.quests[i].split('&')[0];
 						if (q_split == quest._id) {
-							u.quests[i] = quest._id + '&0&' + real_cost; break;
+							u.quests[i] = quest._id + '&0&' + real_cost;
+              break;
 						}
 					}
 					u.markModified("quests");
@@ -2232,13 +2276,16 @@ app.post('/complete_quest', function(req, res){
 							return res.send(quest);
 						}
 					});
-				}
+				} else {
+          return res.send('{"error":"quest not complete"}');
+        }
 			});
 	}); //end user callback
 });
+
 app.get('/new_quest', function(req, res){
 	User.findOne({ _id: req.session.user_id }).select('next_quest_at quests prestige_level flavors_sold flavors').exec(function (err, u) {
-		if (err || !u) return res.send('{"error":"user not found"}'); 
+		if (err || !u) return res.send('{"error":"user not found"}');
 		if (u.quests.length >= 20) return res.send('{"info":"all quests complete"}');
 		if (u.next_quest_at && new Date(u.next_quest_at) > new Date()) return res.json({ time: u.next_quest_at });
 		var number_of_completed = 0;
@@ -2266,7 +2313,7 @@ app.get('/new_quest', function(req, res){
 					var q = gen.quest.split(',');
 					var new_qest = q.join(',') + '&' + x.toUTCString() + '&' + sold;
 					u.quests.push( new_qest );
-					u.save(function (err) { });	
+					u.save(function (err) { });
 					return res.json({
 						name: "Dynamic Quest",
 						dynamic_quest: gen.quest,
@@ -2279,7 +2326,7 @@ app.get('/new_quest', function(req, res){
 				u.next_quest_at = null;
 				u.save(function (err) {
 					return res.json({name: 'Dynamic Quest',dynamic_quest: gen.quest,quest: new_qest});
-				});	
+				});
 			}
 		} else { //normal quest
 			Quest.findOne({level : number_of_completed}).exec(function (err, quest) {
@@ -2299,7 +2346,7 @@ app.get('/new_quest', function(req, res){
 						name: quest.name,
 						description: quest.description.replace('[cost]', real_cost)
 					});
-				});	
+				});
 			});
 		}
 	});
@@ -3218,13 +3265,16 @@ process.on('uncaughtException', function (err) {
 
 /* helper functions */
 function get_cost(x, type) {
+  if (type == 'carts' && x == 0) return 0;
 	if (type == 'carts') return 25 + (Math.pow(x, 2) / 4);
 	if (type == 'employees') return 150 + (x * 100);
 	if (type == 'trucks') return 1000 + (x * x * 50);
 	if (type == 'robots') return 5000 + (x * x * 100);
 	if (type == 'rockets') return 50000 + (x * x * 500);
-	if (type == 'aliens') return 500000+(30 * Math.pow(x,2.5));
-	if (type == 'silo') return 500000+(30 * Math.pow(x,6));
+  if (type == 'aliens') return 500000+(30 * Math.pow(x,2.5));
+	if (type == 'cow_centaurs') return 900000+(30 * Math.pow(x,3));
+  if (type == 'silo') return 500000+(30 * Math.pow(x,6));
+	if (type == 'hay') return Math.floor(1000 * x);
 }
 function log_error(err) {
 	var path_log = path.join(__dirname, 'error.log'),

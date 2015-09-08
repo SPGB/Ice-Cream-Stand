@@ -76,6 +76,8 @@ $(document).ready(function () {
     lang = $('html').attr('lang');
     canvas_cache_height = $(document).height();
 
+
+    $('#upgrades').remove();
     if (lang !== 'en') {
         $.ajax({
             url: image_prepend + '/' + $('html').attr('lang') + '.json.gz',
@@ -91,7 +93,6 @@ $(document).ready(function () {
     me_callback(user, 'start');
     bind_scoopling();
 
-    $('#upgrades.section-side').remove();
     
     $('body').on('click', '.lore_pback, .lore_pnext', function () {
         $('.message_close:visible').click();
@@ -337,26 +338,26 @@ $(document).ready(function () {
     $('body').on('click', '.inline-message', function () {
         $(this).hide();
     });
-    $('body').on('mouseover', '.worker_increment', function () {
-        var unlockable = $(this).closest('.unlockable');
-        var amount = Number( $(this).attr('x-amount') );
+    // $('body').on('mouseover', '.worker_increment', function () {
+    //     var unlockable = $(this).closest('.unlockable');
+    //     var amount = Number( $(this).attr('x-amount') );
 
-        var type = unlockable.attr('x-type').replace('sales_', '');
-        var current_level = Number( unlockable.find('.sale_level').text() );
-        if (current_level >= 1000) {
-            unlockable.find('.cost')[0].textContent = 'Maxed';
-            return;
-        }
-        var cost = 0, real_amount = 0;
-        for (var i = current_level; i < current_level + amount; i++) {
-            var temp_cost = get_cost(i, type);
-            cost += temp_cost;
-            real_amount++;
-            if (cost > user.gold || i >= 1000) break;
-        }
+    //     var type = unlockable.attr('x-type').replace('sales_', '');
+    //     var current_level = Number( unlockable.find('.sale_level').text() );
+    //     if (current_level >= 1000) {
+    //         unlockable.find('.cost')[0].textContent = 'Maxed';
+    //         return;
+    //     }
+    //     var cost = 0, real_amount = 0;
+    //     for (var i = current_level; i < current_level + amount; i++) {
+    //         var temp_cost = get_cost(i, type);
+    //         cost += temp_cost;
+    //         real_amount++;
+    //         if (cost > user.gold || i >= 1000) break;
+    //     }
 
-        unlockable.find('.cost')[0].textContent = numberWithCommas( Math.floor(cost) ) + ' (x' + real_amount + ')';
-    });
+    //     unlockable.find('.cost')[0].textContent = numberWithCommas( Math.floor(cost) ) + ' (x' + real_amount + ')';
+    // });
     bind_tooltips();
 
     $('body').on('click', '.prestige_cancel', function () {
@@ -430,7 +431,7 @@ $(document).ready(function () {
     $('body').on('mouseleave', '#upgrades .unlockable button', function () {
         $('.unlock_update').remove();
     });
-    $('body').on('click', '#upgrades .unlockable button', function () {
+    $('body').on('click', '.unlockable button', function () {
         if (is_cube) {
             cubebar_end();
             $(this).attr('x-cube-pend', true);
@@ -442,6 +443,9 @@ $(document).ready(function () {
         var that = this;
         if (t == 'prestige') {
             game_working = false;
+        }
+        if (t === 'base' || t === 'addon' || t === 'cone') {
+            return false;
         }
         if (t == 'legendary' && user.prestige_level === 0) {
             $(this).append('<div class="unlock_update">Requires 1 level of Prestige.</div>');

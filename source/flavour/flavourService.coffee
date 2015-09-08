@@ -30,10 +30,11 @@ angular.module('ics')
         for i, flavour of flavours
           name = flavour.name.replace /\s+/g, ''
           flavour.image = image_prepend + '/flavours/thumb/' + name + '.png.gz'
-          if user.flavors.indexOf String(flavour._id) > -1
-            vm.flavours_unlocked.push flavour
-          else
+          flavour_index = user.flavors.indexOf String(flavour._id)
+          if flavour_index is -1
             vm.flavours_locked.push flavour
+          else
+            vm.flavours_unlocked.push flavour
 
         df.resolve vm.flavours_unlocked
       df.promise
@@ -45,8 +46,11 @@ angular.module('ics')
 
     get_unlocked_flavours: ->
       vm.flavours_unlocked
+    set_unlocked_flavours: (f) ->
+      vm.flavours_unlocked = f
 
     get_locked_flavours: ->
+      console.log "get_locked_flavours", vm.addons_locked
       vm.flavours_locked
   }
   vm

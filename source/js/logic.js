@@ -41,7 +41,7 @@ var Icecream = {
             $('.page_wrap[x-page="' + index + '"] .option_wrapper').show();
         } else {
             var is_dir_left = (index < cached_page);
-            cached_page = index;      
+            cached_page = index;
             $('.page_wrap:visible').animate({'left': (is_dir_left)? 1000 : -1000}, 500, function () {
                 $(this).hide();
             });
@@ -169,6 +169,29 @@ var Icecream = {
         }
         cached_progress = progress;
         $('#complete_quest_progress').css('width', progress + '%');
+    },
+    set_cow: function(msg) {
+        cow = msg
+    },
+    update_cow: function(msg) {
+        if (msg.resync) {
+            cow = null;
+            Icecream.sync_cow();
+        }
+
+        if (msg.experience) cow.experience = msg.experience;
+
+        cow.level = msg.level;
+        cow.happiness = msg.happiness;
+
+        if (cow.level < 5 && msg.level > 5) {
+            alert('<center><b>Your cow is growing up!</b><br><br><img src="' + image_prepend + '/skins/default.png" class="cow_evolve" /></center>', cow.name + ' is evolving!');
+            cow = null;
+            $('.cow')[0].textContent = '';
+            Icecream.sync_cow();
+        }
+
+        if (msg.item_change) cow_item_stats();
     },
     cloud: function(num) {
         if (is_deep_sleep || !user.is_animation_clouds || !window_focus || canvas_drop_clouds_len > 10 - num) return;
@@ -353,15 +376,17 @@ var Icecream = {
             }
         });
     },
-    update_flavors: function() {
-        if (!cache_event_trend_enable) return;
+    update_flavors: function(limit, isUpdate) {
+        //if (!cache_event_trend_enable) return;
+        if (!limit) limit = 5;
+        console.log("update_flavours", limit);
         $.ajax({
             url : '/flavors',
-            data: { sort: '-votes last_trend_at', limit: 5, show_mine: true },
+            data: { sort: '-votes last_trend_at', limit: limit, show_mine: true },
             type: 'GET',
             dataType: 'JSON',
             success: function (j) {
-                //flavors = j;
+                if (isUpdate) flavors = j;
                 var f_len = j.length;
                 //$('.vote_container').html('');
                 for (var i = 0; i < f_len; i++) {
@@ -693,7 +718,7 @@ var Icecream = {
         console.log('getting quests');
         if (user.quests.length == 0) {
             $('.quest_default').remove(); 
-            $('.quest_list').append('<p class="quest_default">You aren\'t currently on any quests...</p>');
+            $('.quest_list').append('<p class="quest_default">Buy your first cart by going to the shop.</p>');
             if (user.gold > 10) Icecream.get_quest('get_quests');
             return;
         }
@@ -830,60 +855,44 @@ var Icecream = {
         }
     },
     get_tutorial: function() {
+        console.log("Checking tutorial cards");
         $('.tutorial, .tutorial_shadow').remove();
-
-        if (is_cube) {
-            setTimeout(function () {
-                Icecream.get_tutorial();
-            }, 2000);
-            return false;
-        }
         if (user.tutorial === 0) { //where to click
-            $('.section-main, .section-side#upgrades, .expertise_bar_outer').css('opacity', 0);
-            $('body').append('<div class="tutorial tutorial_0"><h2>' + __('Click Me!') + '</h2><p class="tutorial_text">' +
-                'Get money by <b>clicking on scooplings</b>. Once you have an least <b class="money_icon">10</b> click the collect button!' +
-                '</p><div class="tut_ice_cube" x-id="1"></div><div class="triangle-left"></div></div>');
-            for (var i = 0; i < 30; i++) {
-                setTimeout(function () {
-                    $('.tut_ice_cube[x-id="1"]').toggleClass('active');
-                }, i * 500);
-            }
-            setTimeout(function () {
-                $('.icecream').click();
-            }, 3000);
+            $('body').append('<div class="tutorial tutorial_0"><h2>' + __('Shop') + '</h2><p class="tutorial_text">' +
+                'Get money by <b>buying workers</b>. Click on the shop icon.' +
+                '</p><div class="triangle-down"></div></div>');
         }
         if (user.tutorial == 1) {
-            $('.expertise_bar_outer').css('opacity', 1);
-            $('body').append('<div class="tutorial tutorial_2"><h2>' + __('Get better with expertise') + '</h2><p class="tutorial_text">' +
-                __('The more Ice Cream you sell, <b>the better you will get</b> at making it (and the more you can sell it for). This is called ') + '<b>' + __('Expertise') +
-                '</b></p><div class="button next_tutorial button_green">Got it</div><div class="triangle-left"></div></div><div class="tutorial_shadow"></div>');
+            $('body').append('<div class="tutorial tutorial_2"><h2>' + __('Workers') + '</h2><p class="tutorial_text">' +
+                __('Your first worker is free. Click on the <b>Worker</b> tab to buy your first cart.') +
+                '</p><div class="button next_tutorial button_green">Got it</div></div><div class="tutorial_shadow"></div>');
         }
-        if (user.tutorial == 2) {
+        if (user.tutorial == 2 && user.total_prestige_gold > 25) {
             $('.section-main, .section-side#upgrades').css('opacity', 1);
             var top = $('.flavor.main_container').offset().top;
-            $('body').append('<div class="tutorial tutorial_3" style="top: ' + top + 'px;"><h2>' + __('Almost done! Customize here') + '</h2><p class="tutorial_text">' +
-                __('Choose your <b>favourite flavours and add-ons</b> as you unlock them. If you want to see more than your top 5 click Expand.') +
+            $('body').append('<div class="tutorial tutorial_3" style="top: ' + top + 'px;"><h2>' + __('Unlock flavours to sell') + '</h2><p class="tutorial_text">' +
+                __('Choose your <b>favourite flavours and add-ons</b> and your workers will sell them for more money. If you want to see more than your top 5 click Expand.') +
                 '</p><div class="button next_tutorial button_green">Ok cool</div><div class="triangle-left"></div></div><div class="tutorial_shadow"></div>');
         }
-        if (user.total_gold > 50 && user.tutorial == 3) {
-            $('body').append('<div class="tutorial tutorial_4"><h2>' + __('Buy All The Things!') + '</h2>' +
-            'Research <b>powerful upgrades</b> for your Ice Cream here. Hire workers, or get upgrades.<div class="button next_tutorial button_green">' + __("Let's Start") + 
+        if (user.total_prestige_gold > 500 && user.tutorial == 3) {
+            $('body').append('<div class="tutorial tutorial_4"><h2>' + __('Combine all the things!') + '</h2>' +
+            'Mix and match your flavours and addons to unlock combos which sell for more.<div class="button next_tutorial button_green">' + __("Got it") +
             '</div><div class="triangle-right"></div></div><div class="tutorial_shadow"></div>');
         }
-        if (user.total_gold > 500 && user.tutorial == 4) {
+        if (user.total_prestige_gold > 5000 && user.tutorial == 4) {
             $('body').append('<div class="tutorial tutorial_6"><h2>' + __('Connect your Facebook') + '</h2>' +
             __('Secure your account and find friends that play Ice Cream Stand!<br>') +
             '<div class="clearfix"></div><br><div class="button next_tutorial">' + __('No thanks') + '</div><a class="button next_tutorial button_facebook" href="/auth/facebook"><i class="fa fa-facebook"></i> Connect</a>' +
             '</div><div class="tutorial_shadow"></div>');
             
         }
-        if (user.total_gold > 500000 && user.tutorial == 5) {
+        if (user.total_prestige_gold > 500000 && user.tutorial == 5) {
              $('body').append('<div class="tutorial tutorial_6"><h2>' + __('Support Ice Cream Stand') + '</h2>' +
              __('Please help keep Ice Cream Stand free and awesome, <b>support us by donating</b> and earn cosmetic rewards.') +
              '<div class="clearfix"></div><div class="button next_tutorial">' + __('No thanks') + '</div><div x-link="donate" class="button next_tutorial">' +
               __('Support the game') + '</div></div><div class="tutorial_shadow"></div>');
         }
-        if (user.total_gold > 5000000 && user.tutorial == 6) {
+        if (user.total_prestige_gold > 5000000 && user.tutorial == 6) {
             $('body').append('<div class="tutorial tutorial_5"><h2>' + __('Sharing is caring') + '</h2>' +
             __('If you enjoy Ice Cream Stand <b>please tell your friends</b>. Any time someone you invite completes a quest, you earn money!') +
             '<div class="clearfix"></div><div class="button next_tutorial button_red">' + __('No thanks') + 

@@ -39,23 +39,27 @@
     },
     "shoes_cowboy": {
         "type": "shoes",
-        "rarity": "common"
+        "rarity": "common",
+        "cost": 100000
     },
     "tutu_pink": {
         "type": "tutu",
         "int": 1,
         "con": 1,
-        "rarity": "rare"
+        "rarity": "rare",
+        "cost": 200000
     },
     "hat_afro": {
         "type": "hat",
         "str": 2,
-        "rarity": "rare"
+        "rarity": "rare",
+        "cost": 200000
     },
     "hat_fedora": {
         "type": "hat",
         "int": -1,
-        "rarity": "uncommon"
+        "rarity": "uncommon",
+        "cost": 50000
     },
     "hat_horns": {
         "type": "hat",
@@ -65,17 +69,20 @@
     "accessory_lei": {
         "type": "accessory",
         "con": 1,
-        "rarity": "uncommon"
+        "rarity": "uncommon",
+        "cost": 50000
     },
     "skirt_grass": {
         "type": "skirt",
         "int": 1,
-        "rarity": "uncommon"
+        "rarity": "uncommon",
+        "cost": 50000
     },
     "accessory_coconut": {
         "type": "accessory",
         "str": 1,
-        "rarity": "uncommon"
+        "rarity": "uncommon",
+        "cost": 50000
     },
     "hat_jester": {
         "type": "hat",
@@ -141,25 +148,29 @@
         "type": "hat",
         "int": 2,
         "con": 2,
-        "rarity": "rare"
+        "rarity": "rare",
+        "cost": 150000
     },
     "hat_winter": {
         "type": "winter",
         "int": 2,
         "con": 2,
-        "rarity": "rare"
+        "rarity": "rare",
+        "cost": 150000
     },
     "accessory_winter": {
         "type": "accessory",
         "con": 2,
         "str": 2,
-        "rarity": "rare"
+        "rarity": "rare",
+        "cost": 150000
     },
     "coat_canada": {
         "type": "coat",
         "con": 2,
         "str": 2,
-        "rarity": "rare"
+        "rarity": "rare",
+        "cost": 150000
     },
     "digital": {
         "type": "skin",

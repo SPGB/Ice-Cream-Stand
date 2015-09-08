@@ -39,26 +39,18 @@ function sell_icecream(amount, workers) {
             a: amount,
             ds: is_deep_sleep,
             v: version,
+            fi: cached_flavor_index,
             dsq: cache_worker_sales_to_send //sleeping queue
         });
         if (cache_worker_sales_to_send > 0) cache_worker_sales_to_send = 0;
-    } else {
-        console.log('ice cream sale (' + amount + ')');
-        socket.emit('sell', {
-            g: user.gold,
-            d: cached_worker_total,
-            a: amount,
-            addon: cached_addon_value,
-            ta: (trending_addon == user.last_addon),
-            c: (cache_combo)? cache_combo.value : 'false',
-            e: cached_expertise,
-            t: trending_bonus,
-            cbv: cached_flavor_value,
-            cone: cached_cone_value,
-            fp: cached_flavor_index,
-            ds: is_deep_sleep,
-            v: version,
-        });
+
+        if (cached_flavor_index > -1) {
+            user.flavors_sold[cached_flavor_index] = parseInt(user.flavors_sold[cached_flavor_index]) + Math.ceil(cached_worker_total * 0.5);
+            update_expertise(function () {
+                Icecream.update_quest_bar();
+            });
+            Icecream.update_quest_bar();
+        }
     }
 }
 
@@ -79,7 +71,7 @@ function flavour_switch( id ) {
             }
             update_sell_value('main base');
             init_canvas();
-        } else {
+        } else if ( user.flavors.indexOf(id) > -1 ){
             user.last_flavor = id;
             user.last_frankenflavour = null;
             $.ajax({

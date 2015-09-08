@@ -17,7 +17,6 @@ $ ->
                 toast('<p>Your inventory is full</p>', 'Inventory Full')
             else
                 toast('<p>Success! You have purchased <b class="tooltip" x-type="item" x-name="' + item + '">' + item.replace(/_/g, ' - ') + '</b> for ' + cow.name + '.</p>', 'Purchased')
-            return
 
         if is_skin && cow.skins_unlocked && cow.skins_unlocked.indexOf(item) > -1
             return toast '<p>You already own the <b>' + item + '</b> cow skin.</p>', 'Already own'
@@ -48,7 +47,7 @@ $ ->
                     main()
                     return alert('<p>Success! You have unlocked a new badge.</p>', 'Badge Unlocked')
 
-                cow = j
+                Icecream.set_cow j
                 cow_redraw()
                 main()
         }

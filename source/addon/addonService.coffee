@@ -16,7 +16,6 @@ angular.module('ics')
           name = addon.name.replace /\s+/g, ''
           addon.image = image_prepend + '/addons/thumb/' + name + '.png.gz'
           topping_index = user.toppings.indexOf String(addon._id)
-          console.log addon.name, topping_index
           if topping_index is -1
             vm.addons_locked.push addon
           else

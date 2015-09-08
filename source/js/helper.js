@@ -1,3 +1,6 @@
+buff_copy = {
+    'Daily Bonus': 'Gives a % bonus starting at 1% to worker production. Increases by 1 for being active every day up to 100. Resets to 1 after being away for more than a day.'
+}
 function lazy_load(image) {
     var xsrc = $(image).attr('x-src');
     if (typeof xsrc !== 'undefined') {
@@ -6,23 +9,28 @@ function lazy_load(image) {
     }
 }
 function get_cost(x, type) {
-    if (type == 'cart' && x == 0) return 0;
-    if (type == 'cart') return 25 + (Math.pow(x, 2) / 4);
-    if (type == 'employee') return 150 + (x * 100);
-    if (type == 'truck') return 1000 + (x * x * 50);
-    if (type == 'robot') return 5000 + (x * x * 100);
-    if (type == 'rocket') return 50000 + (x * x * 500);
-    if (type == 'alien') return 500000+(30 * Math.pow(x,2.5));
-    if (type == 'cow-centaur') return 900000+(30 * Math.pow(x,3));
-    if (type == 'autopilot') return (250 * (x+1) * (x+1)) + Math.pow(1.05, x*2);
-    if (type == 'coldhands') return 250 * Math.pow(x*2,1.6);
-    if (type == 'silo') return 500000+(30 * Math.pow(x,6));
+    if (type == 'carts' && x == 0) return 0;
+    if (type == 'carts') return 25 + (Math.pow(x, 2) / 4);
+    if (type == 'employees') return 150 + (x * 100);
+    if (type == 'trucks') return 1000 + (x * x * 50);
+    if (type == 'robots') return 5000 + (x * x * 100);
+    if (type == 'rockets') return 50000 + (x * x * 500);
+    if (type == 'aliens') return 500000+(30 * Math.pow(x,2.5));
+    if (type == 'cow-centaurs') return 900000+(30 * Math.pow(x,3));
+    if (type == 'upgrade_autopilot') return Math.floor((250 * (x+1) * (x+1)) + Math.pow(1.05, x*2));
+    if (type == 'upgrade_coldhands') return Math.floor(250 * Math.pow(x*2,1.6));
+    if (type == 'upgrade_machinery') return Math.floor(15000 + (x * 150000));
+    if (type == 'upgrade_silo') return Math.floor(500000+(30 * Math.pow(x,6)));
+    0
 }
-
-function buff_add(buff, text) {
+function buff_description(name) {
+    return buff_copy[name];
+}
+function buff_add(buff, text, bonus) {
     if (cache_buffs.indexOf(buff) !== -1) return;
+    if (!bonus) bonus = '';
     cache_buffs.push(buff);
-    $('.buff_container').append('<div class="buff tooltip" x-type="buff" x-id="' + buff + '" x-hover-text="' + text + '"></div>');
+    $('.buff_container').append('<div class="buff tooltip" x-type="buff" x-id="' + buff + '" x-hover-text="' + text + '">' + bonus + '</div>');
 }
 function buff_remove(buff) {
     if (cache_buffs.indexOf(buff) == -1) return;

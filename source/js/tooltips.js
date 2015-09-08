@@ -64,7 +64,7 @@ function bind_tooltips() {
             var ipm_from_worker = sales_modifier * cached_worker_value;
             $('.hovercard').html('<div class="hover_title">' + __('Alien') + '<span class="level">' + user.aliens + '</span></div><p>' +
                  __('Automatically sells 15 ice cream every') + ' ' + (5 - (user.upgrade_machinery*0.25)) + ' seconds. You earn $' + numberWithCommas( Math.floor(ipm_from_worker)) + ' from aliens every minute.</p><p class="flavor_text">Workers sell your top row. Can be leveled up to 1000. Unlocks after you have 200 Rockets.</p>');
-        } else if (xtype == 'machine') {
+        } else if (xtype == 'machinery') {
             $('.hovercard').html('<div class="hover_title">' + __('Machinery') + '<span class="level">' + user.upgrade_machinery + '</span></div><p>Increases the speed that your workers make ice cream. Currently it takes them ' + (5 - (user.upgrade_machinery*0.25)) + ' seconds, level up to decrease it by .25s</p>');
         } else if (xtype == 'research') {
             $('.hovercard').html('<div class="hover_title">' + __('Flavor research') + '<span class="level">' + user.upgrade_flavor + '</span></div><p>Each level unlocks 3 new flavors of ice cream</p>');
@@ -140,7 +140,7 @@ function bind_tooltips() {
         } else if (xtype == 'autopilot') {
             $('.hovercard').html('<div class="hover_title">' + __('Autopilot') + '<span class="level">' + user.upgrade_autopilot + '</span></div><p>automatically sells your active flavor for you. Selling once every 10 seconds per level of autopilot.</p><p>It can be leveled up to 250.</p>');
         } else if (xtype === 'coldhands') {
-            $('.hovercard').html('<div class="hover_title">' + __('Cold Hands') + '<span class="level">' + user.upgrade_coldhands + '</span></div><p>Clicking a Scoopling sells an additional 0.25 Ice cream.</p><p>It can be leveled up to 1000.</p>');
+            $('.hovercard').html('<div class="hover_title">' + __('Cold Hands') + '<span class="level">' + user.upgrade_coldhands + '</span></div><p>Allows you to purchase 2 additional workers.</p><p>It can be leveled up to 1000.</p>');
         } else if (xtype === 'shop') {
             $('.hovercard').html('<div class="hover_title">' + __('The Bovine Boutique') + '</div><p>Buy powerful items for your cow, flavours, add-ons, workers, and upgrades.</p>');
         } else if (xtype === 'cone') {

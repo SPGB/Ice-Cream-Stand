@@ -116,7 +116,7 @@ function first_time_init() {
         if (is_deep_sleep) return;
         //Icecream.sync_messages();
         Icecream.update_trending();
-        Icecream.update_flavors();
+        Icecream.update_flavors(100, true);
         Icecream.cloud( Math.random() * 3 );
         setTimeout(function () {
           Icecream.cloud( Math.random() * 3 );  
@@ -127,7 +127,7 @@ function first_time_init() {
     Icecream.sync_friends();
     setTimeout(function () {
         Icecream.update_trending();
-        Icecream.update_flavors();
+        Icecream.update_flavors(5);
         Icecream.sync_chat();
         Icecream.sync_cow();
         Icecream.cloud( Math.random() * 2 );
@@ -255,13 +255,16 @@ function me_callback(j, update_type, callback) {
     } else if (j.is_auto_daynight && new Date().getHours() > 20) {
         $('body:not(.night)').addClass('night');
     }
-    if (!j.last_icecube_at && j.total_gold < 100) j.last_icecube_at = new Date();
-    buff_remove('firstwin');
-    cache_first_win_avail = false;
-    if (!j.last_icecube_at || new Date() - new Date(j.last_icecube_at) > 1000 * 60 * 60 * 24 ) {
-            cache_first_win_avail = true;
-            buff_add('firstwin', 'Daily x2 Ice Cube Bonus available');
+
+    for (var i = 0; i < user.buffs.length; i++) {
+        var buff = user.buffs[i].split('/');
+        var buff_date = new Date(buff[1]);
+        var modifier = (buff.length === 3)? buff[2] : '';
+        buff_remove( buff[0] );
+
+        buff_add(buff[0], buff_description(buff[0]) +  '<br><small>Expires: ' + String(buff_date).split(' ').slice(0, 4).join(' ') + '</small>', modifier);
     }
+
     $('.friend_gold').remove();
     if (j.friend_gold) {
         $('.floating_footer').append('<div class="friend_gold"><span class="money_icon is_white">' + numberWithCommas( (j.friend_gold).toFixed(0) ) + '</span><img src="' + image_prepend + '/moneybag.png" id="moneybag" /></div>');
@@ -271,7 +274,8 @@ function me_callback(j, update_type, callback) {
     if (first_time) {
         first_time_init();
     }
-
+    $('.silo_bar').css('height', user.silo_hay / (175 + (25 * user.upgrade_silo_hay)) / 0.01 );
+    
     if (update_type && (update_type === 'badges')) {
                 $('.badge_inner .individual_badge').remove();
                 if (user.badges) {
@@ -340,11 +344,12 @@ function me_callback(j, update_type, callback) {
     get_prestige_bonus(user);  
 
     if (update_type && (update_type === 'carts' || update_type === 'employees' || update_type === 'trucks' || 
-                update_type === 'robots' || update_type === 'rockets' || update_type === 'aliens' || update_type === 'repaint' )) {
-                Icecream.update_worker_fx('main workers');
-                update_sell_value('bought worker');
-                if (callback && typeof callback === 'function') callback();
-                return;
+        update_type === 'robots' || update_type === 'rockets' || update_type === 'aliens' || update_type === 'repaint' )) {
+            Icecream.update_worker_fx('main workers');
+            update_sell_value('bought worker');
+            if (user.quests.length == 0) Icecream.get_quest();
+            if (callback && typeof callback === 'function') callback();
+            return;
     }
     if (update_type && (update_type === 'quest')) {
         console.log('getting quests...');
@@ -358,26 +363,14 @@ function me_callback(j, update_type, callback) {
 function update_worker_tiers() {
 
     sales_per = user.carts + (user.employees*2) + (user.trucks*3) + (user.robots*5) + (user.rockets*10) + (user.aliens*15) ;
-    $('#unlock_machine').attr('x-cost', (15000 + (user.upgrade_machinery * 150000)) );
-    $('#unlock_machine .cost').text(numberWithCommas(15000 + (user.upgrade_machinery * 150000)));
-    $('#unlock_machine .sale_level').text(user.upgrade_machinery);
 
-    var flavour_res_cost = 50 + (user.upgrade_flavor * user.upgrade_flavor * 100);
-    $('#unlock_research').attr('x-cost', flavour_res_cost).find('.cost').text(numberWithCommas( flavour_res_cost));
-
-    var addon_res_cost = 75 + (user.upgrade_addon * user.upgrade_addon * 100);
-    $('#unlock_addon').attr('x-cost', addon_res_cost).find('.cost').text(numberWithCommas( addon_res_cost ));
-
-    var heroic_cost = 1000000 + (3000000 * user.upgrade_heroic);
-    $('#unlock_heroic').attr('x-cost', heroic_cost).find('.cost').text(numberWithCommas( heroic_cost )); 
-
-    var legendary_cost = 50000000 + (100000000 * user.upgrade_legendary);
-    $('#unlock_legendary').attr('x-cost', legendary_cost).find('.cost').text(numberWithCommas( legendary_cost)); 
-
-    $('#unlock_autopilot .unlock_text .cost')[0].textContent = numberWithCommas( Math.floor(get_cost(user.upgrade_autopilot, 'autopilot')) );
-    $('#unlock_autopilot .sale_level').text(user.upgrade_autopilot);
-    $('#unlock_coldhands .unlock_text .cost')[0].textContent = numberWithCommas(  Math.floor(get_cost(user.upgrade_coldhands, 'coldhands')) );
-    $('#unlock_coldhands .sale_level').text(user.upgrade_coldhands);
+    // $('#unlock_machine').attr('x-cost', (15000 + (user.upgrade_machinery * 150000)) );
+    // $('#unlock_machine .cost').text(numberWithCommas(15000 + (user.upgrade_machinery * 150000)));
+    // $('#unlock_machine .sale_level').text(user.upgrade_machinery);
+    // $('#unlock_autopilot .unlock_text .cost')[0].textContent = numberWithCommas( Math.floor(get_cost(user.upgrade_autopilot, 'autopilot')) );
+    // $('#unlock_autopilot .sale_level').text(user.upgrade_autopilot);
+    // $('#unlock_coldhands .unlock_text .cost')[0].textContent = numberWithCommas(  Math.floor(get_cost(user.upgrade_coldhands, 'coldhands')) );
+    // $('#unlock_coldhands .sale_level').text(user.upgrade_coldhands);
 
     $('.employees_inner .unlockable').each(function () {
         var worker = $(this).attr('x-worker');

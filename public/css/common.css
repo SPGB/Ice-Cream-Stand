@@ -2107,7 +2107,6 @@ h3#upgrades_text {
 .unlock_text {
   display: inline-block;
   font-weight: bold;
-  padding-top: 13px;
   position: relative;
   text-align: left;
   text-transform: capitalize;
@@ -2500,8 +2499,12 @@ h3#upgrades_text {
   background-color: rgba(0, 0, 0, 0.25); }
 
 .tutorial_0 {
-  left: 23%;
-  top: 316px; }
+  left: 18%;
+  bottom: 150px;
+  z-index: 5; }
+
+.tutorial_0 .triangle-down {
+  border-top: 15px solid #fff; }
 
 .tut_ice_cube {
   background-image: url("http://static.icecreamstand.ca/scoopling_spritesheet.png");
@@ -2565,10 +2568,9 @@ h3#upgrades_text {
   padding: 20px; }
 
 .quest_default {
-  background-image: url("http://static.icecreamstand.ca/scoopling_spritesheet.png");
-  background-position: -180px bottom;
+  background-image: url("http://static.icecreamstand.ca/cart_thumb.png");
   background-repeat: no-repeat;
-  background-size: auto auto;
+  background-position: middle bottom;
   color: #404040;
   font-weight: bold;
   height: 110px;
@@ -4635,7 +4637,7 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
   display: inline-block;
   cursor: pointer;
   background-color: #9f9de7;
-  padding: 5px 10px;
+  padding: 10px 15px;
   color: #fff;
   font-weight: bold;
   font-size: 14px;
@@ -4692,7 +4694,8 @@ body[x-rand="true"] .inventory_slot[x-item="dress_lace"] img {
 
 .shop_table {
   width: 100%;
-  text-align: left; }
+  text-align: left;
+  padding: 20px 0; }
 
 .shop_table .unlockable {
   width: 48%;
@@ -5277,10 +5280,12 @@ body[x-epic="aoc"] .aoc_log {
   background-size: 30px 30px;
   margin-left: 10px;
   border: 1px solid #888;
-  border-radius: 2px; }
+  border-radius: 2px;
+  vertical-align: top; }
 
-.buff[x-id="firstwin"] {
-  background-image: url("http://static.icecreamstand.ca/buff/daily.png"); }
+.buff[x-id="Daily Bonus"] {
+  background-image: url("http://static.icecreamstand.ca/heroic_thumb.png");
+  background-color: rgba(0, 0, 0, 0.25); }
 
 .buff[x-id="event"] {
   background-image: url("http://static.icecreamstand.ca/buff/event.png"); }
@@ -5664,6 +5669,7 @@ body[x-epic="aoc"] .aoc_log {
   right: 20px;
   z-index: 4;
   max-width: 960px;
+  width: 100%;
   -webkit-transform: translateX(-50%);
       -ms-transform: translateX(-50%);
           transform: translateX(-50%);
@@ -5711,6 +5717,17 @@ body[x-epic="aoc"] .aoc_log {
   box-shadow: none;
   color: #404040;
   font-size: 12px; }
+
+.interval, .cost {
+  color: #888;
+  font-weight: normal; }
+
+.button.prestige_cancel {
+  background-image: none;
+  box-shadow: 0 2px 0 #404040; }
+
+.worker_locked {
+  opacity: 0.25; }
 
 /* RESPONSIVE */
 @media all and (min-width: 1921px) {

@@ -696,7 +696,7 @@ io.on('connection', function ( socket ) {
   	socket.on('sell/worker', function(post){
 		if (!post.v || parseFloat(post.v) < 1.45) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Please update to the latest version.' });
 
-		User.findOne({ _id: socket.handshake.query.id }).select('socket_id updated_at gold total_gold total_prestige_gold today_gold week_gold upgrade_machinery').exec(function (err, u) {
+		User.findOne({ _id: socket.handshake.query.id }).select('buffs upgrade_coldhands employees carts trucks robots rockets aliens socket_id updated_at gold total_gold total_prestige_gold today_gold week_gold upgrade_machinery flavors_sold').exec(function (err, u) {
 			if (!u || err) return io.sockets.connected[ socket.id ].emit("alert", { error: 'Please log in.' });
 			if (u.socket_id != socket.id) {
 				if (u.socket_id && io.sockets.connected[ u.socket_id ]) {
@@ -704,8 +704,9 @@ io.on('connection', function ( socket ) {
 				}
 				u.socket_id = socket.id;
 				console.log(socket.handshake.query.name + ' socket id mismatch >:( ');
-			} 
-			var amount = parseInt(post.a);
+			}
+      var amount = parseInt(post.a);
+			var cached_flavor_index = parseInt(post.fi);
 			var infer_amount = parseFloat(post.d); //post.d is the average ice cream flavor value
 			var infer_sleep_amount = parseFloat(post.dsq); //post.d is the average ice cream flavor value
 			if (!infer_sleep_amount) infer_sleep_amount = 0;
@@ -714,7 +715,47 @@ io.on('connection', function ( socket ) {
 			if (post.ds =='true') { infer_change = infer_change * 30; } //deep sleep
 			if (!u.total_prestige_gold) u.total_prestige_gold = 0;
 
+      worker_cap = 1000 + ((u.upgrade_coldhands || 0) * 2);
+
+      if (Number(u.carts) > worker_cap || Number(u.employees) > worker_cap || Number(u.trucks) > worker_cap || 
+        Number(u.robots) > worker_cap || Number(u.rockets) > worker_cap || Number(u.aliens) > worker_cap) {
+        console.log("MAX", socket.handshake.query.name, u.employees, worker_cap);
+        return io.sockets.connected[ socket.id ].emit("alert", { error: 'Too many workers' });
+      }
+
+      last_online = new Date();
+      hasDailyBonus = false;
+      for (var i = 0; i < u.buffs.length; i++) {
+        var buff = u.buffs[i].split('/');
+        if (buff[0] === 'Daily Bonus') {
+          hasDailyBonus = true;
+          var buff_time = new Date( buff[1] );
+          var buff_delta = (last_online - buff_time) / 1000 / 60 / 60; //age in hours
+          if (buff_delta > 48) {
+            u.buffs.splice(i, 1);
+            u.markModified('buffs');
+          } else if (buff_delta > 24) {
+            buff[1] = last_online;
+            buff[2] = buff[2] + 1;
+            if (buff[2] > 100) buff[2] = 100;
+            u.buffs[i] = buff.join('/');
+            u.markModified('buffs');
+          }
+          break;
+        }
+      }
+
+      if (!hasDailyBonus) {
+        if (!u.buffs) u.buffs = [];
+        u.buffs.push('Daily Bonus/' + new Date() + '/1');
+        u.markModified('buffs');
+      }
+
 			u.gold = parseFloat(u.gold + infer_change).toFixed(2); //instead interfer the new gold total
+
+      u.flavors_sold[cached_flavor_index] = parseInt(u.flavors_sold[cached_flavor_index]) + Math.ceil(infer_amount * 0.5);
+      u.markModified('flavors_sold');
+
 			u.total_gold += infer_change;
 			u.total_prestige_gold += infer_change;
 			if (u.gold > u.total_prestige_gold) u.total_prestige_gold = u.gold;
@@ -724,7 +765,7 @@ io.on('connection', function ( socket ) {
 			u.save(function (err) {
 				if (err) console.log(socket.handshake.query + ': cant update user, err: ' + err);
 			});
-			if (io.sockets.connected[ socket.id ]) io.sockets.connected[ socket.id ].emit("update", { gold: u.gold });
+			if (io.sockets.connected[ socket.id ]) io.sockets.connected[ socket.id ].emit("update", { gold: u.gold, sold: u.flavors_sold[cached_flavor_index] });
 		});
 
 	});

@@ -3,7 +3,7 @@
     .message_close(ng-click="toggleShop(false)")
       i.fa.fa-times
   .shop_nab.button_container
-    .shop__tab(ng-repeat="tab in shopTabs" x-area='shop_tab_{{tab}}' x-type='shop' ng-bind="tab" ng-click="setTab(tab)" ng-class="{ 'active': activeTab == tab }")
+    .shop__tab(ng-repeat="tab in shopTabs" x-area='shop_tab_{{tab.title}}' x-type='shop' ng-bind="tab.title" ng-click="setTab(tab.title, tab.paged)" ng-class="{ 'active': activeTab == tab.title }")
     input.shop__search(placeholder="Search" ng-model="query.title")
   .clearfix
 
@@ -21,7 +21,7 @@
           span.money_icon.is_white(ng-bind="item.cost | number_commas")
 
   .shop_table.align_center(ng-show="activeTab == 'skins'")
-    .card(ng-repeat="item in skins | startFrom:currentPage*pageSize | limitTo: pageSize | filter: query")
+    .card(ng-repeat="item in skins | startFrom:currentPage*pageSize | limitTo: pageSize | filter: query" ng-class="{'skin--unlocked': cow.skins_unlocked.indexOf(item.title) > -1}")
       .card__image
         img.tooltip.inventory_thumb(
         ng-src="https://s3.amazonaws.com/icecreamstand.com/skins/{{item.title | item_image}}.png"
@@ -29,12 +29,16 @@
         x-type="skin")
       .card__label
         | {{ item.title | item_name }}
-        br
-        .shop_button.button(x-cost="{{item.cost}}" x-item="{{item.title}}" ng-if="item.cost")
-          span.money_icon.is_white(ng-bind="item.cost | number_commas")
-        .shop_button.button.button--gray(ng-if="item.note") {{item.note}}
-        .shop_button.button.button--gray(ng-if="item.match-expertise") Requires level 15 expertise with {{item.match-expertise}}
-        .shop_button.button.button--gray(ng-if="item.match-item") Requires the item: {{item.match-item}}
+
+        .shop__button__container(ng-if="cow.skins_unlocked.indexOf(item.title) !== -1")
+          .shop_button.button.button--gray Unlocked!
+
+        .shop__button__container(ng-if="cow.skins_unlocked.indexOf(item.title) === -1")
+          .shop_button.button(x-cost="{{item.cost}}" x-item="{{item.title}}" ng-if="item.cost")
+            span.money_icon.is_white(ng-bind="item.cost | number_commas")
+          .shop_button.button.button--gray(ng-if="item.note" ng-bind="item.note")
+          .shop_button.button.button--gray(ng-if="item.match-expertise") Requires level 15 expertise with a flavour
+          .shop_button.button.button--gray(ng-if="item.match-item") Requires an item
 
   .shop_table.align_center(ng-show="activeTab == 'badges'")
     .card(ng-repeat="item in badges | startFrom:currentPage*pageSize | limitTo: pageSize | filter: query")
@@ -57,45 +61,51 @@
     p.empty(ng-if="flavours_locked.length === 0") All flavours unlocked
 
   .shop_table(ng-show="activeTab == 'add-on'")
-    .unlockable(ng-repeat="addons in addons_locked | orderBy:'cost' | limitTo:6" class="unlockable" x-cost="{{flavour.cost}}" x-id="{{flavour._id}}" x-new="true" x-type="base")
+    .unlockable(ng-repeat="addons in addons_locked | orderBy:'cost' | limitTo:6" class="unlockable" x-cost="{{addons.cost}}" x-id="{{addons._id}}" x-new="true" x-type="addon")
       img.tooltip(ng-src="{{addons.image}}")
       .unlock_text {{addons.name}}
         span.cost {{addons.cost | number:0}}
-      button(ng-click="purchase('addons', addons)") Unlock
+      button(ng-click="purchase('addon', addons)") Unlock
     p.empty(ng-if="addons_locked.length === 0") All add-ons unlocked
 
   .shop_table(ng-show="activeTab == 'worker'")
-    .unlockable(ng-repeat="worker in workerTiers" id="unlock_cart" x-worker="{{worker}}" x-type="sales_cart")
-      img.tooltip(ng-src="http://static.icecreamstand.ca/{{worker}}_thumb.png" x-type="sales_{{worker}}")
+    .unlockable(ng-repeat="worker in workerTiers" id="unlock_{{worker.title}}" x-worker="{{worker.title}}" x-type="sales_{{worker.title}}" ng-class="{ 'worker_locked' : !worker_requirements(worker.requirement) }")
+      img.tooltip(ng-src="http://static.icecreamstand.ca/{{worker.title}}_thumb.png" x-type="sales_{{worker.title}}")
       .unlock_text
-        span.lang {{worker}}
-        span.cost {{get_cost(worker) | number_commas}}
-      .sale_level
+        .lang(ng-bind="worker.title")
+        .cost(ng-bind="get_cost(worker.title+'s')[0] | number_commas")
+        .interval(ng-bind="'x' + get_cost(worker.title+'s')[1] | number_commas")
+      .sale_level(ng-bind="get_level(worker.title) | number_commas")
       .shop__button__container
-        button.worker_increment(x-amount="1") +1
-        button.worker_increment(x-amount="10") +10
-        button.worker_increment.lang(x-amount="1000") Max
+        button.worker_increment(x-amount="1" ng-mouseover="worker_interval(1)" ng-click="worker_buy(worker.title, 1)") +1
+        button.worker_increment(x-amount="10" ng-mouseover="worker_interval(10)" ng-click="worker_buy(worker.title, 10)") +10
+        button.worker_increment.lang(x-amount="1000" ng-mouseover="worker_interval(1000)" ng-click="worker_buy(worker.title, 1000)") Max
 
   .shop_table(ng-show="activeTab == 'cone'")
-    .unlockable(ng-repeat="cone in cones | orderBy:'cost' | limitTo:3" class="unlockable" x-cost="{{cone.cost}}" x-id="{{cone._id}}" x-new="true" x-type="base")
+    .unlockable(ng-repeat="cone in cones | orderBy:'cost'" class="unlockable" x-cost="{{cone.cost}}" x-id="{{cone.name}}" x-new="true" x-type="cone")
       img.tooltip(ng-src="http://static.icecreamstand.ca/cones/thumb/{{cone.name}}.png.gz")
       .unlock_text {{cone.name}}
         span.cost {{cone.cost | number:0}}
       button(ng-click="purchase('cone', cone)") Unlock
 
   .shop_table(ng-show="activeTab == 'upgrade'")
-    .unlockable(ng-repeat="worker in upgrades" id="unlock_cart" x-worker="{{worker}}" x-type="sales_cart")
-      img.tooltip(ng-src="http://static.icecreamstand.ca/{{worker}}_thumb.png" x-type="sales_{{worker}}")
+    .unlockable(ng-repeat="worker in upgrades" id="unlock_cart" x-type="{{worker.title}}")
+      img.tooltip(ng-src="{{worker.image}}" x-type="{{worker.title}}" ng-if="worker.image")
       .unlock_text
-        span.lang {{worker}}
-        span.cost {{get_cost(user[worker], worker)}}
-      .sale_level
-      .shop__button__container
-        button.worker_increment( x-amount="1") +1
-        button.worker_increment(x-amount="10") +10
-        button.worker_increment.lang(x-amount="1000") Max
+        .lang(ng-bind="worker.title")
+        .unlock__text__details(ng-if="worker.title != 'prestige'")
+          .cost(ng-bind="get_cost('upgrade_' + worker.title)[0] | number_commas")
+          .interval(ng-bind="'x' + get_cost('upgrade_' + worker.title)[1] | number_commas")
+      .sale_level(ng-bind="get_upgrade('upgrade_' + worker.title)")
+      .shop__button__container(ng-if="worker.isMultiUnlocks")
+        button.worker_increment( x-amount="1" ng-mouseover="worker_interval(1)" ng-click="worker_buy(worker.title, 1)") +1
+        button.worker_increment(x-amount="10" ng-mouseover="worker_interval(10)" ng-click="worker_buy(worker.title, 10)") +10
+        button.worker_increment.lang(x-amount="1000" ng-mouseover="worker_interval(100)" ng-click="worker_buy(worker.title, 100)") Max
+      .shop__button__container(ng-if="!worker.isMultiUnlocks")
+        .button.prestige_button.lang Unlock
 
-  .shop_page_container
+
+  .shop_page_container(ng-show="isPaged")
     .filter_prev.button(ng-click="shop_paginate(-1)")
       i.fa.fa-arrow-left
     .shop_page_container__current Page {{currentPage + 1}}
